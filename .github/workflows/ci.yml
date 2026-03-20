@@ -36,7 +36,7 @@ jobs:
         run: mvn -B clean package -DskipTests
         working-directory: backend
 
-      - name: Run backend tests
+      - name: Run backend tests with coverage
         run: mvn -B test
         working-directory: backend
 
@@ -47,8 +47,15 @@ jobs:
           name: backend-test-results
           path: backend/target/surefire-reports/
 
+      - name: Upload JaCoCo coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: backend/target/site/jacoco/
+
   frontend-checks:
-    name: Frontend - Build & Lint
+    name: Frontend - Build, Lint & Test
     runs-on: ubuntu-latest
 
     steps:
@@ -60,23 +67,31 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Yarn
-        run: |
-          if ! command -v yarn &> /dev/null; then
-            npm install -g yarn
-          fi
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
         working-directory: frontend
 
       - name: Run ESLint
         run: yarn lint
         working-directory: frontend
 
-      - name: Run Prettier
-        run: yarn prettier --write .
+      - name: Run Prettier check
+        run: yarn prettier --check .
         working-directory: frontend
+
+      - name: Run tests with coverage
+        run: yarn test:coverage
+        working-directory: frontend
+
+      - name: Upload frontend coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage-report
+          path: frontend/coverage/
 
       - name: Build frontend
         run: yarn build
