@@ -14,7 +14,7 @@ RUN mvn clean package -DskipTests -q
 
 # ── Stage 2: Runtime ─────────────────────────────────────────────────────────
 # Lean Tomcat image — only the WAR and runtime, no build tools.
-FROM tomcat:10.1-jre21-temurin-alpine
+FROM tomcat:10.1-jre21-temurin-jammy
 
 # Remove default Tomcat apps to keep the image clean
 RUN rm -rf /usr/local/tomcat/webapps/*
