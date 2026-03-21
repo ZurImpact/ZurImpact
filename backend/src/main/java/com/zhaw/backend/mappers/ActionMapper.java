@@ -23,6 +23,8 @@ public final class ActionMapper {
                 .displayName(entity.getDisplayName())
                 .points(entity.getPoints())
                 .tags(toTagList(entity.getTags()))
+                .type(entity.getType())
+                .hasSubtasks(entity.getHasSubtasks())
                 .validUntil(entity.getValidUntil())
                 .createdOn(entity.getCreatedOn())
                 .build();
@@ -39,6 +41,8 @@ public final class ActionMapper {
                 .displayName(dto.getDisplayName())
                 .points(dto.getPoints())
                 .tags(toTagString(dto.getTags()))
+                .type(dto.getType())
+                .hasSubtasks(dto.getHasSubtasks())
                 .validUntil(dto.getValidUntil())
                 .createdOn(dto.getCreatedOn())
                 .build();

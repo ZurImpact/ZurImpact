@@ -18,6 +18,8 @@ public class ActionDto {
     private String displayName;
     private Integer points;
     private List<Tags> tags;
+    private String type;
+    private Boolean hasSubtasks;
     private LocalDateTime validUntil;
 
     private LocalDateTime createdOn;

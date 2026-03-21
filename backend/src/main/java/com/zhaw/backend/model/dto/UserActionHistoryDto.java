@@ -23,6 +23,8 @@ public class UserActionHistoryDto {
     private LocalDateTime validUntil;
     private LocalDateTime actionCreatedOn;
     private String completionState;
+    private Boolean isSubtask;
+    private String subactionId;
     private LocalDateTime mappingCreatedOn;
 }
 

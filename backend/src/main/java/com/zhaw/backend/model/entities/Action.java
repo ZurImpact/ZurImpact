@@ -31,6 +31,12 @@ public class Action {
     @Column(nullable = false)
     private String tags;
 
+    @Column
+    private String type;
+
+    @Column(name = "has_subtasks")
+    private Boolean hasSubtasks;
+
     @Column(name = "valid_until", nullable = false)
     private LocalDateTime validUntil;
 
