@@ -36,6 +36,8 @@ public class ActionDao {
         action.setDisplayName(rs.getString("display_name"));
         action.setPoints(rs.getInt("points"));
         action.setTags(rs.getString("tags"));
+        action.setType(rs.getString("type"));
+        action.setHasSubtasks(rs.getBoolean("has_subtasks"));
         action.setValidUntil(rs.getTimestamp("valid_until").toLocalDateTime());
         action.setCreatedOn(rs.getTimestamp("created_on").toLocalDateTime());
         return action;
@@ -53,6 +55,8 @@ public class ActionDao {
             .validUntil(rs.getTimestamp("valid_until").toLocalDateTime())
             .actionCreatedOn(rs.getTimestamp("action_created_on").toLocalDateTime())
             .completionState(rs.getString("completion_state"))
+            .isSubtask(rs.getBoolean("is_subtask"))
+            .subactionId(rs.getString("subaction_id"))
             .mappingCreatedOn(rs.getTimestamp("mapping_created_on").toLocalDateTime())
             .build();
 
@@ -63,7 +67,7 @@ public class ActionDao {
      */
     public List<Action> findAllFiltered(ActionFilterDto filter) {
         StringBuilder sql = new StringBuilder(
-                "SELECT id, description, display_name, points, tags, valid_until, created_on FROM action");
+                "SELECT id, description, display_name, points, tags, type, has_subtasks, valid_until, created_on FROM action");
         List<Object> params = new ArrayList<>();
         boolean hasWhere = false;
 
@@ -79,7 +83,7 @@ public class ActionDao {
 
     public Action findById(Long id){
         List<Action> actions = jdbc.query(
-                "SELECT id, description, display_name, points, tags, valid_until, created_on FROM action WHERE id = ?",
+                "SELECT id, description, display_name, points, tags, type, has_subtasks, valid_until, created_on FROM action WHERE id = ?",
                 ROW_MAPPER,
                 id);
         return actions.isEmpty() ? null : actions.get(0);
@@ -96,7 +100,7 @@ public class ActionDao {
         return jdbc.query(
                 "SELECT a.id AS action_id, a.description, a.display_name, a.points, a.tags, "
                         + "a.valid_until, a.created_on AS action_created_on, "
-                        + "uam.completion_state, uam.created_on AS mapping_created_on "
+                        + "uam.completion_state, uam.is_subtask, uam.subaction_id, uam.created_on AS mapping_created_on "
                         + "FROM user_action_mapping uam "
                         + "JOIN action a ON a.id = uam.action_id "
                         + "WHERE uam.user_id = ? "
@@ -109,12 +113,15 @@ public class ActionDao {
      * Starts an action for a user by inserting a new record in the user_action_mapping table with IN_PROGRESS state
      * @param userId id of the user for which the action should be started
      * @param actionId id of the action which should be started
+     * @param isSubtask if the action is a subtask
+     * @param subactionId id of the subtask
      * @return true if the action was successfully started, false otherwise
      */
-    public boolean startAction(Long userId, Long actionId) {
-        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on) " +
-                                "VALUES (?, ?, ?, ?)",
-                userId, actionId, CompletionState.IN_PROGRESS, Timestamp.valueOf(java.time.LocalDateTime.now()));
+    public boolean startAction(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
+        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subaction_id) " +
+                                "VALUES (?, ?, ?, ?, ?, ?)",
+                userId, actionId, CompletionState.IN_PROGRESS, Timestamp.valueOf(java.time.LocalDateTime.now()),
+                isSubtask != null && isSubtask, subactionId);
         return rows > 0;
     }
 
@@ -122,12 +129,15 @@ public class ActionDao {
      * Completes an action for a user by updating the corresponding record in the user_action_mapping table to COMPLETED state
      * @param userId id of the user for which the action should be completed
      * @param actionId id of the action which should be completed
+     * @param isSubtask if it is a subtask
+     * @param subactionId subtask id
      * @return true if the action was successfully completed, false otherwise
      */
-    public boolean completeAction(Long userId, Long actionId) {
-        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on)" +
-                                "VALUES(?,?,?,?)",
-                userId,actionId,CompletionState.COMPLETED,Timestamp.valueOf(java.time.LocalDateTime.now()));
+    public boolean completeAction(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
+        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subaction_id)" +
+                                "VALUES(?,?,?,?,?,?)",
+                userId,actionId,CompletionState.COMPLETED,Timestamp.valueOf(java.time.LocalDateTime.now()),
+                isSubtask != null && isSubtask, subactionId);
         return rows > 0;
     }
 

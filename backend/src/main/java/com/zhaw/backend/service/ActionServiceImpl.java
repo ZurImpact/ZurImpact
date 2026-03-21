@@ -67,8 +67,8 @@ public class ActionServiceImpl implements ActionService {
      * @return true if the action was successfully started, false if not (e.g. if the mapping already exists)
      */
     @Override
-    public boolean startActionForUser(Long userId, Long actionId) {
-        return actionDao.startAction(userId, actionId);
+    public boolean startActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
+        return actionDao.startAction(userId, actionId, isSubtask, subactionId);
     }
 
     /**
@@ -78,8 +78,8 @@ public class ActionServiceImpl implements ActionService {
      * @return true if the action was successfully completed, false if not (e.g. if the mapping does not exist or is already completed)
      */
     @Override
-    public boolean completeActionForUser(Long userId, Long actionId) {
-        return actionDao.completeAction(userId, actionId);
+    public boolean completeActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
+        return actionDao.completeAction(userId, actionId, isSubtask, subactionId);
     }
 
     @Override

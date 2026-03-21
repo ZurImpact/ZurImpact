@@ -34,6 +34,8 @@ class ActionMapperTest {
                 .displayName("display")
                 .points(12)
                 .tags("FOOD, DRINKS,, TRAVEL ")
+                .type("TYPE_STREET")
+                .hasSubtasks(true)
                 .validUntil(validUntil)
                 .createdOn(created)
                 .build();
@@ -46,6 +48,8 @@ class ActionMapperTest {
         assertEquals(entity.getDisplayName(), dto.getDisplayName());
         assertEquals(entity.getPoints(), dto.getPoints());
         assertEquals(List.of(Tags.FOOD, Tags.DRINKS, Tags.TRAVEL), dto.getTags());
+        assertEquals("TYPE_STREET", dto.getType());
+        assertTrue(dto.getHasSubtasks());
         assertEquals(entity.getValidUntil(), dto.getValidUntil());
         assertEquals(entity.getCreatedOn(), dto.getCreatedOn());
     }
@@ -61,6 +65,8 @@ class ActionMapperTest {
                 .displayName("display")
                 .points(20)
                 .tags(Arrays.asList(Tags.FOOD, null, Tags.DRINKS))
+                .type("TYPE_SHOP")
+                .hasSubtasks(false)
                 .validUntil(validUntil)
                 .createdOn(created)
                 .build();
@@ -73,6 +79,8 @@ class ActionMapperTest {
         assertEquals(dto.getDisplayName(), entity.getDisplayName());
         assertEquals(dto.getPoints(), entity.getPoints());
         assertEquals("FOOD,DRINKS", entity.getTags());
+        assertEquals("TYPE_SHOP", entity.getType());
+        assertFalse(entity.getHasSubtasks());
         assertEquals(dto.getValidUntil(), entity.getValidUntil());
         assertEquals(dto.getCreatedOn(), entity.getCreatedOn());
     }

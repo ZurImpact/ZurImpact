@@ -15,9 +15,9 @@ public interface ActionService {
 
     List<UserActionHistoryDto> getUserActions(Long UserId);
 
-    boolean startActionForUser(Long userId, Long actionId);
+    boolean startActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId);
 
-    boolean completeActionForUser(Long userId, Long actionId);
+    boolean completeActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId);
 
     boolean deleteActionForUser(Long userId, Long actionId);
 }

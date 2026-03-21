@@ -85,10 +85,14 @@ public class ActionController {
      * @return success or error
      */
     @PostMapping("/startAction")
-    public ResponseEntity<Void> startAction(@RequestParam(name = "userId") Long userId, @RequestParam(name = "actionId") Long actionId) {
+    public ResponseEntity<Void> startAction(
+            @RequestParam(name = "userId") Long userId,
+            @RequestParam(name = "actionId") Long actionId,
+            @RequestParam(name = "isSubtask", required = false) Boolean isSubtask,
+            @RequestParam(name = "subactionId", required = false) String subactionId) {
         try {
-            actionService.startActionForUser(userId, actionId);
-            logger.info("STARTED ACTION - userId: {}, actionId: {}", userId, actionId);
+            actionService.startActionForUser(userId, actionId, isSubtask, subactionId);
+            logger.info("STARTED ACTION - userId: {}, actionId: {}, isSubtask: {}, subactionId: {}", userId, actionId, isSubtask, subactionId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             logger.error("ERROR STARTING ACTION - userId: {}, actionId: {}, error: {}", userId, actionId, e.getMessage());
@@ -103,10 +107,14 @@ public class ActionController {
      * @return true if the action was successfully completed, false if not (e.g. if the mapping does not exist or is already completed)
      */
     @PostMapping("/completeAction")
-    public ResponseEntity<Void> completeAction(@RequestParam(name = "userId") Long userId, @RequestParam(name = "actionId") Long actionId) {
+    public ResponseEntity<Void> completeAction(
+            @RequestParam(name = "userId") Long userId,
+            @RequestParam(name = "actionId") Long actionId,
+            @RequestParam(name = "isSubtask", required = false) Boolean isSubtask,
+            @RequestParam(name = "subactionId", required = false) String subactionId) {
         try {
-            actionService.completeActionForUser(userId, actionId);
-            logger.info("COMPLETED ACTION - userId: {}, actionId: {}", userId, actionId);
+            actionService.completeActionForUser(userId, actionId, isSubtask, subactionId);
+            logger.info("COMPLETED ACTION - userId: {}, actionId: {}, isSubtask: {}, subactionId: {}", userId, actionId, isSubtask, subactionId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             logger.error("ERROR COMPLETING ACTION - userId: {}, actionId: {}, error: {}", userId, actionId, e.getMessage());
