@@ -19,7 +19,7 @@ import java.util.List;
  * Builds response with success and return values or returns error
  */
 @RestController
-@RequestMapping("/api/action")
+@RequestMapping("/api/actions")
 public class ActionController {
 
     @Autowired
@@ -45,20 +45,23 @@ public class ActionController {
             List<ActionDto> actions = actionService.getActions(text, points, tags, validUntil);
             return ResponseEntity.ok(actions);
         } catch (Exception e) {
+           logger.error("ERROR GETTING ACTIONS - text: {}, points: {}, tags: {}, validUntil: {}, error: {}", text, points, tags, validUntil, e.getMessage());
             return ResponseEntity.status(500).build();
         }
     }
 
-    @GetMapping("/getAction")
-    public ResponseEntity<ActionDto> getAction (@RequestParam(name="id") Long id){
-        try{
+    @GetMapping("/{id}")
+    public ResponseEntity<ActionDto> getAction(@PathVariable("id") Long id) {
+        try {
             ActionDto actionDto = actionService.getActionById(id);
             if (actionDto != null) {
                 return ResponseEntity.ok(actionDto);
-            }else{
+            } else {
+                logger.warn("ACTION NOT FOUND - id: {}", id);
                 return ResponseEntity.notFound().build();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
+            logger.error("ERROR GETTING ACTION - id: {}, error: {}", id, e.getMessage());
             return ResponseEntity.status(500).build();
         }
     }
@@ -69,9 +72,11 @@ public class ActionController {
      * @return all actions done by that user
      */
     @GetMapping("/getUserActions")
-    public ResponseEntity<List<UserActionHistoryDto>> getUserActions(@RequestParam(name = "userId") Long userId){
+    public ResponseEntity<List<UserActionHistoryDto>> getUserActions(
+            @RequestParam(name = "userId") Long userId,
+            @RequestParam(name = "active", required = false) Boolean active){
         try {
-            List<UserActionHistoryDto> dto = actionService.getUserActions(userId);
+            List<UserActionHistoryDto> dto = actionService.getUserActions(userId, active);
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             return ResponseEntity.status(500).build();

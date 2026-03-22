@@ -1,9 +1,12 @@
 package com.zhaw.backend.service;
 
+import com.zhaw.backend.enums.ActionType;
 import com.zhaw.backend.mappers.ActionFilterMapper;
 import com.zhaw.backend.mappers.ActionMapper;
 import com.zhaw.backend.model.dao.ActionDao;
 import com.zhaw.backend.model.dto.ActionDto;
+import com.zhaw.backend.model.dto.GpsActionTaskDto;
+import com.zhaw.backend.model.dto.SubActionDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
@@ -24,6 +27,9 @@ public class ActionServiceImpl implements ActionService {
     @Autowired
     private ActionDao actionDao;
 
+    @Autowired
+    private SubActionService subActionService;
+
     /**
      * Gets all Actions in DB available with filtering options for text, points, tags and validUntil
      * @param text gets all Actions with text in description or displayName, case-insensitive
@@ -34,20 +40,43 @@ public class ActionServiceImpl implements ActionService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<ActionDto> getActions(String text, Integer points, String tags, LocalDateTime validUntil) {
+    public List<ActionDto> getActions(String text, Integer points, String tags, LocalDateTime validUntil) throws Exception {
         ActionFilterDto filter = ActionFilterMapper.fromRequest(text, points, tags, validUntil);
-        List<Action> actions = actionDao.findAllFiltered(filter);
-        return ActionMapper.toDtoList(actions);
+
+        List<Action> actionsList = actionDao.findAllFiltered(filter);
+        List<ActionDto> actionDtoList = ActionMapper.toDtoList(actionsList);
+
+        for(ActionDto actionDto : actionDtoList){
+            if(actionDto.getHasSubtasks()) {
+                actionDto.setSubActionDtoIdList(getSubActionIds(actionDto.getId(), actionDto.getType()));
+            }
+        }
+
+        return actionDtoList;
+    }
+
+    private List<Long> getSubActionIds(Long actionId, ActionType actionType) throws Exception {
+        return subActionService.getSubActionIds(actionId, actionType);
     }
 
     @Override
-    public ActionDto getActionById(Long actionId) {
+    public ActionDto getActionById(Long actionId) throws Exception{
         Action action = actionDao.findById(actionId);
         if (action != null) {
-            return ActionMapper.toDto(action);
+            ActionDto actionDto = ActionMapper.toDto(action);
+
+            if(actionDto.getHasSubtasks()){
+                actionDto.setSubActionDtoList(getSubActions(actionDto.getId(), actionDto.getType()));
+            }
+
+            return actionDto;
         } else {
             return null; // or throw an exception if you prefer
         }
+    }
+
+    private List<SubActionDto> getSubActions(Long actionId, ActionType actionType) throws Exception {
+        return subActionService.getSubActions(actionId, actionType);
     }
 
     /**
@@ -56,8 +85,8 @@ public class ActionServiceImpl implements ActionService {
      * @return all actions done by that user
      */
     @Override
-    public List<UserActionHistoryDto> getUserActions(Long userId){
-        return actionDao.findUserActionHistory(userId);
+    public List<UserActionHistoryDto> getUserActions(Long userId, Boolean active){
+        return actionDao.findUserActionHistory(userId, active);
     }
 
     /**

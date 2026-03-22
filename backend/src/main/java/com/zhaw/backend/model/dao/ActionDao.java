@@ -54,7 +54,7 @@ public class ActionDao {
             .tags(rs.getString("tags"))
             .validUntil(rs.getTimestamp("valid_until").toLocalDateTime())
             .actionCreatedOn(rs.getTimestamp("action_created_on").toLocalDateTime())
-            .completionState(rs.getString("completion_state"))
+            .completionState(String.valueOf(CompletionState.valueOf(rs.getString("completion_state"))))
             .isSubtask(rs.getBoolean("is_subtask"))
             .subactionId(rs.getString("subaction_id"))
             .mappingCreatedOn(rs.getTimestamp("mapping_created_on").toLocalDateTime())
@@ -96,21 +96,28 @@ public class ActionDao {
      * @param userId User to search for
      * @return Actions which the user did
      */
-    public List<UserActionHistoryDto> findUserActionHistory(Long userId) {
-        return jdbc.query(
+    public List<UserActionHistoryDto> findUserActionHistory(Long userId, Boolean active) {
+        StringBuilder sql = new StringBuilder(
                 "SELECT a.id AS action_id, a.description, a.display_name, a.points, a.tags, "
                         + "a.valid_until, a.created_on AS action_created_on, "
                         + "uam.completion_state, uam.is_subtask, uam.subaction_id, uam.created_on AS mapping_created_on "
                         + "FROM user_action_mapping uam "
                         + "JOIN action a ON a.id = uam.action_id "
-                        + "WHERE uam.user_id = ? "
-                        + "ORDER BY uam.created_on DESC",
-                HISTORY_ROW_MAPPER,
-                userId);
+                        + "WHERE uam.user_id = ?");
+        List<Object> params = new ArrayList<>();
+        params.add(userId);
+
+        if (active != null) {
+            sql.append(" AND uam.completion_state = ?");
+            params.add(active ? CompletionState.IN_PROGRESS.name() : CompletionState.COMPLETED.name());
+        }
+
+        sql.append(" ORDER BY uam.created_on DESC");
+
+        return jdbc.query(sql.toString(), HISTORY_ROW_MAPPER, params.toArray());
     }
 
     /**
-     * Starts an action for a user by inserting a new record in the user_action_mapping table with IN_PROGRESS state
      * @param userId id of the user for which the action should be started
      * @param actionId id of the action which should be started
      * @param isSubtask if the action is a subtask

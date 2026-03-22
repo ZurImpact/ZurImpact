@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface ActionService {
 
-    List<ActionDto> getActions(String text, Integer points, String tags, LocalDateTime validUntil);
+    List<ActionDto> getActions(String text, Integer points, String tags, LocalDateTime validUntil) throws Exception;
 
-    ActionDto getActionById(Long actionId);
+    ActionDto getActionById(Long actionId) throws Exception;
 
-    List<UserActionHistoryDto> getUserActions(Long UserId);
+    List<UserActionHistoryDto> getUserActions(Long userId, Boolean active);
 
     boolean startActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId);
 
