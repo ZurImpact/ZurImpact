@@ -10,6 +10,10 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   backend-checks:
     name: Backend - Build & Test
@@ -54,6 +58,17 @@ jobs:
           name: backend-coverage-report
           path: backend/target/site/jacoco/
 
+      - name: Post backend coverage to PR
+        if: github.event_name == 'pull_request'
+        uses: madrapps/jacoco-report@v1.7.2
+        with:
+          paths: backend/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0
+          title: "☕ Backend Code Coverage"
+          update-comment: true
+
   frontend-checks:
     name: Frontend - Build, Lint & Test
     runs-on: ubuntu-latest
@@ -92,6 +107,13 @@ jobs:
         with:
           name: frontend-coverage-report
           path: frontend/coverage/
+
+      - name: Post frontend coverage to PR
+        if: github.event_name == 'pull_request'
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          working-directory: frontend
+          name: "⚛️ Frontend Code Coverage"
 
       - name: Build frontend
         run: yarn build
