@@ -1,0 +1,21 @@
+.obsidian/
+
+# Environment / Secrets — NEVER commit real credentials
+.env
+
+# Maven build output
+target/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Claude Code documentation (local only)
+CLAUDE.md

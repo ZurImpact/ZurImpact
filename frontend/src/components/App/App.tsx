@@ -1,12 +1,10 @@
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 
 function App() {
-    const { t } = useTranslation(['common']);
+  useTranslation(['common']);
 
-    return (
-        <LanguageSwitcher />
-    );
+  return <LanguageSwitcher />;
 }
 
 export default App;

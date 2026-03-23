@@ -92,7 +92,7 @@ frontend/
 
 ## Translations
 
-This project uses i18next for internationalization. 
+This project uses i18next for internationalization.
 Translation files are located in `public/locales/` with subdirectories for each language (e.g., `en/`, `de/`).
 Translation files are in the JSON format, structured as key-value pairs for easy access in the application.
 
@@ -131,7 +131,6 @@ function Example(){
 }
 
 ```
-
 
 ## VS Code Setup
 
