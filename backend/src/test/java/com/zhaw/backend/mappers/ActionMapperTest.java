@@ -1,5 +1,6 @@
 package com.zhaw.backend.mappers;
 
+import com.zhaw.backend.enums.ActionType;
 import com.zhaw.backend.enums.Tags;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.entities.Action;
@@ -34,7 +35,7 @@ class ActionMapperTest {
                 .displayName("display")
                 .points(12)
                 .tags("FOOD, DRINKS,, TRAVEL ")
-                .type("TYPE_STREET")
+                .type("GPS")
                 .hasSubtasks(true)
                 .validUntil(validUntil)
                 .createdOn(created)
@@ -48,7 +49,7 @@ class ActionMapperTest {
         assertEquals(entity.getDisplayName(), dto.getDisplayName());
         assertEquals(entity.getPoints(), dto.getPoints());
         assertEquals(List.of(Tags.FOOD, Tags.DRINKS, Tags.TRAVEL), dto.getTags());
-        assertEquals("TYPE_STREET", dto.getType());
+        assertEquals(ActionType.valueOf("GPS"), dto.getType());
         assertTrue(dto.getHasSubtasks());
         assertEquals(entity.getValidUntil(), dto.getValidUntil());
         assertEquals(entity.getCreatedOn(), dto.getCreatedOn());
@@ -65,7 +66,7 @@ class ActionMapperTest {
                 .displayName("display")
                 .points(20)
                 .tags(Arrays.asList(Tags.FOOD, null, Tags.DRINKS))
-                .type("TYPE_SHOP")
+                .type(ActionType.valueOf("PHOTO"))
                 .hasSubtasks(false)
                 .validUntil(validUntil)
                 .createdOn(created)
@@ -79,7 +80,7 @@ class ActionMapperTest {
         assertEquals(dto.getDisplayName(), entity.getDisplayName());
         assertEquals(dto.getPoints(), entity.getPoints());
         assertEquals("FOOD,DRINKS", entity.getTags());
-        assertEquals("TYPE_SHOP", entity.getType());
+        assertEquals("PHOTO", entity.getType());
         assertFalse(entity.getHasSubtasks());
         assertEquals(dto.getValidUntil(), entity.getValidUntil());
         assertEquals(dto.getCreatedOn(), entity.getCreatedOn());
@@ -93,6 +94,7 @@ class ActionMapperTest {
                 .displayName("n")
                 .points(1)
                 .tags("FOOD")
+                .type("GPS")
                 .validUntil(LocalDateTime.now())
                 .build();
 

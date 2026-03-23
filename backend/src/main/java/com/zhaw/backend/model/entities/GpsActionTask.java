@@ -7,23 +7,9 @@ import lombok.*;
 @Table(name = "gps_action_tasks")
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GpsActionTask {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "display_name", nullable = false)
-    private String displayName;
-
-    @Column(nullable = false)
-    private String description;
-
-    @Column(name = "action_id", nullable = false)
-    private Long actionId;
+public class GpsActionTask extends SubAction{
 
     @Column(name = "gps_x", nullable = false)
     private Float gpsX;

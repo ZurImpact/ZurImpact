@@ -1,5 +1,6 @@
 package com.zhaw.backend.mappers;
 
+import com.zhaw.backend.enums.ActionType;
 import com.zhaw.backend.enums.Tags;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.entities.Action;
@@ -23,7 +24,7 @@ public final class ActionMapper {
                 .displayName(entity.getDisplayName())
                 .points(entity.getPoints())
                 .tags(toTagList(entity.getTags()))
-                .type(entity.getType())
+                .type(ActionType.valueOf(entity.getType()))
                 .hasSubtasks(entity.getHasSubtasks())
                 .validUntil(entity.getValidUntil())
                 .createdOn(entity.getCreatedOn())
@@ -41,7 +42,7 @@ public final class ActionMapper {
                 .displayName(dto.getDisplayName())
                 .points(dto.getPoints())
                 .tags(toTagString(dto.getTags()))
-                .type(dto.getType())
+                .type(String.valueOf(dto.getType()))
                 .hasSubtasks(dto.getHasSubtasks())
                 .validUntil(dto.getValidUntil())
                 .createdOn(dto.getCreatedOn())
