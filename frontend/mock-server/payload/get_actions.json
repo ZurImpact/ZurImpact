@@ -1,8 +1,8 @@
 [
   {
     "id": 1,
-    "description": "action1",
-    "displayName": "action1",
+    "description": "Walk to the checkpoints and earn points for each checkpoint you reach.",
+    "displayName": "Walk for Coffee",
     "points": 10,
     "tags": "GPS",
     "subActionDtoList": [],

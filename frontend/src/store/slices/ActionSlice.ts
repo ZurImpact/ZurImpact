@@ -1,7 +1,7 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import apiClient from '../../api/apiClient';
 
-interface ActionDto {
+export interface ActionDto {
   id: number;
   description?: string;
   displayName: string;

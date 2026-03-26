@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://vite.dev/config/
 // Determine API target: mock server (default) or backend
+// eslint-disable-next-line no-constant-condition
 const API_TARGET = false ? 'http://localhost:8080' : 'http://localhost:4000';
 
 export default defineConfig({
