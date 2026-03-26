@@ -8,7 +8,6 @@ export type DeepPartial<T> = {
 };
 
 const rootReducer = combineReducers({
-  // Add reducers here
   actions: actionReducer,
 });
 
