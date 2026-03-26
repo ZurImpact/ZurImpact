@@ -1,0 +1,218 @@
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import apiClient from '../../api/apiClient';
+
+interface ActionDto {
+  id: number;
+  displayName: string;
+  description?: string;
+  points?: number;
+  tags?: string[];
+  validUntil?: string;
+}
+
+interface UserActionHistoryDto {
+  id: number;
+  actionId: number;
+  userId: number;
+  completionState?: string;
+  startDate?: string;
+}
+
+interface ActionState {
+  actions: ActionDto[];
+  selectedAction: ActionDto | null;
+  userActions: UserActionHistoryDto[];
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: ActionState = {
+  actions: [],
+  selectedAction: null,
+  userActions: [],
+  loading: false,
+  error: null,
+};
+
+export const fetchActions = createAsyncThunk(
+  'action/fetchActions',
+  async (
+    filters: {
+      text?: string;
+      points?: number;
+      tags?: string;
+      validUntil?: string;
+    },
+    {rejectWithValue},
+  ) => {
+    try {
+      const params = new URLSearchParams();
+      if (filters?.text) params.append('text', filters.text);
+      if (filters?.points) params.append('points', filters.points.toString());
+      if (filters?.tags) params.append('tags', filters.tags);
+      if (filters?.validUntil) params.append('validUntil', filters.validUntil);
+
+      const response = await apiClient.get(`/action?${params.toString()}`);
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue('Failed to fetch actions');
+    }
+  },
+);
+
+// Async thunk for fetching a single action by ID
+export const fetchActionById = createAsyncThunk(
+  'action/fetchActionById',
+  async (actionId: number, {rejectWithValue}) => {
+    try {
+      const response = await apiClient.get(`/action/getAction?id=${actionId}`);
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue('Failed to fetch action details');
+    }
+  },
+);
+
+// Async thunk for fetching user's action history
+export const fetchUserActions = createAsyncThunk(
+  'action/fetchUserActions',
+  async (userId: number, {rejectWithValue}) => {
+    try {
+      const response = await apiClient.get(`/action/getUserActions?userId=${userId}`);
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue('Failed to fetch user actions');
+    }
+  },
+);
+
+// Async thunk for starting an action
+export const startAction = createAsyncThunk(
+  'action/startAction',
+  async ({userId, actionId}: {userId: number; actionId: number}, {rejectWithValue}) => {
+    try {
+      const response = await apiClient.post(`/action/startAction?userId=${userId}&actionId=${actionId}`);
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue('Failed to start action');
+    }
+  },
+);
+
+// Async thunk for completing an action
+export const completeAction = createAsyncThunk(
+  'action/completeAction',
+  async ({userId, actionId}: {userId: number; actionId: number}, {rejectWithValue}) => {
+    try {
+      const response = await apiClient.post(`/action/completeAction?userId=${userId}&actionId=${actionId}`);
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue('Failed to complete action');
+    }
+  },
+);
+
+const actionSlice = createSlice({
+  name: 'action',
+  initialState,
+  reducers: {
+    clearSelectedAction: (state) => {
+      state.selectedAction = null;
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    // fetchActions cases
+    builder
+      .addCase(fetchActions.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchActions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.actions = action.payload;
+      })
+      .addCase(fetchActions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // fetchActionById cases
+    builder
+      .addCase(fetchActionById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchActionById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedAction = action.payload;
+      })
+      .addCase(fetchActionById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // fetchUserActions cases
+    builder
+      .addCase(fetchUserActions.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserActions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userActions = action.payload;
+      })
+      .addCase(fetchUserActions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // startAction cases
+    builder
+      .addCase(startAction.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(startAction.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(startAction.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // completeAction cases
+    builder
+      .addCase(completeAction.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(completeAction.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(completeAction.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+  },
+});
+
+export const {clearSelectedAction, clearError} = actionSlice.actions;
+export default actionSlice.reducer;

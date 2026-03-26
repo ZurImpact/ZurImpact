@@ -1,17 +1,18 @@
 import {useTranslation} from 'react-i18next';
+import {Button} from '../ui/button';
 
 export function LanguageSwitcher() {
   const {i18n, t} = useTranslation('common');
 
   return (
-    <div>
+    <div className="flex items-center gap-2">
       <span>{t('language')}: </span>
-      <button type="button" onClick={() => i18n.changeLanguage('en')}>
+      <Button variant="outline" size="sm" onClick={() => i18n.changeLanguage('en')}>
         EN
-      </button>
-      <button type="button" onClick={() => i18n.changeLanguage('de')}>
+      </Button>
+      <Button variant="outline" size="sm" onClick={() => i18n.changeLanguage('de')}>
         DE
-      </button>
+      </Button>
     </div>
   );
 }
