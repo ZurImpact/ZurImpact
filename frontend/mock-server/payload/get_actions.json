@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1,
+    "description": "action1",
+    "displayName": "action1",
+    "points": 10,
+    "tags": "GPS",
+    "subActionDtoList": [],
+    "subActionDtoIdList": [],
+    "type": "GPS",
+    "hasSubtasks": false,
+    "validUntil": "2023-12-31",
+    "createdOn": "2023-01-01"
+  }
+]

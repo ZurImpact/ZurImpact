@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {Card} from '../ui/card';
 import {Button} from '../ui/button';
 import {Badge} from '../ui/badge';
@@ -9,7 +9,8 @@ import {Input} from '../ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '../ui/select';
 import {ImageWithFallback} from '../ui/ImageWithFallback';
 import {toast} from 'sonner';
-import {useAppSelector} from '../../store/store';
+import {useAppSelector, useAppDispatch} from '../../store/store';
+import {fetchActions, fetchUserActions} from '../../store/slices/ActionSlice';
 
 const activityTypes = [
   {
@@ -39,12 +40,19 @@ const activityTypes = [
 ];
 
 export function ActionDashboard() {
+  const dispatch = useAppDispatch();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedType, setSelectedType] = useState('');
   const [distance, setDistance] = useState('');
   const [title, setTitle] = useState('');
 
-  const {actions} = useAppSelector((state) => state.actions);
+  const {actions, loading, error, userActions} = useAppSelector((state) => state.actions);
+
+  // Fetch actions on component mount
+  useEffect(() => {
+    dispatch(fetchActions({}));
+    dispatch(fetchUserActions(123));
+  }, [dispatch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +64,8 @@ export function ActionDashboard() {
     const points =
       selectedType === 'cleanup' ? activityType.basePoints : Math.round(activityType.basePoints * distanceNum);
 
+    // TODO: In a real app, you'd dispatch an action here to save to backend
+    // For now, just show success and reset
     toast.success(`Activity logged! You earned ${points} points!`);
 
     // Reset form
@@ -213,7 +223,18 @@ export function ActionDashboard() {
       <Card className="p-6">
         <h2 className="text-2xl font-semibold mb-6">Your Activity History</h2>
 
-        {actions.length === 0 ? (
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
+
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+            <p className="text-gray-500">Loading activities...</p>
+          </div>
+        ) : actions.length === 0 ? (
           <div className="text-center py-12">
             <Award className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 mb-4">No activities logged yet. Start your sustainable journey today!</p>
@@ -223,23 +244,25 @@ export function ActionDashboard() {
           </div>
         ) : (
           <div className="space-y-3">
-            {actions.map((action) => {
+            {userActions.map((userAction) => {
               const Icon = Award;
 
               return (
                 <div
-                  key={action.id}
+                  key={userAction.actionId}
                   className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   <div className={`p-3 rounded-lg`}>
                     <Icon className={`h-6 w-6`} />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold">{action.displayName}</h4>
-                    <p className="text-sm text-gray-500">{action.description}</p>
+                    <h4 className="font-semibold">{userAction?.displayName || 'Activity'}</h4>
+                    <p className="text-sm text-gray-500">
+                      {new Date(userAction.actionCreatedOn || '').toLocaleDateString()}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-green-600 text-lg">+{action.points}</div>
+                    <div className="font-bold text-green-600 text-lg">+{userAction?.points || 0}</div>
                     <div className="text-xs text-gray-500">points</div>
                   </div>
                 </div>

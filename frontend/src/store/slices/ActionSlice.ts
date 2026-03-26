@@ -3,19 +3,41 @@ import apiClient from '../../api/apiClient';
 
 interface ActionDto {
   id: number;
-  displayName: string;
   description?: string;
+  displayName: string;
   points?: number;
-  tags?: string[];
+  tags?: Tag[];
+  subActionDtoList?: SubActionDto[];
+  subActionDtoIdList?: number[];
+  type?: ActionType;
+  hasSubtasks?: boolean;
   validUntil?: string;
+  createdOn?: string;
 }
 
-interface UserActionHistoryDto {
+type Tag = 'FOOD' | 'SOCIAL';
+
+interface SubActionDto {
   id: number;
+  description?: string;
+  displayName: string;
   actionId: number;
-  userId: number;
+}
+
+type ActionType = 'GPS' | 'PHOTO' | 'TICKET';
+
+interface UserActionHistoryDto {
+  actionId: number;
+  description?: string;
+  displayName: string;
+  points?: number;
+  tags?: string;
+  validUntil?: string;
+  actionCreatedOn?: string;
   completionState?: string;
-  startDate?: string;
+  isSubtask?: boolean;
+  subactionId?: string;
+  mappingCreatedOn?: string;
 }
 
 interface ActionState {
@@ -52,7 +74,7 @@ export const fetchActions = createAsyncThunk(
       if (filters?.tags) params.append('tags', filters.tags);
       if (filters?.validUntil) params.append('validUntil', filters.validUntil);
 
-      const response = await apiClient.get(`/action?${params.toString()}`);
+      const response = await apiClient.get(`/actions`);
       return response.data;
     } catch (error: unknown) {
       if (error instanceof Error) {
