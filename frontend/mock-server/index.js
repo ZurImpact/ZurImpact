@@ -7,12 +7,12 @@ const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
-
+const BASE_URL = '/backend_war_exploded/api';
 const mockActions = loadJSON('get_actions.json');
 const mockUserActions = loadJSON('get_useractions.json');
 
 // GET all actions (with optional filters)
-app.get('/api/actions', (req, res) => {
+app.get(BASE_URL + '/actions', (req, res) => {
   let filtered = [...mockActions];
   if (req.query.text) {
     const text = req.query.text.toLowerCase();
@@ -35,7 +35,7 @@ app.get('/api/actions', (req, res) => {
 });
 
 // GET action by ID (for /api/actions/:id)
-app.get('/api/actions/:id', (req, res) => {
+app.get(BASE_URL + '/actions/:id', (req, res) => {
   const action = mockActions.find((a) => a.id === parseInt(req.params.id));
   if (action) {
     res.json(action);
@@ -45,7 +45,7 @@ app.get('/api/actions/:id', (req, res) => {
 });
 
 // GET action by ID (for /api/actions/getAction?id=...)
-app.get('/api/actions/getAction', (req, res) => {
+app.get(BASE_URL + '/actions/getAction', (req, res) => {
   const action = mockActions.find((a) => a.id === parseInt(req.query.id));
   if (action) {
     res.json(action);
@@ -55,7 +55,7 @@ app.get('/api/actions/getAction', (req, res) => {
 });
 
 // POST create new action
-app.post('/api/actions', (req, res) => {
+app.post(BASE_URL + '/actions', (req, res) => {
   const newAction = {
     id: mockActions.length + 1,
     ...req.body,
@@ -65,7 +65,7 @@ app.post('/api/actions', (req, res) => {
 });
 
 // PUT update action by ID
-app.put('/api/actions/:id', (req, res) => {
+app.put(BASE_URL + '/actions/:id', (req, res) => {
   const idx = mockActions.findIndex((a) => a.id === parseInt(req.params.id));
   if (idx !== -1) {
     mockActions[idx] = {...mockActions[idx], ...req.body};
@@ -76,7 +76,7 @@ app.put('/api/actions/:id', (req, res) => {
 });
 
 // DELETE action by ID
-app.delete('/api/actions/:id', (req, res) => {
+app.delete(BASE_URL + '/actions/:id', (req, res) => {
   const idx = mockActions.findIndex((a) => a.id === parseInt(req.params.id));
   if (idx !== -1) {
     const deleted = mockActions.splice(idx, 1);
@@ -87,7 +87,7 @@ app.delete('/api/actions/:id', (req, res) => {
 });
 
 // GET user actions (aligned with UserActionHistoryDto)
-app.get('/api/action/getUserActions', (req, res) => {
+app.get(BASE_URL + '/action/getUserActions', (req, res) => {
   //const userId = parseInt(req.query.userId);
   // Only return actions for the given userId
   const userActions = mockUserActions;
@@ -95,19 +95,19 @@ app.get('/api/action/getUserActions', (req, res) => {
 });
 
 // POST startAction
-app.post('/api/actions/startAction', (req, res) => {
+app.post(BASE_URL + '/actions/startAction', (req, res) => {
   // Just return success for mock
   res.status(200).json({message: 'Action started (mock)'});
 });
 
 // POST completeAction
-app.post('/api/actions/completeAction', (req, res) => {
+app.post(BASE_URL + '/actions/completeAction', (req, res) => {
   // Just return success for mock
   res.status(200).json({message: 'Action completed (mock)'});
 });
 
 // POST cancelAction
-app.post('/api/actions/cancelAction', (req, res) => {
+app.post(BASE_URL + '/actions/cancelAction', (req, res) => {
   // Just return success for mock
   res.status(200).json({message: 'Action cancelled (mock)'});
 });
