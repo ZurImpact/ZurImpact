@@ -1,9 +1,16 @@
 {
   "appName": "ZurImpact",
-  "nav": {
-    "home": "Home",
-    "about": "About",
-    "contact": "Contact"
+  "rootLayout": {
+    "dashboard": "Dashboard",
+    "logout": "Logout"
   },
+  "actionDashboard": {
+    "header": "Activities",
+    "subheader": "Log your sustainable activities and earn points",
+    "historyTitle": "Your Activity History",
+    "loading": "Loading actions...",
+    "noActions": "You haven't completed any actions yet. Start making an impact today!"
+  },
+  "points": "Points",
   "language": "Language"
 }

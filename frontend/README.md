@@ -132,18 +132,6 @@ function Example(){
 
 ```
 
-## VS Code Setup
-
-### Yarn SDK Integration
-
-To enable proper TypeScript and ESLint support in VS Code with Yarn 2.0, run:
-
-```bash
-yarn dlx @yarnpkg/sdks vscode
-```
-
-This command configures VS Code to use the correct SDK paths for TypeScript, ESLint, and other tools managed by Yarn.
-
 ## Environment Setup
 
 This project uses:
@@ -152,13 +140,33 @@ This project uses:
 - React 19 with automatic JSX handling
 - TypeScript strict mode
 
+## VS Code Setup & SDK Integration
+
+### 1. Open the Frontend Folder Directly
+
+Open the `frontend/` folder itself in VS Code (not the project root). This ensures all editor tooling, TypeScript, and ESLint features work as expected with Yarn 2+.
+
+### 2. Integrate Yarn SDKs
+
+To enable proper TypeScript and ESLint support in VS Code with Yarn 2.0+, run:
+
+```bash
+yarn dlx @yarnpkg/sdks vscode
+```
+
+This command configures VS Code to use the correct SDK paths for TypeScript, ESLint, and other tools managed by Yarn.
+
+### 3. Switch TypeScript Version to Workspace SDK
+
+After running the SDK integration command:
+
+1. Open any `.ts` or `.tsx` file in VS Code.
+2. Click the TypeScript version number in the blue status bar at the bottom right (it may say "TypeScript vX.Y.Z").
+3. Select **"Use Workspace Version"** from the menu.
+
 ## Troubleshooting
 
 **Issue: `yarn` command not found**
 
 - Ensure Corepack is enabled: `corepack enable`
 - Verify Node.js v24+ is installed: `node --version`
-
-**Issue: Module not found errors**
-
-- Clear node_modules and reinstall: `rm -r node_modules && yarn install`
