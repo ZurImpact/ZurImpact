@@ -1,10 +1,8 @@
 package com.zhaw.backend.model.dao;
 
 import com.zhaw.backend.enums.CompletionState;
-import com.zhaw.backend.model.dto.ActionDto;
-import com.zhaw.backend.model.dto.UserActionHistoryDto;
-import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
+import com.zhaw.backend.model.entities.UserActionHistory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -19,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Data Access Object for Action entity.
@@ -55,7 +52,7 @@ public class ActionDao {
     /**
      * Helper method to map resultset to ActionHistoryDto, used for user action history query
      */
-    private static final RowMapper<UserActionHistoryDto> HISTORY_ROW_MAPPER = (rs, rowNum) -> UserActionHistoryDto.builder()
+    private static final RowMapper<UserActionHistory> HISTORY_ROW_MAPPER = (rs, rowNum) -> UserActionHistory.builder()
             .actionId(rs.getLong("action_id"))
             .description(rs.getString("description"))
             .displayName(rs.getString("display_name"))
@@ -71,21 +68,22 @@ public class ActionDao {
 
     /**
      * Finds all actions in regard to filter
-     * @param filter ActionFilterDto with all filter options, if null, no filter is applied and all actions are returned
+     * @param text filter text for description and display_name
+     * @param points filter for exact points match
+     * @param tags filter for tags
+     * @param validUntil filter for valid_until
      * @return List of result
      */
-    public List<Action> findAllFiltered(ActionFilterDto filter) {
+    public List<Action> findAllFiltered(String text, Integer points, List<String> tags, LocalDateTime validUntil) {
         StringBuilder sql = new StringBuilder(
                 "SELECT id, description, display_name, points, tags, type, has_subtasks, valid_until, created_on FROM action");
         List<Object> params = new ArrayList<>();
         boolean hasWhere = false;
 
-        if (filter != null) {
-            hasWhere = appendTextFilter(sql, params, hasWhere, filter.getText());
-            hasWhere = appendEquals(sql, params, hasWhere, "points", filter.getPoints());
-            hasWhere = appendTagFilter(sql, params, hasWhere, filter.getTags());
-            appendTimestamp(sql, params, hasWhere, "valid_until", filter.getValidUntil());
-        }
+        hasWhere = appendTextFilter(sql, params, hasWhere, text);
+        hasWhere = appendEquals(sql, params, hasWhere, "points", points);
+        hasWhere = appendTagFilter(sql, params, hasWhere, tags);
+        appendTimestamp(sql, params, hasWhere, "valid_until", validUntil);
 
         return jdbc.query(sql.toString(), ROW_MAPPER, params.toArray());
     }
@@ -105,7 +103,7 @@ public class ActionDao {
      * @param userId User to search for
      * @return Actions which the user did
      */
-    public List<UserActionHistoryDto> findUserActionHistory(Long userId, Boolean active) {
+    public List<UserActionHistory> findUserActionHistory(Long userId, Boolean active) {
         StringBuilder sql = new StringBuilder(
                 "SELECT a.id AS action_id, a.description, a.display_name, a.points, a.tags, "
                         + "a.valid_until, a.created_on AS action_created_on, "
@@ -157,22 +155,19 @@ public class ActionDao {
         return rows > 0;
     }
 
-    public Long createAction(ActionDto dto) {
-        String tags = dto.getTags() != null
-                ? dto.getTags().stream().map(Enum::name).collect(Collectors.joining(","))
-                : null;
+    public Long createAction(Action action) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO action (description, display_name, points, tags, type, has_subtasks, valid_until, created_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, dto.getDescription());
-            ps.setString(2, dto.getDisplayName());
-            ps.setInt(3, dto.getPoints());
-            ps.setString(4, tags);
-            ps.setString(5, dto.getType() != null ? dto.getType().name() : null);
-            ps.setBoolean(6, dto.getHasSubtasks() != null && dto.getHasSubtasks());
-            ps.setTimestamp(7, dto.getValidUntil() != null ? Timestamp.valueOf(dto.getValidUntil()) : null);
+            ps.setString(1, action.getDescription());
+            ps.setString(2, action.getDisplayName());
+            ps.setInt(3, action.getPoints());
+            ps.setString(4, action.getTags());
+            ps.setString(5, action.getType());
+            ps.setBoolean(6, action.getHasSubtasks() != null && action.getHasSubtasks());
+            ps.setTimestamp(7, action.getValidUntil() != null ? Timestamp.valueOf(action.getValidUntil()) : null);
             ps.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now()));
             return ps;
         }, keyHolder);
@@ -183,16 +178,13 @@ public class ActionDao {
         return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }
 
-    public boolean updateAction(Long id, ActionDto dto) {
-        String tags = dto.getTags() != null
-                ? dto.getTags().stream().map(Enum::name).collect(Collectors.joining(","))
-                : null;
+    public boolean updateAction(Action action) {
         int rows = jdbc.update(
                 "UPDATE action SET description = ?, display_name = ?, points = ?, tags = ?, type = ?, has_subtasks = ?, valid_until = ? WHERE id = ?",
-                dto.getDescription(), dto.getDisplayName(), dto.getPoints(), tags,
-                dto.getType() != null ? dto.getType().name() : null,
-                dto.getHasSubtasks(), dto.getValidUntil() != null ? Timestamp.valueOf(dto.getValidUntil()) : null,
-                id);
+                action.getDescription(), action.getDisplayName(), action.getPoints(), action.getTags(),
+                action.getType(), action.getHasSubtasks(),
+                action.getValidUntil() != null ? Timestamp.valueOf(action.getValidUntil()) : null,
+                action.getId());
         return rows > 0;
     }
 

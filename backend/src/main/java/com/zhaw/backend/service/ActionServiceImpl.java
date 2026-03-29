@@ -3,13 +3,13 @@ package com.zhaw.backend.service;
 import com.zhaw.backend.enums.ActionType;
 import com.zhaw.backend.mappers.ActionFilterMapper;
 import com.zhaw.backend.mappers.ActionMapper;
+import com.zhaw.backend.mappers.UserActionHistoryMapper;
 import com.zhaw.backend.model.dao.ActionDao;
 import com.zhaw.backend.model.dao.SubActionDao;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubActionDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
-import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,9 +45,7 @@ public class ActionServiceImpl implements ActionService {
     @Override
     @Transactional(readOnly = true)
     public List<ActionDto> getActions(String text, Integer points, String tags, LocalDateTime validUntil) throws Exception {
-        ActionFilterDto filter = ActionFilterMapper.fromRequest(text, points, tags, validUntil);
-
-        List<Action> actionsList = actionDao.findAllFiltered(filter);
+        List<Action> actionsList = actionDao.findAllFiltered(text, points, ActionFilterMapper.parseTags(tags), validUntil);
         List<ActionDto> actionDtoList = ActionMapper.toDtoList(actionsList);
 
         for(ActionDto actionDto : actionDtoList){
@@ -86,7 +84,7 @@ public class ActionServiceImpl implements ActionService {
      */
     @Override
     public List<UserActionHistoryDto> getUserActions(Long userId, Boolean active){
-        return actionDao.findUserActionHistory(userId, active);
+        return UserActionHistoryMapper.toDtoList(actionDao.findUserActionHistory(userId, active));
     }
 
     /**
@@ -119,7 +117,8 @@ public class ActionServiceImpl implements ActionService {
     @Override
     @Transactional
     public ActionDto createAction(ActionDto dto) {
-        Long newId = actionDao.createAction(dto);
+        Action entity = ActionMapper.toEntity(dto);
+        Long newId = actionDao.createAction(entity);
         dto.setId(newId);
         if (Boolean.TRUE.equals(dto.getHasSubtasks()) && dto.getSubActions() != null) {
             for (SubActionDto subAction : dto.getSubActions()) {
@@ -133,7 +132,9 @@ public class ActionServiceImpl implements ActionService {
 
     @Override
     public boolean updateAction(Long id, ActionDto dto) {
-        return actionDao.updateAction(id, dto);
+        Action entity = ActionMapper.toEntity(dto);
+        entity.setId(id);
+        return actionDao.updateAction(entity);
     }
 
     @Override

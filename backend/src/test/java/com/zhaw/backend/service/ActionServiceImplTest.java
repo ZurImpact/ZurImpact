@@ -6,8 +6,8 @@ import com.zhaw.backend.model.dao.SubActionDao;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubActionDto;
-import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.entities.Action;
+import com.zhaw.backend.model.entities.UserActionHistory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -62,12 +62,12 @@ class ActionServiceImplTest {
         @DisplayName("does not call SubActionService when no subtasks")
         void doesNotCallSubActionServiceWhenNoSubtasks() throws Exception {
             Action action = buildAction(1L, false);
-            when(actionDao.findAllFiltered(any())).thenReturn(List.of(action));
+            when(actionDao.findAllFiltered(any(), any(), any(), any())).thenReturn(List.of(action));
 
             List<?> result = actionService.getActions(null, null, null, null);
 
             assertEquals(1, result.size());
-            verify(subActionService, never()).getSubActionIds(any(), any());
+            verify(subActionService, never()).getSubActions(any(), any());
         }
     }
 
@@ -125,12 +125,12 @@ class ActionServiceImplTest {
             ActionDto dto = ActionDto.builder()
                     .description("desc").displayName("name").points(10)
                     .type(ActionType.GPS).hasSubtasks(false).build();
-            when(actionDao.createAction(dto)).thenReturn(42L);
+            when(actionDao.createAction(any(Action.class))).thenReturn(42L);
 
             ActionDto result = actionService.createAction(dto);
 
             assertEquals(42L, result.getId());
-            verify(actionDao).createAction(dto);
+            verify(actionDao).createAction(any(Action.class));
             verify(subActionDao, never()).createGpsSubAction(any(), any());
         }
 
@@ -146,7 +146,7 @@ class ActionServiceImplTest {
                     .description("desc").displayName("name").points(10)
                     .type(ActionType.GPS).hasSubtasks(true)
                     .subActions(List.of(gpsDto)).build();
-            when(actionDao.createAction(dto)).thenReturn(5L);
+            when(actionDao.createAction(any(Action.class))).thenReturn(5L);
 
             ActionDto result = actionService.createAction(dto);
 
@@ -160,7 +160,7 @@ class ActionServiceImplTest {
             ActionDto dto = ActionDto.builder()
                     .description("desc").displayName("name").points(10)
                     .type(ActionType.GPS).hasSubtasks(true).subActions(null).build();
-            when(actionDao.createAction(dto)).thenReturn(6L);
+            when(actionDao.createAction(any(Action.class))).thenReturn(6L);
 
             actionService.createAction(dto);
 
@@ -176,17 +176,17 @@ class ActionServiceImplTest {
         @DisplayName("returns true when action updated")
         void returnsTrueWhenUpdated() {
             ActionDto dto = ActionDto.builder().description("updated").build();
-            when(actionDao.updateAction(1L, dto)).thenReturn(true);
+            when(actionDao.updateAction(any(Action.class))).thenReturn(true);
 
             assertTrue(actionService.updateAction(1L, dto));
-            verify(actionDao).updateAction(1L, dto);
+            verify(actionDao).updateAction(any(Action.class));
         }
 
         @Test
         @DisplayName("returns false when action not found")
         void returnsFalseWhenNotFound() {
             ActionDto dto = ActionDto.builder().description("updated").build();
-            when(actionDao.updateAction(99L, dto)).thenReturn(false);
+            when(actionDao.updateAction(any(Action.class))).thenReturn(false);
 
             assertFalse(actionService.updateAction(99L, dto));
         }
@@ -267,12 +267,13 @@ class ActionServiceImplTest {
         @Test
         @DisplayName("getUserActions delegates to DAO")
         void getUserActionsDelegatesToDao() {
-            List<UserActionHistoryDto> history = Collections.singletonList(UserActionHistoryDto.builder().actionId(1L).build());
+            List<UserActionHistory> history = Collections.singletonList(UserActionHistory.builder().actionId(1L).build());
             when(actionDao.findUserActionHistory(5L, true)).thenReturn(history);
 
             var result = actionService.getUserActions(5L, true);
 
             assertEquals(1, result.size());
+            assertEquals(1L, result.getFirst().getActionId());
             verify(actionDao).findUserActionHistory(5L, true);
         }
 
