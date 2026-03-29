@@ -67,20 +67,6 @@ class ActionServiceImplTest {
             assertEquals(1, result.size());
             verify(subActionService, never()).getSubActionIds(any(), any());
         }
-
-        @Test
-        @DisplayName("populates subActionDtoIdList when subtasks exist")
-        void populatesSubActionIdsWhenSubtasksExist() throws Exception {
-            Action action = buildAction(2L, true);
-            when(actionDao.findAllFiltered(any())).thenReturn(List.of(action));
-            when(subActionService.getSubActionIds(2L, ActionType.GPS)).thenReturn(List.of(11L, 12L));
-
-            var result = actionService.getActions("text", 10, "food", null);
-
-            assertEquals(1, result.size());
-            assertEquals(List.of(11L, 12L), result.get(0).getSubActionDtoIdList());
-            verify(subActionService).getSubActionIds(2L, ActionType.GPS);
-        }
     }
 
     @Nested
@@ -107,12 +93,12 @@ class ActionServiceImplTest {
             var result = actionService.getActionById(3L);
 
             assertEquals(3L, result.getId());
-            assertNull(result.getSubActionDtoList());
+            assertNull(result.getSubActions());
             verify(subActionService, never()).getSubActions(any(), any());
         }
 
         @Test
-        @DisplayName("populates subActionDtoList when subtasks exist")
+        @DisplayName("populates subActions when subtasks exist")
         void populatesSubActionListWhenSubtasksExist() throws Exception {
             Action action = buildAction(4L, true);
             when(actionDao.findById(4L)).thenReturn(action);
@@ -122,7 +108,7 @@ class ActionServiceImplTest {
             var result = actionService.getActionById(4L);
 
             assertEquals(4L, result.getId());
-            assertEquals(subActions, result.getSubActionDtoList());
+            assertEquals(subActions, result.getSubActions());
             verify(subActionService).getSubActions(4L, ActionType.GPS);
         }
     }

@@ -5,7 +5,6 @@ import com.zhaw.backend.mappers.ActionFilterMapper;
 import com.zhaw.backend.mappers.ActionMapper;
 import com.zhaw.backend.model.dao.ActionDao;
 import com.zhaw.backend.model.dto.ActionDto;
-import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubActionDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
@@ -48,15 +47,11 @@ public class ActionServiceImpl implements ActionService {
 
         for(ActionDto actionDto : actionDtoList){
             if(actionDto.getHasSubtasks()) {
-                actionDto.setSubActionDtoIdList(getSubActionIds(actionDto.getId(), actionDto.getType()));
+                actionDto.setSubActions(getSubActions(actionDto.getId(), actionDto.getType()));
             }
         }
 
         return actionDtoList;
-    }
-
-    private List<Long> getSubActionIds(Long actionId, ActionType actionType) throws Exception {
-        return subActionService.getSubActionIds(actionId, actionType);
     }
 
     @Override
@@ -66,7 +61,7 @@ public class ActionServiceImpl implements ActionService {
             ActionDto actionDto = ActionMapper.toDto(action);
 
             if(actionDto.getHasSubtasks()){
-                actionDto.setSubActionDtoList(getSubActions(actionDto.getId(), actionDto.getType()));
+                actionDto.setSubActions(getSubActions(actionDto.getId(), actionDto.getType()));
             }
 
             return actionDto;
