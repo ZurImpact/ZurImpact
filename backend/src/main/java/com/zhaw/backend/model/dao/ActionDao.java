@@ -1,16 +1,25 @@
 package com.zhaw.backend.model.dao;
 
 import com.zhaw.backend.enums.CompletionState;
+import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Data Access Object for Action entity.
@@ -145,6 +154,50 @@ public class ActionDao {
                                 "VALUES(?,?,?,?,?,?)",
                 userId,actionId,CompletionState.COMPLETED,Timestamp.valueOf(java.time.LocalDateTime.now()),
                 isSubtask != null && isSubtask, subactionId);
+        return rows > 0;
+    }
+
+    public Long createAction(ActionDto dto) {
+        String tags = dto.getTags() != null
+                ? dto.getTags().stream().map(Enum::name).collect(Collectors.joining(","))
+                : null;
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbc.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO action (description, display_name, points, tags, type, has_subtasks, valid_until, created_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, dto.getDescription());
+            ps.setString(2, dto.getDisplayName());
+            ps.setInt(3, dto.getPoints());
+            ps.setString(4, tags);
+            ps.setString(5, dto.getType() != null ? dto.getType().name() : null);
+            ps.setBoolean(6, dto.getHasSubtasks() != null && dto.getHasSubtasks());
+            ps.setTimestamp(7, dto.getValidUntil() != null ? Timestamp.valueOf(dto.getValidUntil()) : null);
+            ps.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now()));
+            return ps;
+        }, keyHolder);
+        Map<String, Object> keys = keyHolder.getKeys();
+        if (keys != null && keys.containsKey("id")) {
+            return ((Number) keys.get("id")).longValue();
+        }
+        return Objects.requireNonNull(keyHolder.getKey()).longValue();
+    }
+
+    public boolean updateAction(Long id, ActionDto dto) {
+        String tags = dto.getTags() != null
+                ? dto.getTags().stream().map(Enum::name).collect(Collectors.joining(","))
+                : null;
+        int rows = jdbc.update(
+                "UPDATE action SET description = ?, display_name = ?, points = ?, tags = ?, type = ?, has_subtasks = ?, valid_until = ? WHERE id = ?",
+                dto.getDescription(), dto.getDisplayName(), dto.getPoints(), tags,
+                dto.getType() != null ? dto.getType().name() : null,
+                dto.getHasSubtasks(), dto.getValidUntil() != null ? Timestamp.valueOf(dto.getValidUntil()) : null,
+                id);
+        return rows > 0;
+    }
+
+    public boolean deleteActionById(Long id) {
+        int rows = jdbc.update("DELETE FROM action WHERE id = ?", id);
         return rows > 0;
     }
 

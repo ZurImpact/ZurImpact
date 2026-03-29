@@ -1,6 +1,5 @@
 package com.zhaw.backend.model.dto;
 
-import jakarta.persistence.Column;
 import lombok.*;
 
 @Getter
