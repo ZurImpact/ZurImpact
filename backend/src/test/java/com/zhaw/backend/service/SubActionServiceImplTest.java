@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,7 +90,7 @@ class SubActionServiceImplTest {
 
             // Then
             assertEquals(1, result.size());
-            assertEquals("GPS Task 1", result.get(0).getDescription());
+            assertEquals("GPS Task 1", result.getFirst().getDescription());
         }
 
         @Test

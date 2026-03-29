@@ -118,12 +118,8 @@ public class ActionServiceImpl implements ActionService {
             if(action == null){
                 return false; // action must exist
             }
-            try {
-                ActionType type = ActionType.valueOf(action.getType());
-                return subActionService.validateCompletionForSubaction(userId, actionId, type, subactionId, gpsx, gpsy, gpsz);
-            } catch (Exception e) {
-                throw e;
-            }
+            ActionType type = ActionType.valueOf(action.getType());
+            return subActionService.validateCompletionForSubaction(userId, actionId, type, subactionId, gpsx, gpsy, gpsz);
         }
         if(validateActionCompletion(userId, actionId)){
             return actionDao.completeAction(userId, actionId, false, null);

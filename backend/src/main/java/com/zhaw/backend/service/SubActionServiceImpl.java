@@ -62,6 +62,7 @@ public class SubActionServiceImpl implements SubActionService{
         if (userId == null || actionId == null || subactionId == null || type == null) {
             throw new Exception("User ID, Action ID, Subaction ID and Action Type must not be null");
         }
+        //Extend swtich case to add other SubAction types when implemented
         return switch (type) {
             case GPS -> completeGpsSubActionForUser(userId, actionId, subactionId, gpsx, gpsy, gpsz);
             default -> throw new Exception("Unsupported Action Type: " + type);

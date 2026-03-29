@@ -2,7 +2,6 @@ package com.zhaw.backend.service;
 
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
-import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 
 import java.time.LocalDateTime;
 import java.util.List;

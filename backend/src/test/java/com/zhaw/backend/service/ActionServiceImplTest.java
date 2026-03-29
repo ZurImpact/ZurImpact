@@ -81,7 +81,7 @@ class ActionServiceImplTest {
             var result = actionService.getActions("text", 10, "food", null);
 
             assertEquals(1, result.size());
-            assertEquals(List.of(11L, 12L), result.get(0).getSubActionDtoIdList());
+            assertEquals(List.of(11L, 12L), result.getFirst().getSubActionDtoIdList());
             verify(subActionService).getSubActionIds(2L, ActionType.GPS);
         }
     }

@@ -3,7 +3,6 @@ package com.zhaw.backend.controller;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.service.ActionService;
-import org.hibernate.type.descriptor.jdbc.TimestampWithTimeZoneJdbcType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Controller for Actions, takes request from frontend, passes to Service.
