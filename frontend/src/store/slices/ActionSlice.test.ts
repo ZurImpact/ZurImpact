@@ -37,10 +37,7 @@ const mockAction: ActionDto = {
   hasSubtasks: false,
 };
 
-const mockActions: ActionDto[] = [
-  mockAction,
-  {id: 2, displayName: 'Plant Tree', points: 100, tags: ['FOOD']},
-];
+const mockActions: ActionDto[] = [mockAction, {id: 2, displayName: 'Plant Tree', points: 100, tags: ['FOOD']}];
 
 const mockUserAction = {
   actionId: 1,
