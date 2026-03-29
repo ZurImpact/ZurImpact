@@ -10,4 +10,7 @@ public interface SubActionService {
     List<Long> getSubActionIds(Long actionId, ActionType actionType) throws Exception;
 
     List<SubActionDto> getSubActions(Long actionId, ActionType actionType) throws Exception;
+
+    boolean validateCompletionForSubaction(Long userId, Long actionId,ActionType type ,String subactionId, Float gpsx, Float gpsy, Float gpsz) throws Exception;
+
 }

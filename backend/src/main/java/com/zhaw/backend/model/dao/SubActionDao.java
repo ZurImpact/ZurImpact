@@ -34,4 +34,15 @@ public class SubActionDao {
                 actionId
         );
     }
+
+    public GpsActionTask findGpsSubActionById(Long id) {
+        return jdbc.queryForObject(
+                "SELECT " +
+                "id, description, display_name, action_id, gpsX, gpsY, gpsZ" +
+                " FROM gps_action_tasks " +
+                "WHERE id = ?",
+                GpsActionTask.class,
+                id
+        );
+    }
 }

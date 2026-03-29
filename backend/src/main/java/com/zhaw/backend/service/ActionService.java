@@ -17,7 +17,7 @@ public interface ActionService {
 
     boolean startActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId);
 
-    boolean completeActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId);
+    boolean completeActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId, Float gpsx, Float gpsy, Float gpsz) throws Exception;
 
     boolean deleteActionForUser(Long userId, Long actionId);
 }

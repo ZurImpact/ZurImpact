@@ -13,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controller for Actions, takes request from frontend, passes to Service.
@@ -116,9 +117,12 @@ public class ActionController {
             @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "actionId") Long actionId,
             @RequestParam(name = "isSubtask", required = false) Boolean isSubtask,
-            @RequestParam(name = "subactionId", required = false) String subactionId) {
+            @RequestParam(name = "subactionId", required = false) String subactionId,
+            @RequestParam(name = "gpsX", required = false) Float gpsX,
+            @RequestParam(name = "gpsY", required = false) Float gpsY,
+            @RequestParam(name = "gpsZ", required = false) Float gpsZ) {
         try {
-            actionService.completeActionForUser(userId, actionId, isSubtask, subactionId);
+            actionService.completeActionForUser(userId, actionId, isSubtask, subactionId, gpsX, gpsY, gpsZ);
             logger.info("COMPLETED ACTION - userId: {}, actionId: {}, isSubtask: {}, subactionId: {}", userId, actionId, isSubtask, subactionId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {

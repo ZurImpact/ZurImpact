@@ -6,7 +6,6 @@ import com.zhaw.backend.model.dao.SubActionDao;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubActionDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
-import com.zhaw.backend.model.entities.SubAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +21,7 @@ public class SubActionServiceImpl implements SubActionService{
     private SubActionDao subActionDao;
     private final Map<ActionType, Function<Long, List<Long>>> handlersForIds;
     private final Map<ActionType, Function<Long, List<SubActionDto>>> handlersForEntities;
+    private final float gpsAccuracyThreshold = 10.0f; // Example threshold for GPS accuracy
 
     public SubActionServiceImpl() {
 
@@ -55,6 +55,41 @@ public class SubActionServiceImpl implements SubActionService{
     private List<SubActionDto> getGpsSubAction(Long actionId) {
         List<GpsActionTask> gpsActionTaskList = subActionDao.findGpsSubAction(actionId);
         return SubActionMapper.GpsActionTaskToDtoList(gpsActionTaskList);
+    }
+
+    @Override
+    public boolean validateCompletionForSubaction(Long userId, Long actionId, ActionType type ,String subactionId, Float gpsx, Float gpsy, Float gpsz) throws Exception {
+        if (userId == null || actionId == null || subactionId == null || type == null) {
+            throw new Exception("User ID, Action ID, Subaction ID and Action Type must not be null");
+        }
+        return switch (type) {
+            case GPS -> completeGpsSubActionForUser(userId, actionId, subactionId, gpsx, gpsy, gpsz);
+            default -> throw new Exception("Unsupported Action Type: " + type);
+        };
+    }
+
+    public boolean completeGpsSubActionForUser(Long userId, Long actionId, String subactionId, Float gpsx, Float gpsy, Float gpsz) throws Exception {
+        if (userId == null || actionId == null || subactionId == null || gpsx == null || gpsy == null) {
+            throw new Exception("User ID, Action ID, Subaction ID and GPS coordinates must not be null");
+        }
+        GpsActionTask gpsActionTaskEntity = null;
+        try {
+            gpsActionTaskEntity = subActionDao.findGpsSubActionById(Long.valueOf(subactionId));
+        } catch (Exception e) {
+            throw new Exception("Error retrieving GPS SubAction for ID: " + subactionId, e);
+        }
+        GpsActionTaskDto gpsActionTask = gpsActionTaskEntity != null ? (GpsActionTaskDto) SubActionMapper.GpsActionTaskToDto(gpsActionTaskEntity) : null;
+        if (gpsActionTask == null) {
+            throw new Exception("GPS SubAction not found for ID: " + subactionId);
+        }
+        return isValidGPSCoordinate(gpsActionTask.getGpsX(), gpsx) && isValidGPSCoordinate(gpsActionTask.getGpsY(), gpsy) && isValidGPSCoordinate(gpsActionTask.getGpsZ(), gpsz);
+    }
+
+    private boolean isValidGPSCoordinate(Float target, Float result) throws Exception {
+        if (target == null || result == null) {
+            throw new Exception("Target and Result GPS coordinates must not be null");
+        }
+        return Math.abs(target - result) <= gpsAccuracyThreshold;
     }
 
     private List<SubActionDto> getPhotoSubAction(Long actionId) {
