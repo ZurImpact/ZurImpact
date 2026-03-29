@@ -5,7 +5,6 @@ import com.zhaw.backend.mappers.ActionFilterMapper;
 import com.zhaw.backend.mappers.ActionMapper;
 import com.zhaw.backend.mappers.UserActionHistoryMapper;
 import com.zhaw.backend.model.dao.ActionDao;
-import com.zhaw.backend.model.dao.SubActionDao;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubActionDto;
@@ -30,9 +29,6 @@ public class ActionServiceImpl implements ActionService {
 
     @Autowired
     private SubActionService subActionService;
-
-    @Autowired
-    private SubActionDao subActionDao;
 
     /**
      * Gets all Actions in DB available with filtering options for text, points, tags and validUntil
@@ -123,7 +119,7 @@ public class ActionServiceImpl implements ActionService {
         if (Boolean.TRUE.equals(dto.getHasSubtasks()) && dto.getSubActions() != null) {
             for (SubActionDto subAction : dto.getSubActions()) {
                 if (subAction instanceof GpsActionTaskDto gpsDto) {
-                    subActionDao.createGpsSubAction(newId, gpsDto);
+                    subActionService.createSubAction(newId, gpsDto);
                 }
             }
         }
@@ -144,11 +140,11 @@ public class ActionServiceImpl implements ActionService {
 
     @Override
     public boolean updateSubAction(Long id, GpsActionTaskDto dto) {
-        return subActionDao.updateGpsSubAction(id, dto);
+        return subActionService.updateSubAction(id, dto);
     }
 
     @Override
     public boolean deleteSubAction(Long id) {
-        return subActionDao.deleteSubAction(id);
+        return subActionService.deleteSubAction(id);
     }
 }

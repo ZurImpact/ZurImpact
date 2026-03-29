@@ -2,7 +2,6 @@ package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.ActionType;
 import com.zhaw.backend.model.dao.ActionDao;
-import com.zhaw.backend.model.dao.SubActionDao;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubActionDto;
@@ -33,9 +32,6 @@ class ActionServiceImplTest {
 
     @Mock
     private SubActionService subActionService;
-
-    @Mock
-    private SubActionDao subActionDao;
 
     @InjectMocks
     private ActionServiceImpl actionService;
@@ -131,7 +127,7 @@ class ActionServiceImplTest {
 
             assertEquals(42L, result.getId());
             verify(actionDao).createAction(any(Action.class));
-            verify(subActionDao, never()).createGpsSubAction(any(), any());
+            verify(subActionService, never()).createSubAction(any(), any());
         }
 
         @Test
@@ -151,7 +147,7 @@ class ActionServiceImplTest {
             ActionDto result = actionService.createAction(dto);
 
             assertEquals(5L, result.getId());
-            verify(subActionDao).createGpsSubAction(5L, gpsDto);
+            verify(subActionService).createSubAction(5L, gpsDto);
         }
 
         @Test
@@ -164,7 +160,7 @@ class ActionServiceImplTest {
 
             actionService.createAction(dto);
 
-            verify(subActionDao, never()).createGpsSubAction(any(), any());
+            verify(subActionService, never()).createSubAction(any(), any());
         }
     }
 
@@ -219,20 +215,20 @@ class ActionServiceImplTest {
     class UpdateSubAction {
 
         @Test
-        @DisplayName("delegates to SubActionDao and returns true")
-        void delegatesToSubActionDao() {
+        @DisplayName("delegates to SubActionService and returns true")
+        void delegatesToSubActionService() {
             GpsActionTaskDto dto = new GpsActionTaskDto();
-            when(subActionDao.updateGpsSubAction(1L, dto)).thenReturn(true);
+            when(subActionService.updateSubAction(1L, dto)).thenReturn(true);
 
             assertTrue(actionService.updateSubAction(1L, dto));
-            verify(subActionDao).updateGpsSubAction(1L, dto);
+            verify(subActionService).updateSubAction(1L, dto);
         }
 
         @Test
         @DisplayName("returns false when subaction not found")
         void returnsFalseWhenNotFound() {
             GpsActionTaskDto dto = new GpsActionTaskDto();
-            when(subActionDao.updateGpsSubAction(99L, dto)).thenReturn(false);
+            when(subActionService.updateSubAction(99L, dto)).thenReturn(false);
 
             assertFalse(actionService.updateSubAction(99L, dto));
         }
@@ -243,18 +239,18 @@ class ActionServiceImplTest {
     class DeleteSubAction {
 
         @Test
-        @DisplayName("delegates to SubActionDao and returns true")
-        void delegatesToSubActionDao() {
-            when(subActionDao.deleteSubAction(1L)).thenReturn(true);
+        @DisplayName("delegates to SubActionService and returns true")
+        void delegatesToSubActionService() {
+            when(subActionService.deleteSubAction(1L)).thenReturn(true);
 
             assertTrue(actionService.deleteSubAction(1L));
-            verify(subActionDao).deleteSubAction(1L);
+            verify(subActionService).deleteSubAction(1L);
         }
 
         @Test
         @DisplayName("returns false when subaction not found")
         void returnsFalseWhenNotFound() {
-            when(subActionDao.deleteSubAction(99L)).thenReturn(false);
+            when(subActionService.deleteSubAction(99L)).thenReturn(false);
 
             assertFalse(actionService.deleteSubAction(99L));
         }
