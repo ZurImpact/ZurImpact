@@ -1,9 +1,16 @@
 {
-  "appName": "ZurImpact",
-  "nav": {
-    "home": "Startseite",
-    "about": "Über uns",
-    "contact": "Kontakt"
+  "appName": "ZürImpact",
+  "rootLayout": {
+    "dashboard": "Dashboard",
+    "logout": "Abmelden"
   },
+  "actionDashboard": {
+    "header": "Aktivitäten",
+    "subheader": "Logge deine nachhaltigen Aktivitäten und sammle Punkte",
+    "historyTitle": "Deine Aktivitätshistorie",
+    "loading": "Aktivitäten werden geladen...",
+    "noActions": "Du hast noch keine Aktivitäten abgeschlossen. Starte noch heute deinen nachhaltigen Weg!"
+  },
+  "points": "Punkte",
   "language": "Sprache"
 }

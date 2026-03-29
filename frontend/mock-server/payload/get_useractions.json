@@ -1,0 +1,15 @@
+[
+  {
+    "actionId": 1,
+    "description": "action1",
+    "displayName": "action1",
+    "points": 10,
+    "tags": "GPS",
+    "validUntil": "2023-12-31",
+    "actionCreatedOn": "2023-01-01",
+    "completionState": "NOT_STARTED",
+    "isSubtask": false,
+    "subactionId": "subaction1",
+    "mappingCreatedOn": "2023-01-01"
+  }
+]

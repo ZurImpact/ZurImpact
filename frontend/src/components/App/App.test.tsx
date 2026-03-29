@@ -1,10 +1,10 @@
 import {describe, it, expect} from 'vitest';
-import {render} from '@testing-library/react';
 import App from './App';
+import {renderWithProviders} from '../../test/test.utils';
 
 describe('App', () => {
   it('renders without crashing', () => {
-    render(<App />);
+    renderWithProviders(<App />);
     // The App component renders a LanguageSwitcher
     expect(document.body).toBeDefined();
   });
