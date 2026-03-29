@@ -2,6 +2,9 @@ package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.ActionType;
 import com.zhaw.backend.model.dao.ActionDao;
+import com.zhaw.backend.model.dao.SubActionDao;
+import com.zhaw.backend.model.dto.ActionDto;
+import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubActionDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.entities.Action;
@@ -17,13 +20,9 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ActionServiceImpl - Unit Tests")
@@ -34,6 +33,9 @@ class ActionServiceImplTest {
 
     @Mock
     private SubActionService subActionService;
+
+    @Mock
+    private SubActionDao subActionDao;
 
     @InjectMocks
     private ActionServiceImpl actionService;
@@ -114,6 +116,151 @@ class ActionServiceImplTest {
     }
 
     @Nested
+    @DisplayName("createAction")
+    class CreateAction {
+
+        @Test
+        @DisplayName("creates action and returns DTO with generated ID")
+        void createsActionAndSetsId() {
+            ActionDto dto = ActionDto.builder()
+                    .description("desc").displayName("name").points(10)
+                    .type(ActionType.GPS).hasSubtasks(false).build();
+            when(actionDao.createAction(dto)).thenReturn(42L);
+
+            ActionDto result = actionService.createAction(dto);
+
+            assertEquals(42L, result.getId());
+            verify(actionDao).createAction(dto);
+            verify(subActionDao, never()).createGpsSubAction(any(), any());
+        }
+
+        @Test
+        @DisplayName("inserts GPS subactions when hasSubtasks is true")
+        void insertsGpsSubactionsWhenHasSubtasks() {
+            GpsActionTaskDto gpsDto = new GpsActionTaskDto();
+            gpsDto.setDescription("checkpoint");
+            gpsDto.setGpsX(47.3f);
+            gpsDto.setGpsY(8.5f);
+
+            ActionDto dto = ActionDto.builder()
+                    .description("desc").displayName("name").points(10)
+                    .type(ActionType.GPS).hasSubtasks(true)
+                    .subActions(List.of(gpsDto)).build();
+            when(actionDao.createAction(dto)).thenReturn(5L);
+
+            ActionDto result = actionService.createAction(dto);
+
+            assertEquals(5L, result.getId());
+            verify(subActionDao).createGpsSubAction(5L, gpsDto);
+        }
+
+        @Test
+        @DisplayName("does not insert subactions when subActions list is null")
+        void doesNotInsertSubactionsWhenListIsNull() {
+            ActionDto dto = ActionDto.builder()
+                    .description("desc").displayName("name").points(10)
+                    .type(ActionType.GPS).hasSubtasks(true).subActions(null).build();
+            when(actionDao.createAction(dto)).thenReturn(6L);
+
+            actionService.createAction(dto);
+
+            verify(subActionDao, never()).createGpsSubAction(any(), any());
+        }
+    }
+
+    @Nested
+    @DisplayName("updateAction")
+    class UpdateAction {
+
+        @Test
+        @DisplayName("returns true when action updated")
+        void returnsTrueWhenUpdated() {
+            ActionDto dto = ActionDto.builder().description("updated").build();
+            when(actionDao.updateAction(1L, dto)).thenReturn(true);
+
+            assertTrue(actionService.updateAction(1L, dto));
+            verify(actionDao).updateAction(1L, dto);
+        }
+
+        @Test
+        @DisplayName("returns false when action not found")
+        void returnsFalseWhenNotFound() {
+            ActionDto dto = ActionDto.builder().description("updated").build();
+            when(actionDao.updateAction(99L, dto)).thenReturn(false);
+
+            assertFalse(actionService.updateAction(99L, dto));
+        }
+    }
+
+    @Nested
+    @DisplayName("deleteAction")
+    class DeleteAction {
+
+        @Test
+        @DisplayName("returns true when action deleted")
+        void returnsTrueWhenDeleted() {
+            when(actionDao.deleteActionById(1L)).thenReturn(true);
+
+            assertTrue(actionService.deleteAction(1L));
+            verify(actionDao).deleteActionById(1L);
+        }
+
+        @Test
+        @DisplayName("returns false when action not found")
+        void returnsFalseWhenNotFound() {
+            when(actionDao.deleteActionById(99L)).thenReturn(false);
+
+            assertFalse(actionService.deleteAction(99L));
+        }
+    }
+
+    @Nested
+    @DisplayName("updateSubAction")
+    class UpdateSubAction {
+
+        @Test
+        @DisplayName("delegates to SubActionDao and returns true")
+        void delegatesToSubActionDao() {
+            GpsActionTaskDto dto = new GpsActionTaskDto();
+            when(subActionDao.updateGpsSubAction(1L, dto)).thenReturn(true);
+
+            assertTrue(actionService.updateSubAction(1L, dto));
+            verify(subActionDao).updateGpsSubAction(1L, dto);
+        }
+
+        @Test
+        @DisplayName("returns false when subaction not found")
+        void returnsFalseWhenNotFound() {
+            GpsActionTaskDto dto = new GpsActionTaskDto();
+            when(subActionDao.updateGpsSubAction(99L, dto)).thenReturn(false);
+
+            assertFalse(actionService.updateSubAction(99L, dto));
+        }
+    }
+
+    @Nested
+    @DisplayName("deleteSubAction")
+    class DeleteSubAction {
+
+        @Test
+        @DisplayName("delegates to SubActionDao and returns true")
+        void delegatesToSubActionDao() {
+            when(subActionDao.deleteSubAction(1L)).thenReturn(true);
+
+            assertTrue(actionService.deleteSubAction(1L));
+            verify(subActionDao).deleteSubAction(1L);
+        }
+
+        @Test
+        @DisplayName("returns false when subaction not found")
+        void returnsFalseWhenNotFound() {
+            when(subActionDao.deleteSubAction(99L)).thenReturn(false);
+
+            assertFalse(actionService.deleteSubAction(99L));
+        }
+    }
+
+    @Nested
     @DisplayName("delegation methods")
     class DelegationMethods {
 
@@ -163,4 +310,3 @@ class ActionServiceImplTest {
         }
     }
 }
-
