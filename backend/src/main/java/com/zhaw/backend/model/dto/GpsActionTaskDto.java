@@ -11,6 +11,5 @@ public class GpsActionTaskDto extends SubActionDto{
 
     private Float gpsX;
     private Float gpsY;
-    private Float gpsZ;
 
 }

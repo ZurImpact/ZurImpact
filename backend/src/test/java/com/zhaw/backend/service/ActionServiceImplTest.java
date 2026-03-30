@@ -166,7 +166,7 @@ class ActionServiceImplTest {
             when(actionDao.isActionCompleted(7L, 8L, null, null)).thenReturn(true);
             when(actionDao.completeAction(7L, 8L, false, null)).thenReturn(true);
 
-            boolean result = actionService.completeActionForUser(7L, 8L, false, null, null, null, null);
+            boolean result = actionService.completeActionForUser(7L, 8L, false, null, null, null);
 
             assertTrue(result);
             verify(actionDao).completeAction(7L, 8L, false, null);
@@ -197,11 +197,11 @@ class ActionServiceImplTest {
             when(actionDao.isActionCompleted(anyLong(), anyLong(), isNull(), isNull())).thenReturn(true);
             when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(true);
 
-            boolean result = actionService.completeActionForUser(1L, 2L, false, null, null, null, null);
+            boolean result = actionService.completeActionForUser(1L, 2L, false, null, null, null);
 
             assertTrue(result);
             verify(actionDao).completeAction(1L, 2L, false, null);
-            verify(subActionService, never()).validateCompletionForSubaction(any(), any(), any(), any(), any(), any(), any());
+            verify(subActionService, never()).validateCompletionForSubaction(any(), any(), any(), any(), any(), any());
         }
 
         @Test
@@ -213,20 +213,20 @@ class ActionServiceImplTest {
             when(actionDao.isActionCompleted(anyLong(), anyLong(), isNull(), isNull())).thenReturn(true);
             when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(true);
 
-            boolean result = actionService.completeActionForUser(1L, 2L, null, null, null, null, null);
+            boolean result = actionService.completeActionForUser(1L, 2L, null, null, null, null);
 
             assertTrue(result);
             verify(actionDao).completeAction(1L, 2L, false, null);
-            verify(subActionService, never()).validateCompletionForSubaction(any(), any(), any(), any(), any(), any(), any());
+            verify(subActionService, never()).validateCompletionForSubaction(any(), any(), any(), any(), any(), any());
         }
 
         @Test
         @DisplayName("returns false when subactionId is null but isSubtask is true")
         void returnsFalseWhenSubactionIdNullButIsSubtaskTrue() throws Exception {
-            boolean result = actionService.completeActionForUser(1L, 2L, true, null, null, null, null);
+            boolean result = actionService.completeActionForUser(1L, 2L, true, null, null, null);
 
             assertFalse(result);
-            verify(subActionService, never()).validateCompletionForSubaction(any(), any(), any(), any(), any(), any(), any());
+            verify(subActionService, never()).validateCompletionForSubaction(any(), any(), any(), any(), any(), any());
             verify(actionDao, never()).completeAction(any(), any(), any(), any());
         }
 
@@ -239,7 +239,7 @@ class ActionServiceImplTest {
             when(actionDao.isActionCompleted(anyLong(), anyLong(), isNull(), isNull())).thenReturn(true);
             when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(false);
 
-            boolean result = actionService.completeActionForUser(1L, 2L, false, null, null, null, null);
+            boolean result = actionService.completeActionForUser(1L, 2L, false, null, null, null);
 
             assertFalse(result);
             verify(actionDao).completeAction(1L, 2L, false, null);

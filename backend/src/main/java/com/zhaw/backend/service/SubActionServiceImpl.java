@@ -58,18 +58,18 @@ public class SubActionServiceImpl implements SubActionService{
     }
 
     @Override
-    public boolean validateCompletionForSubaction(Long userId, Long actionId, ActionType type ,String subactionId, Float gpsx, Float gpsy, Float gpsz) throws Exception {
+    public boolean validateCompletionForSubaction(Long userId, Long actionId, ActionType type ,String subactionId, Float gpsx, Float gpsy) throws Exception {
         if (userId == null || actionId == null || subactionId == null || type == null) {
             throw new Exception("User ID, Action ID, Subaction ID and Action Type must not be null");
         }
         //Extend swtich case to add other SubAction types when implemented
         return switch (type) {
-            case GPS -> completeGpsSubActionForUser(userId, actionId, subactionId, gpsx, gpsy, gpsz);
+            case GPS -> completeGpsSubActionForUser(userId, actionId, subactionId, gpsx, gpsy);
             default -> throw new Exception("Unsupported Action Type: " + type);
         };
     }
 
-    public boolean completeGpsSubActionForUser(Long userId, Long actionId, String subactionId, Float gpsx, Float gpsy, Float gpsz) throws Exception {
+    public boolean completeGpsSubActionForUser(Long userId, Long actionId, String subactionId, Float gpsx, Float gpsy) throws Exception {
         if (userId == null || actionId == null || subactionId == null || gpsx == null || gpsy == null) {
             throw new Exception("User ID, Action ID, Subaction ID and GPS coordinates must not be null");
         }
@@ -83,7 +83,7 @@ public class SubActionServiceImpl implements SubActionService{
         if (gpsActionTask == null) {
             throw new Exception("GPS SubAction not found for ID: " + subactionId);
         }
-        return isValidGPSCoordinate(gpsActionTask.getGpsX(), gpsx) && isValidGPSCoordinate(gpsActionTask.getGpsY(), gpsy) && isValidGPSCoordinate(gpsActionTask.getGpsZ(), gpsz);
+        return isValidGPSCoordinate(gpsActionTask.getGpsX(), gpsx) && isValidGPSCoordinate(gpsActionTask.getGpsY(), gpsy);
     }
 
     private boolean isValidGPSCoordinate(Float target, Float result) throws Exception {

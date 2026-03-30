@@ -81,7 +81,6 @@ class SubActionServiceImplTest {
             gpsTask.setActionId(actionId);
             gpsTask.setGpsX(10.0f);
             gpsTask.setGpsY(20.0f);
-            gpsTask.setGpsZ(5.0f);
             List<GpsActionTask> gpsTasks = List.of(gpsTask);
             when(subActionDao.findGpsSubAction(actionId)).thenReturn(gpsTasks);
 
@@ -131,11 +130,10 @@ class SubActionServiceImplTest {
             gpsTask.setId(10L);
             gpsTask.setGpsX(10.0f);
             gpsTask.setGpsY(20.0f);
-            gpsTask.setGpsZ(5.0f);
             when(subActionDao.findGpsSubActionById(10L)).thenReturn(gpsTask);
 
             // When
-            boolean result = subActionService.validateCompletionForSubaction(userId, actionId, ActionType.GPS, subactionId, gpsx, gpsy, gpsz);
+            boolean result = subActionService.validateCompletionForSubaction(userId, actionId, ActionType.GPS, subactionId, gpsx, gpsy);
 
             // Then
             assertTrue(result);
@@ -146,7 +144,7 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionForUnsupportedActionType() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.validateCompletionForSubaction(1L, 1L, ActionType.PHOTO, "10", 10.0f, 20.0f, 5.0f));
+                subActionService.validateCompletionForSubaction(1L, 1L, ActionType.PHOTO, "10", 10.0f, 20.0f));
             assertEquals("Unsupported Action Type: PHOTO", exception.getMessage());
         }
 
@@ -155,7 +153,7 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionWhenUserIdIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.validateCompletionForSubaction(null, 1L, ActionType.GPS, "10", 10.0f, 20.0f, 5.0f));
+                subActionService.validateCompletionForSubaction(null, 1L, ActionType.GPS, "10", 10.0f, 20.0f));
             assertEquals("User ID, Action ID, Subaction ID and Action Type must not be null", exception.getMessage());
         }
 
@@ -164,7 +162,7 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionWhenActionIdIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.validateCompletionForSubaction(1L, null, ActionType.GPS, "10", 10.0f, 20.0f, 5.0f));
+                subActionService.validateCompletionForSubaction(1L, null, ActionType.GPS, "10", 10.0f, 20.0f));
             assertEquals("User ID, Action ID, Subaction ID and Action Type must not be null", exception.getMessage());
         }
 
@@ -173,7 +171,7 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionWhenSubactionIdIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.validateCompletionForSubaction(1L, 1L, ActionType.GPS, null, 10.0f, 20.0f, 5.0f));
+                subActionService.validateCompletionForSubaction(1L, 1L, ActionType.GPS, null, 10.0f, 20.0f));
             assertEquals("User ID, Action ID, Subaction ID and Action Type must not be null", exception.getMessage());
         }
 
@@ -182,7 +180,7 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionWhenActionTypeIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.validateCompletionForSubaction(1L, 1L, null, "10", 10.0f, 20.0f, 5.0f));
+                subActionService.validateCompletionForSubaction(1L, 1L, null, "10", 10.0f, 20.0f));
             assertEquals("User ID, Action ID, Subaction ID and Action Type must not be null", exception.getMessage());
         }
     }
@@ -206,11 +204,10 @@ class SubActionServiceImplTest {
             gpsTask.setId(10L);
             gpsTask.setGpsX(10.0f);
             gpsTask.setGpsY(20.0f);
-            gpsTask.setGpsZ(5.0f);
             when(subActionDao.findGpsSubActionById(10L)).thenReturn(gpsTask);
 
             // When
-            boolean result = subActionService.completeGpsSubActionForUser(userId, actionId, subactionId, gpsx, gpsy, gpsz);
+            boolean result = subActionService.completeGpsSubActionForUser(userId, actionId, subactionId, gpsx, gpsy);
 
             // Then
             assertTrue(result);
@@ -231,11 +228,10 @@ class SubActionServiceImplTest {
             gpsTask.setId(10L);
             gpsTask.setGpsX(10.0f);
             gpsTask.setGpsY(20.0f);
-            gpsTask.setGpsZ(5.0f);
             when(subActionDao.findGpsSubActionById(10L)).thenReturn(gpsTask);
 
             // When
-            boolean result = subActionService.completeGpsSubActionForUser(userId, actionId, subactionId, gpsx, gpsy, gpsz);
+            boolean result = subActionService.completeGpsSubActionForUser(userId, actionId, subactionId, gpsx, gpsy);
 
             // Then
             assertFalse(result);
@@ -246,7 +242,7 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionWhenUserIdIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeGpsSubActionForUser(null, 1L, "10", 10.0f, 20.0f, 5.0f));
+                subActionService.completeGpsSubActionForUser(null, 1L, "10", 10.0f, 20.0f));
             assertEquals("User ID, Action ID, Subaction ID and GPS coordinates must not be null", exception.getMessage());
         }
 
@@ -255,7 +251,7 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionWhenActionIdIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeGpsSubActionForUser(1L, null, "10", 10.0f, 20.0f, 5.0f));
+                subActionService.completeGpsSubActionForUser(1L, null, "10", 10.0f, 20.0f));
             assertEquals("User ID, Action ID, Subaction ID and GPS coordinates must not be null", exception.getMessage());
         }
 
@@ -264,7 +260,7 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionWhenSubactionIdIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeGpsSubActionForUser(1L, 1L, null, 10.0f, 20.0f, 5.0f));
+                subActionService.completeGpsSubActionForUser(1L, 1L, null, 10.0f, 20.0f));
             assertEquals("User ID, Action ID, Subaction ID and GPS coordinates must not be null", exception.getMessage());
         }
 
@@ -273,7 +269,7 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionWhenGpsxIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeGpsSubActionForUser(1L, 1L, "10", null, 20.0f, 5.0f));
+                subActionService.completeGpsSubActionForUser(1L, 1L, "10", null, 20.0f));
             assertEquals("User ID, Action ID, Subaction ID and GPS coordinates must not be null", exception.getMessage());
         }
 
@@ -282,7 +278,7 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionWhenGpsyIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeGpsSubActionForUser(1L, 1L, "10", 10.0f, null, 5.0f));
+                subActionService.completeGpsSubActionForUser(1L, 1L, "10", 10.0f, null));
             assertEquals("User ID, Action ID, Subaction ID and GPS coordinates must not be null", exception.getMessage());
         }
 
@@ -294,7 +290,7 @@ class SubActionServiceImplTest {
 
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeGpsSubActionForUser(1L, 1L, "10", 10.0f, 20.0f, 5.0f));
+                subActionService.completeGpsSubActionForUser(1L, 1L, "10", 10.0f, 20.0f));
             assertEquals("GPS SubAction not found for ID: 10", exception.getMessage());
         }
     }

@@ -106,7 +106,7 @@ public class ActionServiceImpl implements ActionService {
      * @return true if the action was successfully completed, false if not (e.g. if the mapping does not exist or is already completed)
      */
     @Override
-    public boolean completeActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId, Float gpsx, Float gpsy, Float gpsz) throws Exception {
+    public boolean completeActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId, Float gpsx, Float gpsy) throws Exception {
         if (isSubtask == null) {
             isSubtask = false;
         }
@@ -119,7 +119,7 @@ public class ActionServiceImpl implements ActionService {
                 return false; // action must exist
             }
             ActionType type = ActionType.valueOf(action.getType());
-            return subActionService.validateCompletionForSubaction(userId, actionId, type, subactionId, gpsx, gpsy, gpsz);
+            return subActionService.validateCompletionForSubaction(userId, actionId, type, subactionId, gpsx, gpsy);
         }
         if(validateActionCompletion(userId, actionId)){
             return actionDao.completeAction(userId, actionId, false, null);

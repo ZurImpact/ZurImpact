@@ -120,7 +120,7 @@ public class ActionController {
             @RequestParam(name = "gpsY", required = false) Float gpsY,
             @RequestParam(name = "gpsZ", required = false) Float gpsZ) {
         try {
-            actionService.completeActionForUser(userId, actionId, isSubtask, subactionId, gpsX, gpsY, gpsZ);
+            actionService.completeActionForUser(userId, actionId, isSubtask, subactionId, gpsX, gpsY);
             logger.info("COMPLETED ACTION - userId: {}, actionId: {}, isSubtask: {}, subactionId: {}", userId, actionId, isSubtask, subactionId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
