@@ -95,8 +95,8 @@ public class ActionServiceImpl implements ActionService {
      * @return true if the action was successfully started, false if not (e.g. if the mapping already exists)
      */
     @Override
-    public boolean startActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
-        return actionDao.startAction(userId, actionId, isSubtask, subactionId);
+    public boolean startActionForUser(Long userId, Long actionId, Boolean isSubtask, String subActionId) {
+        return actionDao.startAction(userId, actionId, isSubtask, subActionId);
     }
 
     /**
@@ -106,21 +106,11 @@ public class ActionServiceImpl implements ActionService {
      * @return true if the action was successfully completed, false if not (e.g. if the mapping does not exist or is already completed)
      */
     @Override
-    public boolean completeActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId, Float gpsx, Float gpsy) throws Exception {
-        if(isSubtask || subactionId == null){
-            return false; // subactionId must be provided for subtasks
-        }
-        if(isSubtask){
-            Action action = actionDao.findById(actionId);
-            if(action == null){
-                return false; // action must exist
-            }
-            ActionType type = ActionType.valueOf(action.getType());
-            return subActionService.validateCompletionForSubaction(userId, actionId, type, subactionId, gpsx, gpsy);
-        }
+    public boolean completeActionForUser(Long userId, Long actionId) throws Exception {
+        /**
         if(validateActionCompletion(userId, actionId)){
             return actionDao.completeAction(userId, actionId, false, null);
-        }
+        }**/
         return false;
     }
 
@@ -129,21 +119,4 @@ public class ActionServiceImpl implements ActionService {
         return actionDao.deleteAction(userId, actionId);
     }
 
-    private boolean validateActionCompletion(Long userID, Long actionID) {
-        boolean result = false;
-        try {
-            List<SubActionDto> subActions = subActionService.getSubActions(actionID, null);
-            if(!subActions.isEmpty()){
-                for(SubActionDto subAction : subActions){
-                    if(!actionDao.isActionCompleted(userID, subAction.getActionId(), null, null )){
-                        break;
-                    }
-                    result = true;
-                }
-            }
-        }catch (Exception e){
-            throw new RuntimeException(e);
-        }
-        return result;
-    }
 }

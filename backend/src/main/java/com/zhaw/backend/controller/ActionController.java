@@ -113,15 +113,10 @@ public class ActionController {
     @PostMapping("/completeAction")
     public ResponseEntity<Void> completeAction(
             @RequestParam(name = "userId") Long userId,
-            @RequestParam(name = "actionId") Long actionId,
-            @RequestParam(name = "isSubtask", required = false) Boolean isSubtask,
-            @RequestParam(name = "subactionId", required = false) String subactionId,
-            @RequestParam(name = "gpsX", required = false) Float gpsX,
-            @RequestParam(name = "gpsY", required = false) Float gpsY,
-            @RequestParam(name = "gpsZ", required = false) Float gpsZ) {
+            @RequestParam(name = "actionId") Long actionId){
         try {
-            actionService.completeActionForUser(userId, actionId, isSubtask, subactionId, gpsX, gpsY);
-            logger.info("COMPLETED ACTION - userId: {}, actionId: {}, isSubtask: {}, subactionId: {}", userId, actionId, isSubtask, subactionId);
+            actionService.completeActionForUser(userId, actionId);
+            logger.info("COMPLETED ACTION - userId: {}, actionId: {}, isSubtask: {}, subactionId: {}", userId, actionId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             logger.error("ERROR COMPLETING ACTION - userId: {}, actionId: {}, error: {}", userId, actionId, e.getMessage());

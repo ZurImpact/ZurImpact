@@ -11,6 +11,5 @@ public interface SubActionService {
 
     List<SubActionDto> getSubActions(Long actionId, ActionType actionType) throws Exception;
 
-    boolean validateCompletionForSubaction(Long userId, Long actionId,ActionType type ,String subactionId, Float gpsx, Float gpsy) throws Exception;
-
+    boolean completeSubActionForUser(Long userID, Long actionId, Long subActionId, ActionType subActionType, Float gpsX, Float gpsY) throws Exception;
 }
