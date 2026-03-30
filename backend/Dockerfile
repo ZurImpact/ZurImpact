@@ -1,6 +1,6 @@
 # ── Stage 1: Build ──────────────────────────────────────────────────────────
 # Uses the full Maven + JDK image to compile and package the WAR.
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM maven:3.9-eclipse-temurin-21-alpine AS build
 
 WORKDIR /app
 
@@ -16,16 +16,28 @@ RUN mvn clean package -DskipTests -q
 # Lean Tomcat image — only the WAR and runtime, no build tools.
 FROM tomcat:10.1-jre21-temurin-jammy
 
+# Create a non-root group and user
+RUN groupadd --gid 1001 tomcat && \
+    useradd --uid 1001 --gid tomcat --shell /bin/false --no-create-home tomcat
+
 # Remove default Tomcat apps to keep the image clean
 RUN rm -rf /usr/local/tomcat/webapps/*
+
+# Tomcat needs write access to logs/, work/, temp/ /webapps at runtime
+RUN chown -R 1001:1001 \
+        /usr/local/tomcat/webapps \
+        /usr/local/tomcat/logs \
+        /usr/local/tomcat/work \
+        /usr/local/tomcat/temp && \
+    chmod -R 750 \
+        /usr/local/tomcat/logs \
+        /usr/local/tomcat/work \
+        /usr/local/tomcat/temp
 
 # Copy the built WAR, renamed to ROOT.war so it serves at /
 COPY --from=build /app/target/backend-*.war /usr/local/tomcat/webapps/ROOT.war
 
-# Credentials and DB config are injected as environment variables at runtime.
-# For Kubernetes: use a Secret mounted as env vars in the pod spec.
-# For local dev: pass --env-file .env to docker run, or set them in docker-compose.
-# Required vars: DB_URL, DB_USER, DB_PASSWORD
+USER 1001:1001
 
 EXPOSE 8080
 
