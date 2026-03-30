@@ -180,6 +180,7 @@ public class ActionDao {
         params.add(actionId);
         params.add(CompletionState.COMPLETED.name());
 
+        //TODO: cleanup
         if (isSubtask != null) {
             sql.append(" AND is_subtask = ?");
             params.add(isSubtask);

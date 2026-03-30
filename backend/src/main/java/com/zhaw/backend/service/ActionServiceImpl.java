@@ -107,10 +107,7 @@ public class ActionServiceImpl implements ActionService {
      */
     @Override
     public boolean completeActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId, Float gpsx, Float gpsy) throws Exception {
-        if (isSubtask == null) {
-            isSubtask = false;
-        }
-        if(isSubtask && subactionId == null){
+        if(isSubtask || subactionId == null){
             return false; // subactionId must be provided for subtasks
         }
         if(isSubtask){
