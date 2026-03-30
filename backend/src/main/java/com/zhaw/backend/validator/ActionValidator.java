@@ -17,12 +17,13 @@ public class ActionValidator {
     public static boolean validateActionCompletion(List<Map<String, CompletionState>> completionStates) {
         if(completionStates == null || completionStates.isEmpty())return true;
         for(Map<String, CompletionState> subActionCompletionState : completionStates) {
+            if(subActionCompletionState == null || subActionCompletionState.isEmpty()) continue;
             for(CompletionState state : subActionCompletionState.values()) {
                 if(state != CompletionState.COMPLETED) {
                     return false;
                 }
             }
         }
-        return false;
+        return true;
     }
 }
