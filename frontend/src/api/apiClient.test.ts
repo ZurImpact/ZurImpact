@@ -3,7 +3,7 @@ import apiClient from './apiClient';
 
 describe('apiClient', () => {
   it('has the configured baseURL', () => {
-    expect(apiClient.defaults.baseURL).toBe('http://localhost:5173/backend_war_exploded/api');
+    expect(apiClient.defaults.baseURL).toBe('/backend_war_exploded/api');
   });
 
   it('has a 10 second timeout', () => {
