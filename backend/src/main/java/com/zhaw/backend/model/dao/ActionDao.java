@@ -165,13 +165,12 @@ public class ActionDao {
 
     /**
      * Checks if an action has been completed by a user
-     * @param userId id of the user
+     *
+     * @param userId   id of the user
      * @param actionId id of the action
-     * @param isSubtask whether this is a subtask check
-     * @param subactionId subtask id (can be null if not a subtask)
      * @return true if the action is completed, false otherwise
      */
-    public boolean isActionCompleted(Long userId, Long actionId, Boolean isSubtask, Long subactionId) {
+    public boolean isActionCompleted(Long userId, Long actionId) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(*) FROM user_action_mapping " +
                 "WHERE user_id = ? AND action_id = ? AND completion_state = ?");

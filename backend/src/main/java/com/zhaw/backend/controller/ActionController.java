@@ -116,7 +116,7 @@ public class ActionController {
             @RequestParam(name = "actionId") Long actionId){
         try {
             actionService.completeActionForUser(userId, actionId);
-            logger.info("COMPLETED ACTION - userId: {}, actionId: {}, isSubtask: {}, subactionId: {}", userId, actionId);
+            logger.info("COMPLETED ACTION - userId: {}, actionId: {}", userId, actionId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             logger.error("ERROR COMPLETING ACTION - userId: {}, actionId: {}, error: {}", userId, actionId, e.getMessage());
