@@ -10,10 +10,11 @@
 
 # Project directories
 BACKEND_DIR  := backend
-DB_DIR       := backend/local-database
+FRONTEND_DIR := frontend
+ENV_DIR      := local-env
 
 # Docker Compose file for the full local stack (DB + backend container)
-DC           := docker compose -f $(DB_DIR)/docker-compose.yml
+DC           := docker compose -f $(ENV_DIR)/docker-compose.yaml
 
 # Maven wrapper / command
 MVN          := mvn
@@ -22,6 +23,7 @@ MVN          := mvn
         build build-skip-tests clean \
         test \
         db-up db-down db-logs db-reset \
+		backend-up backend-down backend-logs backend-reset \
         up down logs restart \
         env-setup
 
@@ -63,11 +65,24 @@ db-reset: ## ⚠ Destroy & recreate the PostgreSQL container (data loss!)
 	$(DC) down -v postgres-db
 	$(DC) up -d postgres-db
 
-# ─── Full local stack (DB + backend container) ───────────────────────────────
-up: ## Build & start the full stack (DB + backend) in detached mode
+# ─── Database + Backend ───────────────────────────────────────────────────
+backend-up: ## Build & start DB + Backend (No Frontend)
+	$(DC) up -d --build backend
+
+backend-down: ## Stop and remove Backend & PostgreSQL container
+	$(DC) down backend postgres-db
+
+backend-logs: ## Follow backend container logs
+	$(DC) logs -f backend
+
+backend-reset: ## ⚠ Destroy & recreate the PostgreSQL and backend container (data loss!)
+	$(DC) down -v backend postgres-db
+	$(DC) up -d backend postgres-db
+# ─── Full local stack (DB + backend container + frontend container) ───────────────────────────────
+up: ## Build & start the FULL stack (DB + Backend + Frontend)
 	$(DC) up -d --build
 
-down: ## Stop and remove all containers in the stack
+down: ## Stop and remove ALL containers in the stack
 	$(DC) down
 
 logs: ## Follow logs for all containers in the stack
@@ -76,10 +91,10 @@ logs: ## Follow logs for all containers in the stack
 restart: down up ## Tear down and restart the full stack
 
 # ─── Environment setup ───────────────────────────────────────────────────────
-env-setup: ## Create backend/.env from .env.example (if it does not exist yet)
-	@if [ -f $(BACKEND_DIR)/.env ]; then \
-		echo "  ⚠  $(BACKEND_DIR)/.env already exists – skipping."; \
+env-setup: ## Create local-env/.env from .env.example
+	@if [ -f $(ENV_FILE) ]; then \
+		echo "  ⚠  $(ENV_FILE) already exists – skipping."; \
 	else \
-		cp $(BACKEND_DIR)/.env.example $(BACKEND_DIR)/.env; \
-		echo "  ✅ Created $(BACKEND_DIR)/.env – remember to fill in real values!"; \
+		cp $(ENV_DIR)/.env.example $(ENV_FILE); \
+		echo "  ✅ Created $(ENV_FILE) – remember to fill in real values!"; \
 	fi
