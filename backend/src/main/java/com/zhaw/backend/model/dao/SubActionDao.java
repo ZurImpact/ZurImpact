@@ -30,7 +30,7 @@ public class SubActionDao {
     public List<GpsActionTask> findGpsSubAction(Long actionId) {
         return jdbc.queryForList(
                 "SELECT " +
-                "id, description, display_name, action_id, gpsX, gpsY, gpsZ" +
+                "id, description, display_name, action_id, gpsX, gpsY" +
                 " FROM gps_action_tasks " +
                 "WHERE action_id = ?",
                 GpsActionTask.class,
@@ -41,7 +41,7 @@ public class SubActionDao {
     public GpsActionTask findGpsSubActionById(Long id) {
         return jdbc.queryForObject(
                 "SELECT " +
-                "id, description, display_name, action_id, gpsX, gpsY, gpsZ" +
+                "id, description, display_name, action_id, gpsX, gpsY" +
                 " FROM gps_action_tasks " +
                 "WHERE id = ?",
                 GpsActionTask.class,

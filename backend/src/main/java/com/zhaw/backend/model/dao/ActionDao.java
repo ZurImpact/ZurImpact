@@ -180,16 +180,6 @@ public class ActionDao {
         params.add(actionId);
         params.add(CompletionState.COMPLETED.name());
 
-        //TODO: cleanup
-        if (isSubtask != null) {
-            sql.append(" AND is_subtask = ?");
-            params.add(isSubtask);
-            if (subactionId != null) {
-                sql.append(" AND subaction_id = ?");
-                params.add(subactionId);
-            }
-        }
-
         Integer count = jdbc.queryForObject(sql.toString(), Integer.class, params.toArray());
         return count != null && count > 0;
     }
