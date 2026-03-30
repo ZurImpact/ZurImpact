@@ -44,21 +44,28 @@ public class ActionDao {
     };
 
     /**
-     * Helper method to map resultset to ActionHistoryDto, used for user action history query
+     * Helper method to map resultset to ActionHistoryDto, used for user action history query.
+     * Returns parent action information even when is_subtask is true.
      */
-    private static final RowMapper<UserActionHistoryDto> HISTORY_ROW_MAPPER = (rs, rowNum) -> UserActionHistoryDto.builder()
+    private static final RowMapper<UserActionHistoryDto> HISTORY_ROW_MAPPER = (rs, rowNum) -> {
+        java.sql.Timestamp validUntilTs = rs.getTimestamp("valid_until");
+        java.sql.Timestamp actionCreatedOnTs = rs.getTimestamp("action_created_on");
+        java.sql.Timestamp mappingCreatedOnTs = rs.getTimestamp("mapping_created_on");
+        
+        return UserActionHistoryDto.builder()
             .actionId(rs.getLong("action_id"))
             .description(rs.getString("description"))
             .displayName(rs.getString("display_name"))
             .points(rs.getInt("points"))
             .tags(rs.getString("tags"))
-            .validUntil(rs.getTimestamp("valid_until").toLocalDateTime())
-            .actionCreatedOn(rs.getTimestamp("action_created_on").toLocalDateTime())
+            .validUntil(validUntilTs != null ? validUntilTs.toLocalDateTime() : null)
+            .actionCreatedOn(actionCreatedOnTs != null ? actionCreatedOnTs.toLocalDateTime() : null)
             .completionState(String.valueOf(CompletionState.valueOf(rs.getString("completion_state"))))
             .isSubtask(rs.getBoolean("is_subtask"))
             .subactionId(rs.getString("subaction_id"))
-            .mappingCreatedOn(rs.getTimestamp("mapping_created_on").toLocalDateTime())
+            .mappingCreatedOn(mappingCreatedOnTs != null ? mappingCreatedOnTs.toLocalDateTime() : null)
             .build();
+    };
 
     /**
      * Finds all actions in regard to filter
