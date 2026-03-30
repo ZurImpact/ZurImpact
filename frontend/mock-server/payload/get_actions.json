@@ -11,5 +11,31 @@
     "hasSubtasks": false,
     "validUntil": "2023-12-31",
     "createdOn": "2023-01-01"
+  },
+  {
+    "id": 2,
+    "description": "Walk to the checkpoints and earn points for each checkpoint you reach.",
+    "displayName": "Walk for Lunch",
+    "points": 50,
+    "tags": "GPS",
+    "subActionDtoList": [],
+    "subActionDtoIdList": [],
+    "type": "GPS",
+    "hasSubtasks": false,
+    "validUntil": "2023-12-31",
+    "createdOn": "2023-01-01"
+  },
+  {
+    "id": 3,
+    "description": "Walk to the checkpoints and earn points for each checkpoint you reach.",
+    "displayName": "Walk for Sandwich",
+    "points": 100,
+    "tags": "GPS",
+    "subActionDtoList": [],
+    "subActionDtoIdList": [],
+    "type": "GPS",
+    "hasSubtasks": false,
+    "validUntil": "2023-12-31",
+    "createdOn": "2023-01-01"
   }
 ]
