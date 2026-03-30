@@ -3,6 +3,8 @@ package com.zhaw.backend.model.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Getter
 @Setter
@@ -22,6 +24,24 @@ public class SubAction {
     private String displayName;
 
     @Column(name = "action_id", nullable = false)
-    private Long   actionId;
+    private Long actionId;
 
+    @Column(name = "created_on", nullable = false, updatable = false)
+    private LocalDateTime createdOn;
+
+    @Column(name = "updated_on")
+    private LocalDateTime updatedOn;
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdOn == null) {
+            createdOn = LocalDateTime.now();
+        }
+        updatedOn = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedOn = LocalDateTime.now();
+    }
 }

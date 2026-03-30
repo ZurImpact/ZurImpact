@@ -75,6 +75,8 @@ public final class SubActionMapper {
         target.setDescription(source.getDescription());
         target.setDisplayName(source.getDisplayName());
         target.setActionId(source.getActionId());
+        target.setCreatedOn(source.getCreatedOn());
+        target.setUpdatedOn(source.getUpdatedOn());
     }
 
     private static void mapCommonFields(SubActionDto source, SubAction target) {
@@ -82,5 +84,7 @@ public final class SubActionMapper {
         target.setDescription(source.getDescription());
         target.setDisplayName(source.getDisplayName());
         target.setActionId(source.getActionId());
+        target.setCreatedOn(source.getCreatedOn());
+        target.setUpdatedOn(source.getUpdatedOn());
     }
 }
