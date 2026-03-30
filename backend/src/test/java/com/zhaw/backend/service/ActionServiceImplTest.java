@@ -1,6 +1,7 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.ActionType;
+import com.zhaw.backend.enums.CompletionState;
 import com.zhaw.backend.model.dao.ActionDao;
 import com.zhaw.backend.model.dto.SubActionDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -23,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -160,15 +161,13 @@ class ActionServiceImplTest {
         @Test
         @DisplayName("completeActionForUser with non-subtask delegates to DAO")
         void completeActionForUserWithNonSubtaskDelegatesToDao() throws Exception {
-            SubActionDto completedSubAction = new SubActionDto();
-            completedSubAction.setActionId(8L);
-            when(subActionService.getSubActions(8L, null)).thenReturn(List.of(completedSubAction));
-            when(actionDao.isActionCompleted(7L, 8L, null, null)).thenReturn(true);
+            when(subActionService.getSubActionsCompletionStatesForUser(7L, 8L)).thenReturn(null);
             when(actionDao.completeAction(7L, 8L, false, null)).thenReturn(true);
 
-            boolean result = actionService.completeActionForUser(7L, 8L, false, null, null, null);
+            boolean result = actionService.completeActionForUser(7L, 8L);
 
             assertTrue(result);
+            verify(subActionService).getSubActionsCompletionStatesForUser(7L, 8L);
             verify(actionDao).completeAction(7L, 8L, false, null);
         }
 
@@ -189,57 +188,38 @@ class ActionServiceImplTest {
     class CompleteActionForUserTests {
 
         @Test
-        @DisplayName("successfully completes regular action when isSubtask is false")
-        void successfullyCompletesRegularActionWhenIsSubtaskFalse() throws Exception {
-            SubActionDto completedSubAction = new SubActionDto();
-            completedSubAction.setActionId(2L);
-            when(subActionService.getSubActions(anyLong(), isNull())).thenReturn(List.of(completedSubAction));
-            when(actionDao.isActionCompleted(anyLong(), anyLong(), isNull(), isNull())).thenReturn(true);
+        @DisplayName("completes action when there are no sub-action completion states")
+        void completesActionWhenNoSubActionStatesExist() throws Exception {
+            when(subActionService.getSubActionsCompletionStatesForUser(1L, 2L)).thenReturn(null);
             when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(true);
 
-            boolean result = actionService.completeActionForUser(1L, 2L, false, null, null, null);
+            boolean result = actionService.completeActionForUser(1L, 2L);
 
             assertTrue(result);
+            verify(subActionService).getSubActionsCompletionStatesForUser(1L, 2L);
             verify(actionDao).completeAction(1L, 2L, false, null);
-            verify(subActionService, never()).validateCompletionForSubaction(any(), any(), any(), any(), any(), any());
         }
 
         @Test
-        @DisplayName("successfully completes regular action when isSubtask is null")
-        void successfullyCompletesRegularActionWhenIsSubtaskNull() throws Exception {
-            SubActionDto completedSubAction = new SubActionDto();
-            completedSubAction.setActionId(2L);
-            when(subActionService.getSubActions(anyLong(), isNull())).thenReturn(List.of(completedSubAction));
-            when(actionDao.isActionCompleted(anyLong(), anyLong(), isNull(), isNull())).thenReturn(true);
-            when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(true);
+        @DisplayName("returns false and does not call DAO when any sub-action is not completed")
+        void returnsFalseWhenACompletionStateIsNotCompleted() throws Exception {
+            when(subActionService.getSubActionsCompletionStatesForUser(1L, 2L))
+                    .thenReturn(List.of(Map.of("subaction_id", CompletionState.IN_PROGRESS)));
 
-            boolean result = actionService.completeActionForUser(1L, 2L, null, null, null, null);
-
-            assertTrue(result);
-            verify(actionDao).completeAction(1L, 2L, false, null);
-            verify(subActionService, never()).validateCompletionForSubaction(any(), any(), any(), any(), any(), any());
-        }
-
-        @Test
-        @DisplayName("returns false when subactionId is null but isSubtask is true")
-        void returnsFalseWhenSubactionIdNullButIsSubtaskTrue() throws Exception {
-            boolean result = actionService.completeActionForUser(1L, 2L, true, null, null, null);
+            boolean result = actionService.completeActionForUser(1L, 2L);
 
             assertFalse(result);
-            verify(subActionService, never()).validateCompletionForSubaction(any(), any(), any(), any(), any(), any());
-            verify(actionDao, never()).completeAction(any(), any(), any(), any());
+            verify(subActionService).getSubActionsCompletionStatesForUser(1L, 2L);
+            verify(actionDao, never()).completeAction(anyLong(), anyLong(), any(), any());
         }
 
         @Test
-        @DisplayName("completes regular action and returns false when DAO returns false")
-        void completesRegularActionAndReturnsFalseWhenDaoReturnsFalse() throws Exception {
-            SubActionDto completedSubAction = new SubActionDto();
-            completedSubAction.setActionId(2L);
-            when(subActionService.getSubActions(anyLong(), isNull())).thenReturn(List.of(completedSubAction));
-            when(actionDao.isActionCompleted(anyLong(), anyLong(), isNull(), isNull())).thenReturn(true);
+        @DisplayName("returns false when DAO fails to complete action")
+        void returnsFalseWhenDaoFailsToCompleteAction() throws Exception {
+            when(subActionService.getSubActionsCompletionStatesForUser(1L, 2L)).thenReturn(Collections.emptyList());
             when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(false);
 
-            boolean result = actionService.completeActionForUser(1L, 2L, false, null, null, null);
+            boolean result = actionService.completeActionForUser(1L, 2L);
 
             assertFalse(result);
             verify(actionDao).completeAction(1L, 2L, false, null);

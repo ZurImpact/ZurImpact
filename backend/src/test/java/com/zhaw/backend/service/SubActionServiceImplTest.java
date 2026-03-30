@@ -124,13 +124,13 @@ class SubActionServiceImplTest {
             Long subactionId = 10L;
             Float gpsx = 10.0f;
             Float gpsy = 20.0f;
-            Float gpsz = 5.0f;
 
             GpsActionTask gpsTask = new GpsActionTask();
             gpsTask.setId(10L);
             gpsTask.setGpsX(10.0f);
             gpsTask.setGpsY(20.0f);
             when(subActionDao.findGpsSubActionById(10L)).thenReturn(gpsTask);
+            when(subActionDao.completeSubActionForUser(userId, actionId, true, subactionId.toString())).thenReturn(true);
 
             // When
             boolean result = subActionService.completeSubActionForUser(userId, actionId, subactionId, ActionType.GPS, gpsx, gpsy);
@@ -148,7 +148,6 @@ class SubActionServiceImplTest {
             Long subactionId = 10L;
             Float gpsx = 25.0f; // Outside 10.0 threshold from target 10.0
             Float gpsy = 20.0f;
-            Float gpsz = 5.0f;
 
             GpsActionTask gpsTask = new GpsActionTask();
             gpsTask.setId(10L);

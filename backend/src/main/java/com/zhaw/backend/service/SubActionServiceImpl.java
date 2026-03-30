@@ -1,6 +1,7 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.ActionType;
+import com.zhaw.backend.enums.CompletionState;
 import com.zhaw.backend.mappers.SubActionMapper;
 import com.zhaw.backend.model.dao.SubActionDao;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
@@ -53,6 +54,11 @@ public class SubActionServiceImpl implements SubActionService{
         return handlersForEntities.getOrDefault(actionType, id -> List.of()).apply(actionId);
     }
 
+    @Override
+    public List<Map<String, CompletionState>> getSubActionsCompletionStatesForUser(Long userId,Long actionId){
+        return subActionDao.findSubActionCompletionStates(userId, actionId);
+    }
+
     private List<SubActionDto> getGpsSubAction(Long actionId) {
         List<GpsActionTask> gpsActionTaskList = subActionDao.findGpsSubAction(actionId);
         return SubActionMapper.GpsActionTaskToDtoList(gpsActionTaskList);
@@ -85,7 +91,7 @@ public class SubActionServiceImpl implements SubActionService{
             throw new Exception("GPS SubAction not found for ID: " + subactionId);
         }
         if(SubActionValidator.validateGpsSubAction(gpsx, gpsy, gpsActionTask.getGpsX(), gpsActionTask.getGpsY(), gpsAccuracyThreshold)){
-            return subActionDao.completeSubAction(userId, actionId, true, subactionId.toString());
+            return subActionDao.completeSubActionForUser(userId, actionId, true, subactionId.toString());
         }
         return false;
     }

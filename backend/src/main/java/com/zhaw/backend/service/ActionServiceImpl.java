@@ -9,6 +9,7 @@ import com.zhaw.backend.model.dto.SubActionDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
+import com.zhaw.backend.validator.ActionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,10 +108,9 @@ public class ActionServiceImpl implements ActionService {
      */
     @Override
     public boolean completeActionForUser(Long userId, Long actionId) throws Exception {
-        /**
-        if(validateActionCompletion(userId, actionId)){
+        if(ActionValidator.validateActionCompletion(subActionService.getSubActionsCompletionStatesForUser(userId,actionId)) ){
             return actionDao.completeAction(userId, actionId, false, null);
-        }**/
+        }
         return false;
     }
 
