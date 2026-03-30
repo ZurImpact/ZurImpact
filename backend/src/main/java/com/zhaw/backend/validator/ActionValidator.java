@@ -15,7 +15,9 @@ public class ActionValidator {
      * @return returns true if all subTasks are completed or if there are no subTasks, false otherwise
      */
     public static boolean validateActionCompletion(List<Map<String, CompletionState>> completionStates) {
-        if(completionStates == null || completionStates.isEmpty())return true;
+        if(completionStates == null || completionStates.isEmpty()) {
+            return true;
+        }
         for(Map<String, CompletionState> subActionCompletionState : completionStates) {
             if(subActionCompletionState == null || subActionCompletionState.isEmpty()) continue;
             for(CompletionState state : subActionCompletionState.values()) {

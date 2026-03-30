@@ -58,7 +58,6 @@ public class SubActionDao {
      * @return true if the action was successfully completed, false otherwise
      */
     public boolean completeSubActionForUser(Long userId, Long actionId, Boolean isSubtask, String subActionId) {
-        if(!isSubtask || subActionId == null) return false;
         int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subaction_id) " +
                         "VALUES(?,?,?,?,?,?)",
                 userId,actionId, CompletionState.COMPLETED.name(), Timestamp.valueOf(java.time.LocalDateTime.now()),
