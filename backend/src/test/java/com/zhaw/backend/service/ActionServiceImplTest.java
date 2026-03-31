@@ -58,7 +58,7 @@ class ActionServiceImplTest {
         @DisplayName("does not call SubActionService when no subtasks")
         void doesNotCallSubActionServiceWhenNoSubtasks() throws Exception {
             Action action = buildAction(1L, false);
-            when(actionDao.findAllFiltered(any(), any(), any(), any())).thenReturn(List.of(action));
+            when(actionDao.findAllFiltered(any())).thenReturn(List.of(action));
 
             List<?> result = actionService.getActions(null, null, null, null);
 

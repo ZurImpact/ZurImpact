@@ -9,6 +9,7 @@ import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubActionDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
+import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,8 @@ public class ActionServiceImpl implements ActionService {
     @Override
     @Transactional(readOnly = true)
     public List<ActionDto> getActions(String text, Integer points, String tags, LocalDateTime validUntil) throws Exception {
-        List<Action> actionsList = actionDao.findAllFiltered(text, points, ActionFilterMapper.parseTags(tags), validUntil);
+        ActionFilterDto filter = ActionFilterMapper.fromRequest(text, points, tags, validUntil);
+        List<Action> actionsList = actionDao.findAllFiltered(filter);
         List<ActionDto> actionDtoList = ActionMapper.toDtoList(actionsList);
 
         for(ActionDto actionDto : actionDtoList){

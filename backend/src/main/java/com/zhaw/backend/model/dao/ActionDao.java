@@ -1,6 +1,7 @@
 package com.zhaw.backend.model.dao;
 
 import com.zhaw.backend.enums.CompletionState;
+import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
 import com.zhaw.backend.model.entities.UserActionHistory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -68,22 +69,21 @@ public class ActionDao {
 
     /**
      * Finds all actions in regard to filter
-     * @param text filter text for description and display_name
-     * @param points filter for exact points match
-     * @param tags filter for tags
-     * @param validUntil filter for valid_until
+     * @param filter ActionFilterDto with all filter options, if null, no filter is applied and all actions are returned
      * @return List of result
      */
-    public List<Action> findAllFiltered(String text, Integer points, List<String> tags, LocalDateTime validUntil) {
+    public List<Action> findAllFiltered(ActionFilterDto filter) {
         StringBuilder sql = new StringBuilder(
                 "SELECT id, description, display_name, points, tags, type, has_subtasks, valid_until, created_on FROM action");
         List<Object> params = new ArrayList<>();
         boolean hasWhere = false;
 
-        hasWhere = appendTextFilter(sql, params, hasWhere, text);
-        hasWhere = appendEquals(sql, params, hasWhere, "points", points);
-        hasWhere = appendTagFilter(sql, params, hasWhere, tags);
-        appendTimestamp(sql, params, hasWhere, "valid_until", validUntil);
+        if (filter != null) {
+            hasWhere = appendTextFilter(sql, params, hasWhere, filter.getText());
+            hasWhere = appendEquals(sql, params, hasWhere, "points", filter.getPoints());
+            hasWhere = appendTagFilter(sql, params, hasWhere, filter.getTags());
+            appendTimestamp(sql, params, hasWhere, "valid_until", filter.getValidUntil());
+        }
 
         return jdbc.query(sql.toString(), ROW_MAPPER, params.toArray());
     }
