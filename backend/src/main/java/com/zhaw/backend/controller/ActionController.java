@@ -108,7 +108,7 @@ public class ActionController {
      *
      * @param id  the action ID
      * @param dto the updated action data
-     * @return 200 on success
+     * @return 204 on success
      */
     @PutMapping("/{id}")
     @Operation(summary = "Update action", description = "Updates an existing action. Requires ADMIN or PARTNER role.", tags = "Action Management")
@@ -120,7 +120,7 @@ public class ActionController {
                 return ResponseEntity.notFound().build();
             }
             logger.info("UPDATED ACTION - id: {}", id);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             logger.error("ERROR UPDATING ACTION - id: {}, error: {}", id, e.getMessage());
             return ResponseEntity.status(500).build();
@@ -131,7 +131,7 @@ public class ActionController {
      * Deletes an action by ID.
      *
      * @param id the action ID
-     * @return 200 on success, 404 if not found
+     * @return 204 on success, 404 if not found
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete action", description = "Permanently deletes an action. Requires ADMIN or PARTNER role.", tags = "Action Management")
@@ -143,7 +143,7 @@ public class ActionController {
                 return ResponseEntity.notFound().build();
             }
             logger.info("DELETED ACTION - id: {}", id);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             logger.error("ERROR DELETING ACTION - id: {}, error: {}", id, e.getMessage());
             return ResponseEntity.status(500).build();
@@ -155,7 +155,7 @@ public class ActionController {
      *
      * @param id  the subaction ID
      * @param dto the updated subaction data
-     * @return 200 on success, 404 if not found
+     * @return 204 on success, 404 if not found
      */
     @PutMapping("/subaction/{id}")
     @Operation(summary = "Update subaction", description = "Updates an existing GPS subaction. Requires ADMIN or PARTNER role.", tags = "Action Management")
@@ -167,7 +167,7 @@ public class ActionController {
                 return ResponseEntity.notFound().build();
             }
             logger.info("UPDATED SUBACTION - id: {}", id);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             logger.error("ERROR UPDATING SUBACTION - id: {}, error: {}", id, e.getMessage());
             return ResponseEntity.status(500).build();
@@ -178,7 +178,7 @@ public class ActionController {
      * Deletes a subaction by ID.
      *
      * @param id the subaction ID
-     * @return 200 on success, 404 if not found
+     * @return 204 on success, 404 if not found
      */
     @DeleteMapping("/subaction/{id}")
     @Operation(summary = "Delete subaction", description = "Permanently deletes a subaction. Requires ADMIN or PARTNER role.", tags = "Action Management")
@@ -190,7 +190,7 @@ public class ActionController {
                 return ResponseEntity.notFound().build();
             }
             logger.info("DELETED SUBACTION - id: {}", id);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             logger.error("ERROR DELETING SUBACTION - id: {}, error: {}", id, e.getMessage());
             return ResponseEntity.status(500).build();
