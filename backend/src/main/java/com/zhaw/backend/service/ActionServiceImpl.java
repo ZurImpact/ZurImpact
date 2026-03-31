@@ -3,6 +3,7 @@ package com.zhaw.backend.service;
 import com.zhaw.backend.enums.ActionType;
 import com.zhaw.backend.mappers.ActionFilterMapper;
 import com.zhaw.backend.mappers.ActionMapper;
+import com.zhaw.backend.mappers.UserActionHistoryMapper;
 import com.zhaw.backend.model.dao.ActionDao;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
@@ -42,21 +43,16 @@ public class ActionServiceImpl implements ActionService {
     @Transactional(readOnly = true)
     public List<ActionDto> getActions(String text, Integer points, String tags, LocalDateTime validUntil) throws Exception {
         ActionFilterDto filter = ActionFilterMapper.fromRequest(text, points, tags, validUntil);
-
         List<Action> actionsList = actionDao.findAllFiltered(filter);
         List<ActionDto> actionDtoList = ActionMapper.toDtoList(actionsList);
 
         for(ActionDto actionDto : actionDtoList){
             if(actionDto.getHasSubtasks()) {
-                actionDto.setSubActionDtoIdList(getSubActionIds(actionDto.getId(), actionDto.getType()));
+                actionDto.setSubActions(getSubActions(actionDto.getId(), actionDto.getType()));
             }
         }
 
         return actionDtoList;
-    }
-
-    private List<Long> getSubActionIds(Long actionId, ActionType actionType) throws Exception {
-        return subActionService.getSubActionIds(actionId, actionType);
     }
 
     @Override
@@ -66,7 +62,7 @@ public class ActionServiceImpl implements ActionService {
             ActionDto actionDto = ActionMapper.toDto(action);
 
             if(actionDto.getHasSubtasks()){
-                actionDto.setSubActionDtoList(getSubActions(actionDto.getId(), actionDto.getType()));
+                actionDto.setSubActions(getSubActions(actionDto.getId(), actionDto.getType()));
             }
 
             return actionDto;
@@ -86,7 +82,7 @@ public class ActionServiceImpl implements ActionService {
      */
     @Override
     public List<UserActionHistoryDto> getUserActions(Long userId, Boolean active){
-        return actionDao.findUserActionHistory(userId, active);
+        return UserActionHistoryMapper.toDtoList(actionDao.findUserActionHistory(userId, active));
     }
 
     /**
@@ -114,5 +110,43 @@ public class ActionServiceImpl implements ActionService {
     @Override
     public boolean deleteActionForUser(Long userId, Long actionId){
         return actionDao.deleteAction(userId, actionId);
+    }
+
+    @Override
+    @Transactional
+    public ActionDto createAction(ActionDto dto) {
+        Action entity = ActionMapper.toEntity(dto);
+        Long newId = actionDao.createAction(entity);
+        dto.setId(newId);
+        if (Boolean.TRUE.equals(dto.getHasSubtasks()) && dto.getSubActions() != null) {
+            for (SubActionDto subAction : dto.getSubActions()) {
+                if (subAction instanceof GpsActionTaskDto gpsDto) {
+                    subActionService.createSubAction(newId, gpsDto);
+                }
+            }
+        }
+        return dto;
+    }
+
+    @Override
+    public boolean updateAction(Long id, ActionDto dto) {
+        Action entity = ActionMapper.toEntity(dto);
+        entity.setId(id);
+        return actionDao.updateAction(entity);
+    }
+
+    @Override
+    public boolean deleteAction(Long id) {
+        return actionDao.deleteActionById(id);
+    }
+
+    @Override
+    public boolean updateSubAction(Long id, GpsActionTaskDto dto) {
+        return subActionService.updateSubAction(id, dto);
+    }
+
+    @Override
+    public boolean deleteSubAction(Long id) {
+        return subActionService.deleteSubAction(id);
     }
 }

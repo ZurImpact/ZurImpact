@@ -7,8 +7,7 @@ export interface ActionDto {
   displayName: string;
   points?: number;
   tags?: Tag[];
-  subActionDtoList?: SubActionDto[];
-  subActionDtoIdList?: number[];
+  subActions?: SubActionDto[];
   type?: ActionType;
   hasSubtasks?: boolean;
   validUntil?: string;
