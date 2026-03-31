@@ -20,7 +20,7 @@
   "description": "Pick up litter in your neighbourhood",
   "displayName": "Clean Up",
   "points": 50,
-  "tags": ["ECO", "COMMUNITY"],
+  "tags": ["TRAVEL"],
   "type": "GPS",
   "hasSubtasks": false,
   "validUntil": "2026-12-31T23:59:59"
@@ -33,7 +33,7 @@
   "description": "Visit all recycling stations in the city",
   "displayName": "Recycling Tour",
   "points": 100,
-  "tags": ["ECO"],
+  "tags": ["TRAVEL"],
   "type": "GPS",
   "hasSubtasks": true,
   "validUntil": "2026-12-31T23:59:59",
@@ -64,7 +64,7 @@
   "description": "Updated description",
   "displayName": "Updated Name",
   "points": 75,
-  "tags": ["ECO", "HEALTH"],
+  "tags": ["TRAVEL"],
   "type": "GPS",
   "hasSubtasks": false,
   "validUntil": "2026-12-31T23:59:59"
