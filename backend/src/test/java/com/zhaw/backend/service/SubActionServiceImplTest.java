@@ -2,6 +2,7 @@ package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.ActionType;
 import com.zhaw.backend.model.dao.SubActionDao;
+import com.zhaw.backend.model.dto.SubActionCompletionRequestDto;
 import com.zhaw.backend.model.dto.SubActionDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -112,8 +115,8 @@ class SubActionServiceImplTest {
     }
 
     @Nested
-    @DisplayName("completeGpsSubActionForUser")
-    class CompleteGpsSubActionForUserTests {
+    @DisplayName("completeSubActionForUser")
+    class CompleteSubActionForUserTests {
 
         @Test
         @DisplayName("Should complete GPS subaction successfully when coordinates match")
@@ -125,6 +128,18 @@ class SubActionServiceImplTest {
             Float gpsx = 10.0f;
             Float gpsy = 20.0f;
 
+            Map<String, Object> additionalData = new HashMap<>();
+            additionalData.put("gpsX", gpsx);
+            additionalData.put("gpsY", gpsy);
+
+            SubActionCompletionRequestDto requestDto = SubActionCompletionRequestDto.builder()
+                    .userId(userId)
+                    .actionId(actionId)
+                    .subActionId(subactionId)
+                    .actionType(ActionType.GPS)
+                    .additionalData(additionalData)
+                    .build();
+
             GpsActionTask gpsTask = new GpsActionTask();
             gpsTask.setId(10L);
             gpsTask.setGpsX(10.0f);
@@ -133,7 +148,7 @@ class SubActionServiceImplTest {
             when(subActionDao.completeSubActionForUser(userId, actionId, true, subactionId.toString())).thenReturn(true);
 
             // When
-            boolean result = subActionService.completeSubActionForUser(userId, actionId, subactionId, ActionType.GPS, gpsx, gpsy);
+            boolean result = subActionService.completeSubActionForUser(requestDto);
 
             // Then
             assertTrue(result);
@@ -149,6 +164,18 @@ class SubActionServiceImplTest {
             Float gpsx = 25.0f; // Outside 10.0 threshold from target 10.0
             Float gpsy = 20.0f;
 
+            Map<String, Object> additionalData = new HashMap<>();
+            additionalData.put("gpsX", gpsx);
+            additionalData.put("gpsY", gpsy);
+
+            SubActionCompletionRequestDto requestDto = SubActionCompletionRequestDto.builder()
+                    .userId(userId)
+                    .actionId(actionId)
+                    .subActionId(subactionId)
+                    .actionType(ActionType.GPS)
+                    .additionalData(additionalData)
+                    .build();
+
             GpsActionTask gpsTask = new GpsActionTask();
             gpsTask.setId(10L);
             gpsTask.setGpsX(10.0f);
@@ -156,67 +183,75 @@ class SubActionServiceImplTest {
             when(subActionDao.findGpsSubActionById(10L)).thenReturn(gpsTask);
 
             // When
-            boolean result = subActionService.completeSubActionForUser(userId, actionId, subactionId,ActionType.GPS, gpsx, gpsy);
+            boolean result = subActionService.completeSubActionForUser(requestDto);
 
             // Then
             assertFalse(result);
         }
 
         @Test
-        @DisplayName("Should throw exception when userId is null")
-        void shouldThrowExceptionWhenUserIdIsNull() {
-            // When & Then
-            Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeSubActionForUser(null, 1L, 10L, ActionType.GPS ,10.0f, 20.0f));
-            assertEquals("User ID, Action ID, Subaction ID and Subcation Type must not be null", exception.getMessage());
-        }
+        @DisplayName("Should throw exception when GPS coordinates are null")
+        void shouldThrowExceptionWhenGpsCoordinatesAreNull() {
+            // Given
+            Map<String, Object> additionalData = new HashMap<>();
+            additionalData.put("gpsX", null);
+            additionalData.put("gpsY", null);
 
-        @Test
-        @DisplayName("Should throw exception when actionId is null")
-        void shouldThrowExceptionWhenActionIdIsNull() {
-            // When & Then
-            Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeSubActionForUser(1L, null, 10L, ActionType.GPS,10.0f, 20.0f));
-            assertEquals("User ID, Action ID, Subaction ID and Subcation Type must not be null", exception.getMessage());
-        }
+            SubActionCompletionRequestDto requestDto = SubActionCompletionRequestDto.builder()
+                    .userId(1L)
+                    .actionId(1L)
+                    .subActionId(10L)
+                    .actionType(ActionType.GPS)
+                    .additionalData(additionalData)
+                    .build();
 
-        @Test
-        @DisplayName("Should throw exception when subactionId is null")
-        void shouldThrowExceptionWhenSubactionIdIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeSubActionForUser(1L, 1L, null, ActionType.GPS, 10.0f, 20.0f));
-            assertEquals("User ID, Action ID, Subaction ID and Subcation Type must not be null", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should throw exception when gpsx is null")
-        void shouldThrowExceptionWhenGpsxIsNull() {
-            // When & Then
-            Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeSubActionForUser(1L, 1L, 10L, ActionType.GPS, null, 20.0f));
-            assertEquals("User ID, Action ID, Subaction ID and GPS coordinates must not be null", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should throw exception when gpsy is null")
-        void shouldThrowExceptionWhenGpsyIsNull() {
-            // When & Then
-            Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeSubActionForUser(1L, 1L, 10L, ActionType.GPS, 10.0f, null));
-            assertEquals("User ID, Action ID, Subaction ID and GPS coordinates must not be null", exception.getMessage());
+                subActionService.completeSubActionForUser(requestDto));
+            assertEquals("GPS coordinates must not be null", exception.getMessage());
         }
 
         @Test
         @DisplayName("Should throw exception when GPS subaction is not found")
         void shouldThrowExceptionWhenGpsSubactionNotFound() {
             // Given
+            Map<String, Object> additionalData = new HashMap<>();
+            additionalData.put("gpsX", 10.0f);
+            additionalData.put("gpsY", 20.0f);
+
+            SubActionCompletionRequestDto requestDto = SubActionCompletionRequestDto.builder()
+                    .userId(1L)
+                    .actionId(1L)
+                    .subActionId(10L)
+                    .actionType(ActionType.GPS)
+                    .additionalData(additionalData)
+                    .build();
+
             when(subActionDao.findGpsSubActionById(10L)).thenReturn(null);
 
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeSubActionForUser(1L, 1L, 10L, ActionType.GPS , 10.0f, 20.0f));
-            assertEquals("GPS SubAction not found for ID: 10", exception.getMessage());
+                subActionService.completeSubActionForUser(requestDto));
+            assertTrue(exception.getMessage().contains("GPS SubAction not found"));
+        }
+
+        @Test
+        @DisplayName("Should throw exception when unsupported action type is provided")
+        void shouldThrowExceptionWhenUnsupportedActionType() {
+            // Given
+            Map<String, Object> additionalData = new HashMap<>();
+            SubActionCompletionRequestDto requestDto = SubActionCompletionRequestDto.builder()
+                    .userId(1L)
+                    .actionId(1L)
+                    .subActionId(10L)
+                    .actionType(ActionType.PHOTO)  // Unsupported
+                    .additionalData(additionalData)
+                    .build();
+
+            // When & Then
+            Exception exception = assertThrows(Exception.class, () ->
+                subActionService.completeSubActionForUser(requestDto));
+            assertTrue(exception.getMessage().contains("Unsupported SubAction Type"));
         }
     }
 }

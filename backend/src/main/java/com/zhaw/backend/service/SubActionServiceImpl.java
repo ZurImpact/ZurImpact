@@ -5,6 +5,7 @@ import com.zhaw.backend.enums.CompletionState;
 import com.zhaw.backend.mappers.SubActionMapper;
 import com.zhaw.backend.model.dao.SubActionDao;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
+import com.zhaw.backend.model.dto.SubActionCompletionRequestDto;
 import com.zhaw.backend.model.dto.SubActionDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
 import com.zhaw.backend.validator.SubActionValidator;
@@ -65,20 +66,17 @@ public class SubActionServiceImpl implements SubActionService{
     }
 
     @Override
-    public boolean completeSubActionForUser(Long userId, Long actionId, Long subActionId, ActionType subActionType, Float gpsX, Float gpsY) throws Exception {
-        if (userId == null || actionId == null || subActionId == null || subActionType == null) {
-            throw new Exception("User ID, Action ID, Subaction ID and Subcation Type must not be null");
-        }
-
-        return switch (subActionType) {
-            case GPS -> completeGpsSubActionForUser(userId, actionId, subActionId, gpsX, gpsY);
-            default -> throw new Exception("Unsupported SubAction Type: " + subActionType);
+    public boolean completeSubActionForUser(SubActionCompletionRequestDto requestDto) throws Exception {
+        return switch (requestDto.getActionType()) {
+            case GPS -> completeGpsSubActionForUser(requestDto.getUserId(), requestDto.getActionId(), requestDto.getSubActionId(),
+                    (Float) requestDto.getAdditionalData().get("gpsX"), (Float) requestDto.getAdditionalData().get("gpsY"));
+            default -> throw new Exception("Unsupported SubAction Type: " + requestDto.getActionType());
         };
     }
 
     private boolean completeGpsSubActionForUser(Long userId, Long actionId, Long subactionId, Float gpsx, Float gpsy) throws Exception {
-        if (userId == null || actionId == null || subactionId == null || gpsx == null || gpsy == null) {
-            throw new Exception("User ID, Action ID, Subaction ID and GPS coordinates must not be null");
+        if (gpsx == null || gpsy == null) {
+            throw new Exception("GPS coordinates must not be null");
         }
         GpsActionTask gpsActionTaskEntity = null;
         try {
