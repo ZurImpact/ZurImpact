@@ -250,20 +250,16 @@ public class ActionController {
      *
      * @param userId      the user ID
      * @param actionId    the action ID to complete
-     * @param isSubtask   whether this is a subtask interaction
-     * @param subactionId the subtask ID, if applicable
      * @return 200 on success
      */
     @PostMapping("/completeAction")
     @Operation(summary = "Complete action", description = "Records that a user has completed an action.", tags = "User Progress")
     public ResponseEntity<Void> completeAction(
             @RequestParam(name = "userId") Long userId,
-            @RequestParam(name = "actionId") Long actionId,
-            @RequestParam(name = "isSubtask", required = false) Boolean isSubtask,
-            @RequestParam(name = "subactionId", required = false) String subactionId) {
+            @RequestParam(name = "actionId") Long actionId){
         try {
-            actionService.completeActionForUser(userId, actionId, isSubtask, subactionId);
-            logger.info("COMPLETED ACTION - userId: {}, actionId: {}, isSubtask: {}, subactionId: {}", userId, actionId, isSubtask, subactionId);
+            actionService.completeActionForUser(userId, actionId);
+            logger.info("COMPLETED ACTION - userId: {}, actionId: {}", userId, actionId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             logger.error("ERROR COMPLETING ACTION - userId: {}, actionId: {}, error: {}", userId, actionId, e.getMessage());

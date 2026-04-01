@@ -134,7 +134,7 @@ public class ActionDao {
     public boolean startAction(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
         int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subaction_id) " +
                                 "VALUES (?, ?, ?, ?, ?, ?)",
-                userId, actionId, CompletionState.IN_PROGRESS, Timestamp.valueOf(java.time.LocalDateTime.now()),
+                userId, actionId, CompletionState.IN_PROGRESS.name(), Timestamp.valueOf(java.time.LocalDateTime.now()),
                 isSubtask != null && isSubtask, subactionId);
         return rows > 0;
     }
@@ -148,9 +148,9 @@ public class ActionDao {
      * @return true if the action was successfully completed, false otherwise
      */
     public boolean completeAction(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
-        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subaction_id)" +
+        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subaction_id) " +
                                 "VALUES(?,?,?,?,?,?)",
-                userId,actionId,CompletionState.COMPLETED,Timestamp.valueOf(java.time.LocalDateTime.now()),
+                userId,actionId,CompletionState.COMPLETED.name(),Timestamp.valueOf(java.time.LocalDateTime.now()),
                 isSubtask != null && isSubtask, subactionId);
         return rows > 0;
     }
@@ -206,6 +206,26 @@ public class ActionDao {
                     ps.setLong(2, actionId);
                 });
         return rows > 0;
+    }
+
+    /**
+     * Checks if an action has been completed by a user
+     *
+     * @param userId   id of the user
+     * @param actionId id of the action
+     * @return true if the action is completed, false otherwise
+     */
+    public boolean isActionCompleted(Long userId, Long actionId) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) FROM user_action_mapping " +
+                "WHERE user_id = ? AND action_id = ? AND completion_state = ?");
+        List<Object> params = new ArrayList<>();
+        params.add(userId);
+        params.add(actionId);
+        params.add(CompletionState.COMPLETED.name());
+
+        Integer count = jdbc.queryForObject(sql.toString(), Integer.class, params.toArray());
+        return count != null && count > 0;
     }
 
     /**

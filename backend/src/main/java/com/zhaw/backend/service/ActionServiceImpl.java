@@ -11,6 +11,7 @@ import com.zhaw.backend.model.dto.SubActionDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
+import com.zhaw.backend.validator.ActionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,8 +93,8 @@ public class ActionServiceImpl implements ActionService {
      * @return true if the action was successfully started, false if not (e.g. if the mapping already exists)
      */
     @Override
-    public boolean startActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
-        return actionDao.startAction(userId, actionId, isSubtask, subactionId);
+    public boolean startActionForUser(Long userId, Long actionId, Boolean isSubtask, String subActionId) {
+        return actionDao.startAction(userId, actionId, isSubtask, subActionId);
     }
 
     /**
@@ -103,8 +104,11 @@ public class ActionServiceImpl implements ActionService {
      * @return true if the action was successfully completed, false if not (e.g. if the mapping does not exist or is already completed)
      */
     @Override
-    public boolean completeActionForUser(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
-        return actionDao.completeAction(userId, actionId, isSubtask, subactionId);
+    public boolean completeActionForUser(Long userId, Long actionId) {
+        if(ActionValidator.validateActionCompletion(subActionService.getSubActionsCompletionStatesForUser(userId,actionId)) ){
+            return actionDao.completeAction(userId, actionId, false, null);
+        }
+        return false;
     }
 
     @Override
