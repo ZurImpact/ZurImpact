@@ -104,7 +104,7 @@ public class ActionServiceImpl implements ActionService {
      * @return true if the action was successfully completed, false if not (e.g. if the mapping does not exist or is already completed)
      */
     @Override
-    public boolean completeActionForUser(Long userId, Long actionId) throws Exception {
+    public boolean completeActionForUser(Long userId, Long actionId) {
         if(ActionValidator.validateActionCompletion(subActionService.getSubActionsCompletionStatesForUser(userId,actionId)) ){
             return actionDao.completeAction(userId, actionId, false, null);
         }

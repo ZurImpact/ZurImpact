@@ -32,14 +32,6 @@ public class SubActionDao {
         this.jdbc = jdbc;
     }
 
-    public List<Long> findGpsSubActionIds(Long actionId) {
-        return jdbc.queryForList(
-                "SELECT id FROM gps_action_tasks WHERE action_id = ?",
-                Long.class,
-                actionId
-        );
-    }
-
     public List<GpsActionTask> findGpsSubAction(Long actionId) {
         return jdbc.query(
                 "SELECT id, description, display_name, action_id, gps_x, gps_y FROM gps_action_tasks WHERE action_id = ?",

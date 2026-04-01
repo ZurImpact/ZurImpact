@@ -43,14 +43,14 @@
       "description": "Recycling station Hauptbahnhof",
       "displayName": "HB Station",
       "gpsX": 47.3769,
-      "gpsY": 8.5417,
+      "gpsY": 8.5417
     },
     {
       "type": "GPS",
       "description": "Recycling station Oerlikon",
       "displayName": "Oerlikon Station",
       "gpsX": 47.4108,
-      "gpsY": 8.5448,
+      "gpsY": 8.5448
     }
   ]
 }
@@ -75,7 +75,7 @@
   "description": "Updated checkpoint description",
   "displayName": "Updated Checkpoint",
   "gpsX": 47.3769,
-  "gpsY": 8.5417,
+  "gpsY": 8.5417
 }
 ```
 
