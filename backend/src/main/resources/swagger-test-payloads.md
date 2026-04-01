@@ -44,7 +44,6 @@
       "displayName": "HB Station",
       "gpsX": 47.3769,
       "gpsY": 8.5417,
-      "gpsZ": 0.0
     },
     {
       "type": "GPS",
@@ -52,7 +51,6 @@
       "displayName": "Oerlikon Station",
       "gpsX": 47.4108,
       "gpsY": 8.5448,
-      "gpsZ": 0.0
     }
   ]
 }
@@ -78,7 +76,6 @@
   "displayName": "Updated Checkpoint",
   "gpsX": 47.3769,
   "gpsY": 8.5417,
-  "gpsZ": 10.0
 }
 ```
 

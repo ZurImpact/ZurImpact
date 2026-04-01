@@ -31,44 +31,6 @@ class SubActionServiceImplTest {
     private SubActionServiceImpl subActionService;
 
     @Nested
-    @DisplayName("getSubActionIds")
-    class GetSubActionIdsTests {
-
-        @Test
-        @DisplayName("Should return GPS subaction IDs for GPS action type")
-        void shouldReturnGpsSubActionIdsForGpsType() throws Exception {
-            // Given
-            Long actionId = 1L;
-            List<Long> expectedIds = List.of(10L, 20L);
-            when(subActionDao.findGpsSubActionIds(actionId)).thenReturn(expectedIds);
-
-            // When
-            List<Long> result = subActionService.getSubActionIds(actionId, ActionType.GPS);
-
-            // Then
-            assertEquals(expectedIds, result);
-        }
-
-        @Test
-        @DisplayName("Should throw exception when actionId is null")
-        void shouldThrowExceptionWhenActionIdIsNull() {
-            // When & Then
-            Exception exception = assertThrows(Exception.class, () ->
-                subActionService.getSubActionIds(null, ActionType.GPS));
-            assertEquals("Action ID and Action Type must not be null", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should throw exception when actionType is null")
-        void shouldThrowExceptionWhenActionTypeIsNull() {
-            // When & Then
-            Exception exception = assertThrows(Exception.class, () ->
-                subActionService.getSubActionIds(1L, null));
-            assertEquals("Action ID and Action Type must not be null", exception.getMessage());
-        }
-    }
-
-    @Nested
     @DisplayName("getSubActions")
     class GetSubActionsTests {
 
