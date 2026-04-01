@@ -19,7 +19,7 @@ public interface SubActionService {
 
     boolean deleteSubAction(Long id);
 
-    List<Map<String, CompletionState>> getSubActionsCompletionStatesForUser(Long userId, Long actionId);
+    Map<Long, CompletionState> getSubActionsCompletionStatesForUser(Long userId, Long actionId);
 
     boolean completeSubActionForUser(SubActionCompletionRequestDto requestDto) throws Exception;
 }

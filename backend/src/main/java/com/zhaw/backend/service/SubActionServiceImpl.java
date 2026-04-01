@@ -42,7 +42,7 @@ public class SubActionServiceImpl implements SubActionService {
     }
 
     @Override
-    public List<Map<String, CompletionState>> getSubActionsCompletionStatesForUser(Long userId,Long actionId){
+    public Map<Long, CompletionState> getSubActionsCompletionStatesForUser(Long userId,Long actionId){
         return subActionDao.findSubActionCompletionStates(userId, actionId);
     }
 

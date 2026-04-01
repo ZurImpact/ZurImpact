@@ -71,19 +71,21 @@ public class SubActionDao {
      * Returns a list of Subtasks and their coresponding CompletionState
      * @param userId id of the user
      * @param actionId id of the parent action
-     * @return List of maps with subaction_id and completion_state for the given user and action
+     * @return Map with subaction_id and completion_state for the given user and action
      */
-    public List<Map<String, CompletionState>> findSubActionCompletionStates(Long userId, Long actionId) {
+    public Map<Long, CompletionState> findSubActionCompletionStates(Long userId, Long actionId) {
         return jdbc.query(
                 "SELECT subaction_id, completion_state FROM user_action_mapping " +
-                "WHERE user_id = ? AND action_id = ? AND is_subtask = true",
-                (rs, rowNum) -> {
-                    Map<String, CompletionState> row = new HashMap<>();
-                    row.put(
-                            rs.getString("subaction_id"),
-                            CompletionState.valueOf(rs.getString("completion_state"))
-                    );
-                    return row;
+                        "WHERE user_id = ? AND action_id = ? AND is_subtask = true",
+                rs -> {
+                    Map<Long, CompletionState> result = new HashMap<>();
+                    while (rs.next()) {
+                        result.put(
+                                rs.getLong("subaction_id"),
+                                CompletionState.valueOf(rs.getString("completion_state"))
+                        );
+                    }
+                    return result;
                 },
                 userId, actionId
         );

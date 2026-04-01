@@ -337,7 +337,7 @@ class ActionServiceImplTest {
             @DisplayName("returns false and does not call DAO when any sub-action is not completed")
             void returnsFalseWhenACompletionStateIsNotCompleted() {
                 when(subActionService.getSubActionsCompletionStatesForUser(1L, 2L))
-                        .thenReturn(List.of(Map.of("subaction_id", CompletionState.IN_PROGRESS)));
+                        .thenReturn(Map.of(1L, CompletionState.IN_PROGRESS));
 
                 boolean result = actionService.completeActionForUser(1L, 2L);
 
@@ -349,7 +349,7 @@ class ActionServiceImplTest {
             @Test
             @DisplayName("returns false when DAO fails to complete action")
             void returnsFalseWhenDaoFailsToCompleteAction() {
-                when(subActionService.getSubActionsCompletionStatesForUser(1L, 2L)).thenReturn(Collections.emptyList());
+                when(subActionService.getSubActionsCompletionStatesForUser(1L, 2L)).thenReturn(Map.of());
                 when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(false);
 
                 boolean result = actionService.completeActionForUser(1L, 2L);
