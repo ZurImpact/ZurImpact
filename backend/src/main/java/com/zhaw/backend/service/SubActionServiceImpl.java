@@ -78,7 +78,7 @@ public class SubActionServiceImpl implements SubActionService{
         if (gpsx == null || gpsy == null) {
             throw new Exception("GPS coordinates must not be null");
         }
-        GpsActionTask gpsActionTaskEntity = null;
+        GpsActionTask gpsActionTaskEntity;
         try {
             gpsActionTaskEntity = subActionDao.findGpsSubActionById(subactionId);
         } catch (Exception e) {
