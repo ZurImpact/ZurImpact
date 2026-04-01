@@ -18,33 +18,19 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
-public class SubActionServiceImpl implements SubActionService{
+public class SubActionServiceImpl implements SubActionService {
 
     @Autowired
     private SubActionDao subActionDao;
-    private final Map<ActionType, Function<Long, List<Long>>> handlersForIds;
+
     private final Map<ActionType, Function<Long, List<SubActionDto>>> handlersForEntities;
     private final float gpsAccuracyThreshold = 10.0f; // Example threshold for GPS accuracy
 
     public SubActionServiceImpl() {
-
-        this.handlersForIds = new EnumMap<>(ActionType.class);
-        this.handlersForIds.put(ActionType.GPS, this::getGpsSubActionIds);
-        this.handlersForIds.put(ActionType.PHOTO, this::getPhotoSubActionIds);
-        this.handlersForIds.put(ActionType.TICKET, this::getTicketSubActionIds);
-
         this.handlersForEntities = new EnumMap<>(ActionType.class);
         this.handlersForEntities.put(ActionType.GPS, this::getGpsSubAction);
         this.handlersForEntities.put(ActionType.PHOTO, this::getPhotoSubAction);
         this.handlersForEntities.put(ActionType.TICKET, this::getTicketSubAction);
-    }
-
-    @Override
-    public List<Long> getSubActionIds(Long actionId, ActionType actionType) throws Exception {
-        if (actionId == null || actionType == null) {
-            throw new Exception("Action ID and Action Type must not be null");
-        }
-        return handlersForIds.getOrDefault(actionType, id -> List.of()).apply(actionId);
     }
 
     @Override
@@ -102,15 +88,18 @@ public class SubActionServiceImpl implements SubActionService{
         return List.of();
     }
 
-    private List<Long> getGpsSubActionIds(Long actionId) {
-        return subActionDao.findGpsSubActionIds(actionId);
+    @Override
+    public void createSubAction(Long actionId, GpsActionTaskDto dto) {
+        subActionDao.createGpsSubAction(actionId, dto);
     }
 
-    private List<Long> getPhotoSubActionIds(Long actionId) {
-        return List.of();
+    @Override
+    public boolean updateSubAction(Long id, GpsActionTaskDto dto) {
+        return subActionDao.updateGpsSubAction(id, dto);
     }
 
-    private List<Long> getTicketSubActionIds(Long actionId) {
-        return List.of();
+    @Override
+    public boolean deleteSubAction(Long id) {
+        return subActionDao.deleteSubAction(id);
     }
 }
