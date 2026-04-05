@@ -2,7 +2,8 @@
   "appName": "ZurImpact",
   "rootLayout": {
     "dashboard": "Dashboard",
-    "logout": "Logout"
+    "logout": "Logout", 
+    "track": "Map"
   },
   "actionDashboard": {
     "header": "Activities",
@@ -10,6 +11,17 @@
     "historyTitle": "Your Activity History",
     "loading": "Loading actions...",
     "noActions": "You haven't completed any actions yet. Start making an impact today!"
+  },
+  "actionDetail": {
+    "header": "Track Your Route",  
+    "subheader": "Track your biking and walking activities in real-time", 
+    "distance": "Distance",
+    "duration": "Duration",
+    "statsTitle": "Current Activity",
+    "points": "Estimated Points",
+    "startTracking": "Start Tracking",
+    "geolocationError": "Geolocation is not supported by your browser"
+
   },
   "points": "Points",
   "language": "Language"
