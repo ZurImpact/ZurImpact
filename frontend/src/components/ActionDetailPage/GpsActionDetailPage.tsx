@@ -344,7 +344,9 @@ export function GpsActionDetailPage() {
                 <div
                   key={checkpoint.id}
                   className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                    checkpoint.isCheckedIn ? 'bg-green-100 dark:bg-card/40 border border-green-200 dark:border-green-400' : 'bg-gray-50 dark:bg-card/40 border border-gray-200'
+                    checkpoint.isCheckedIn
+                      ? 'bg-green-100 dark:bg-card/40 border border-green-200 dark:border-green-400'
+                      : 'bg-gray-50 dark:bg-card/40 border border-gray-200'
                   }`}
                 >
                   <div

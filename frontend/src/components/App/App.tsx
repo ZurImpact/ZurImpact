@@ -16,7 +16,7 @@ function App() {
             <Route index element={<Navigate to={ROUTES.dashboard} replace />} />
             <Route path={ROUTES.dashboard} element={<ActionDashboard />} />
             <Route path={ROUTES.track} element={<MapTrackingPage />} />
-            <Route path={"/actions/:id"} element={<GpsActionDetailPage />} />
+            <Route path={'/actions/:id'} element={<GpsActionDetailPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

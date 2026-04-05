@@ -1,33 +1,24 @@
-import { useState, useEffect, useRef } from "react";
+import {useState, useEffect, useRef} from 'react';
 // import { useNavigate } from "react-router";
-import { Card } from "./ui/card";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { MapContainer, TileLayer, Polyline, Marker, useMap } from 'react-leaflet';
+import {Card} from './ui/card';
+import {Button} from './ui/button';
+import {Badge} from './ui/badge';
+import {MapContainer, TileLayer, Polyline, Marker, useMap} from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import {
-  Play,
-  Square,
-  MapPin,
-  Clock,
-  Route,
-  Award,
-  Bike,
-  Footprints,
-} from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
+import {Play, Square, MapPin, Clock, Route, Award, Bike, Footprints} from 'lucide-react';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from './ui/select';
+import {toast} from 'sonner';
+import {useTranslation} from 'react-i18next';
 
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 const DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
@@ -35,14 +26,13 @@ L.Marker.prototype.options.icon = DefaultIcon;
 export function MapTrackingPage() {
   const {t} = useTranslation();
   const [isTracking, setIsTracking] = useState(false);
-  const [activityType, setActivityType] = useState<"bike" | "walk">("bike");
+  const [activityType, setActivityType] = useState<'bike' | 'walk'>('bike');
   const [distance, setDistance] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [path, setPath] = useState<[number, number][]>([]);
   const watchIdRef = useRef<number | null>(null);
-
 
   useEffect(() => {
     if (isTracking && startTime) {
@@ -60,21 +50,21 @@ export function MapTrackingPage() {
     };
   }, [isTracking, startTime]);
 
-  // calculating distance using the haversine forumla 
+  // calculating distance using the haversine forumla
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Earth's radius in km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
 
   const handleStartTracking = () => {
     if (!navigator.geolocation) {
-      return toast.error("Geolocation is not supported by your browser");
+      return toast.error('Geolocation is not supported by your browser');
     }
 
     setIsTracking(true);
@@ -85,7 +75,7 @@ export function MapTrackingPage() {
     // Watch position in real-time
     watchIdRef.current = navigator.geolocation.watchPosition(
       (position) => {
-        const { latitude, longitude } = position.coords;
+        const {latitude, longitude} = position.coords;
         const newPoint: [number, number] = [latitude, longitude];
 
         setPath((prevPath) => {
@@ -98,16 +88,16 @@ export function MapTrackingPage() {
           return [...prevPath, newPoint];
         });
       },
-      (error) => toast.error("Error tracking location: " + error.message),
-      { 
-        enableHighAccuracy: true, 
-        timeout: 10000, 
-        maximumAge: 0 
-      }
+      (error) => toast.error('Error tracking location: ' + error.message),
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      },
     );
   };
 
-// maybe adding a method which can destinguish how fast the change of location is -> so someone cannot take the car??
+  // maybe adding a method which can destinguish how fast the change of location is -> so someone cannot take the car??
 
   const handleStopTracking = () => {
     if (watchIdRef.current !== null) {
@@ -117,14 +107,14 @@ export function MapTrackingPage() {
 
     if (distance > 0) {
       const totalDistance = parseFloat(distance.toFixed(2));
-      const points = activityType === "bike" ? Math.round(totalDistance * 10) : Math.round(totalDistance * 5);
+      const points = activityType === 'bike' ? Math.round(totalDistance * 10) : Math.round(totalDistance * 5);
 
-    //   addActivity({
-    //     type: activityType,
-    //     title: `${activityType === "bike" ? "Bike Ride" : "Walk"} - ${totalDistance} km`,
-    //     points,
-    //     distance: totalDistance,
-    //   });
+      //   addActivity({
+      //     type: activityType,
+      //     title: `${activityType === "bike" ? "Bike Ride" : "Walk"} - ${totalDistance} km`,
+      //     points,
+      //     distance: totalDistance,
+      //   });
 
       toast.success(`Activity saved! You earned ${points} points!`);
     }
@@ -132,7 +122,7 @@ export function MapTrackingPage() {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    
+
     setStartTime(null);
     setDistance(0);
     setElapsedTime(0);
@@ -157,9 +147,7 @@ export function MapTrackingPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-4xl font-bold text-primary mb-2">{t('actionDetail.header')}</h1>
-        <p className="text-primary">
-          {t('actionDetail.subheader')}
-        </p>
+        <p className="text-primary">{t('actionDetail.subheader')}</p>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -167,11 +155,7 @@ export function MapTrackingPage() {
         <div className="lg:col-span-2">
           <Card className="overflow-hidden h-[600px] bg-primary/20 flex items-center justify-center shadow-lg">
             <div className="h-full w-full">
-              <MapContainer 
-                center={[47.3769, 8.5417]} 
-                zoom={13} 
-                style={{ height: '100%', width: '100%' }}
-              >
+              <MapContainer center={[47.3769, 8.5417]} zoom={13} style={{height: '100%', width: '100%'}}>
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -195,7 +179,7 @@ export function MapTrackingPage() {
             <h3 className="font-semibold mb-4">Activity Type</h3>
             <Select
               value={activityType}
-              onValueChange={(value: "bike" | "walk") => setActivityType(value)}
+              onValueChange={(value: 'bike' | 'walk') => setActivityType(value)}
               disabled={isTracking}
             >
               <SelectTrigger>
@@ -249,9 +233,7 @@ export function MapTrackingPage() {
                 <div className="flex-1">
                   <p className="text-sm text-gray-600">{t('actionDetail.points')}</p>
                   <p className="text-2xl font-bold">
-                    {activityType === "bike"
-                      ? Math.round(distance * 10)
-                      : Math.round(distance * 5)}
+                    {activityType === 'bike' ? Math.round(distance * 10) : Math.round(distance * 5)}
                   </p>
                 </div>
               </div>
@@ -288,8 +270,8 @@ export function MapTrackingPage() {
               <div className="text-sm text-blue-500">
                 <p className="font-semibold mb-1">GPS Tracking</p>
                 <p className="text-blue-500">
-                  Your location is tracked only during active sessions. Make sure location
-                  services are enabled on your device.
+                  Your location is tracked only during active sessions. Make sure location services are enabled on your
+                  device.
                 </p>
               </div>
             </div>
@@ -308,7 +290,7 @@ export function MapTrackingPage() {
 }
 
 // Simple helper to keep map centered on user
-function RecenterMap({ coords }: { coords: [number, number] }) {
+function RecenterMap({coords}: {coords: [number, number]}) {
   const map = useMap();
   useEffect(() => {
     map.setView(coords, map.getZoom());
