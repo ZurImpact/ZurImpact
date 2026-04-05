@@ -1,17 +1,37 @@
 import {Link, useLocation} from 'react-router';
 import {ROUTES} from '../../routes';
-import {Mountain, LogOut, Award, Menu, Moon, Sun} from 'lucide-react';
+import {Mountain, LogOut, Award, Menu, Moon, Sun, Languages} from 'lucide-react';
 import {Button} from '../ui/button';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from 'next-themes';
 import {Sheet, SheetContent, SheetTrigger} from '../ui/sheet';
+import i18n from '../../utility/i18n';
 
 export const Navigation = () => {
   const location = useLocation();
   const {t} = useTranslation();
   const {theme, setTheme} = useTheme();
 
-  const navLinks = [{to: ROUTES.dashboard, label: t('rootLayout.dashboard')}];
+  const navLinks = [
+    {to: ROUTES.dashboard, label: t('rootLayout.dashboard')},
+    {to: ROUTES.track, label: t('rootLayout.track')},
+  ];
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'en' ? 'de' : 'en';
+    i18n.changeLanguage(newLang);
+  };
+
+  const renderLanguageButton = () => (
+    <button
+      onClick={toggleLanguage}
+      className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-1"
+      title="Toggle language"
+    >
+      <Languages className="h-5 w-5" />
+      <span className="text-xs font-medium">{i18n.language.toUpperCase()}</span>
+    </button>
+  );
 
   const renderThemeButton = () => (
     <button
@@ -42,6 +62,7 @@ export const Navigation = () => {
               </Link>
             ))}
             {renderThemeButton()}
+            {renderLanguageButton()}
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-full">
                 <Award className="h-4 w-4 text-green-600" />
@@ -57,6 +78,7 @@ export const Navigation = () => {
           </div>
           <div className="flex md:hidden items-center gap-4">
             {renderThemeButton()}
+            {renderLanguageButton()}
             <Sheet>
               <SheetTrigger asChild>
                 <button className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
