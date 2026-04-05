@@ -35,7 +35,7 @@ app.get(BASE_URL + '/actions', (req, res) => {
 });
 
 // GET action by ID (for /api/actions/getAction?id=...) - MUST come before /actions/:id
-app.get(BASE_URL + '/actions/getAction', (req, res) => {
+app.get(BASE_URL + '/action/getAction', (req, res) => {
   const action = mockActions.find((a) => a.id === parseInt(req.query.id));
   if (action) {
     res.json(action);

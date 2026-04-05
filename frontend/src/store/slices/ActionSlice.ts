@@ -92,7 +92,7 @@ export const fetchActionById = createAsyncThunk(
   'action/fetchActionById',
   async (actionId: number, {rejectWithValue}) => {
     try {
-      const response = await apiClient.get(`/actions/getAction?id=${actionId}`);
+      const response = await apiClient.get(`/action/getAction?id=${actionId}`);
       return response.data;
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -124,7 +124,7 @@ export const startAction = createAsyncThunk(
   'action/startAction',
   async ({userId, actionId}: {userId: number; actionId: number}, {rejectWithValue}) => {
     try {
-      const response = await apiClient.post(`/actions/startAction?userId=${userId}&actionId=${actionId}`);
+      const response = await apiClient.post(`/action/startAction?userId=${userId}&actionId=${actionId}`);
       return response.data;
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -140,7 +140,7 @@ export const completeAction = createAsyncThunk(
   'action/completeAction',
   async ({userId, actionId}: {userId: number; actionId: number}, {rejectWithValue}) => {
     try {
-      const response = await apiClient.post(`/actions/completeAction?userId=${userId}&actionId=${actionId}`);
+      const response = await apiClient.post(`/action/completeAction?userId=${userId}&actionId=${actionId}`);
       return response.data;
     } catch (error: unknown) {
       if (error instanceof Error) {
