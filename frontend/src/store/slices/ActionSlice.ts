@@ -16,11 +16,14 @@ export interface ActionDto {
 
 type Tag = 'FOOD' | 'SOCIAL';
 
-interface SubActionDto {
+export interface SubActionDto {
   id: number;
   description?: string;
   displayName: string;
   actionId: number;
+  latitude?: number;
+  longitude?: number;
+  altitude?: number;
 }
 
 type ActionType = 'GPS' | 'PHOTO' | 'TICKET';

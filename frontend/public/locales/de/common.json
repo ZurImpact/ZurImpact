@@ -2,7 +2,7 @@
   "appName": "ZürImpact",
   "rootLayout": {
     "dashboard": "Dashboard",
-    "logout": "Abmelden", 
+    "logout": "Abmelden",
     "track": "Karte"
   },
   "actionDashboard": {
@@ -13,15 +13,31 @@
     "noActions": "Du hast noch keine Aktivitäten abgeschlossen. Starte noch heute deinen nachhaltigen Weg!"
   },
   "actionDetail": {
-    "header": "Zeichne deine Route auf",  
-    "subheader": "Zeichne deine Fahrrad und Geh Aktivitäten in Echtzeit auf", 
+    "header": "Zeichne deine Route auf",
+    "subheader": "Zeichne deine Fahrrad und Geh Aktivitäten in Echtzeit auf",
     "distance": "Distanz",
     "duration": "Dauer",
     "statsTitle": "Aktuelle Aktivität",
     "points": "Geschätzte Anzahl Punkte",
     "startTracking": "Starte die Aufzeichnung",
-    "geolocationError": "Geolocation is not supported by your browser"
-
+    "geolocationError": "Geolocation wird von deinem Browser nicht unterstützt"
+  },
+  "gpsActionDetail": {
+    "progress": "Fortschritt",
+    "checkpoints": "Checkpoints",
+    "checkpointList": "Checkpoint Liste",
+    "back": "Zurück zum Dashboard",
+    "actionNotFound": "Aktion nicht gefunden",
+    "yourLocation": "Dein Standort",
+    "allCheckpointsReached": "Alle Checkpoints erreicht!",
+    "noCheckpoints": "Keine Checkpoints für diese Aktion verfügbar",
+    "trackingActive": "GPS-Aufzeichnung aktiv",
+    "trackingEnabled": "Dein Standort wird verfolgt",
+    "trackingDisabled": "Standortverfolgung ist deaktiviert",
+    "geolocationError": "Geolocation wird von deinem Browser nicht unterstützt",
+    "locationError": "Fehler beim Abrufen des Standorts",
+    "checkpoint": "Checkpoint",
+    "checkpointReached": "Checkpoint {{checkpoint}} erreicht: {{name}}!"
   },
   "points": "Punkte",
   "language": "Sprache"

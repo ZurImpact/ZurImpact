@@ -3,11 +3,27 @@ import type {ActionDto} from '../../../store/slices/ActionSlice';
 import {Card} from '../../ui/card';
 import {Badge} from '../../ui/badge';
 import {useTranslation} from 'react-i18next';
+import {useNavigate} from 'react-router';
 
-export const ActionCard = ({action, onClick}: {action: ActionDto; onClick: () => void}) => {
+export const ActionCard = ({action, onClick}: {action: ActionDto; onClick?: () => void}) => {
   const {t} = useTranslation();
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (action.type === 'GPS') {
+      navigate(`/action/${action.id}`);
+    } else if (onClick) {
+      onClick();
+    } else {
+      console.log('Action clicked:', action.id);
+    }
+  };
+
   return (
-    <Card className="p-6 relative overflow-hidden hover:shadow-lg transition-shadow" onClick={onClick}>
+    <Card
+      className="p-6 relative overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={handleClick}
+    >
       <div className="relative z-10">
         <div className="p-3 bg-blue-100 rounded-lg w-fit mb-4">
           <Footprints className="h-8 w-8 text-blue-600" />

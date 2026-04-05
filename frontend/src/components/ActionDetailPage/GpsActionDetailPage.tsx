@@ -1,0 +1,406 @@
+import {useEffect, useState, useRef, useMemo} from 'react';
+import {useParams, useNavigate} from 'react-router';
+import {MapContainer, TileLayer, Marker, Polyline, Popup, useMap} from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import {Card} from '../ui/card';
+import {Button} from '../ui/button';
+import {Badge} from '../ui/badge';
+import {useAppDispatch, useAppSelector} from '../../store/store';
+import {fetchActionById, clearSelectedAction, type ActionDto} from '../../store/slices/ActionSlice';
+import {useTranslation} from 'react-i18next';
+import {toast} from 'sonner';
+import {MapPin, Navigation, CheckCircle2, Circle, ArrowLeft, Award, Target} from 'lucide-react';
+
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+const DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
+const createCheckpointIcon = (index: number, isCheckedIn: boolean) => {
+  const color = isCheckedIn ? '#22c55e' : '#3b82f6';
+  const svgIcon = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="45" fill="${color}" stroke="white" stroke-width="4"/>
+      <text x="50" y="65" font-size="40" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">${index}</text>
+    </svg>
+  `;
+  return L.divIcon({
+    html: svgIcon,
+    className: 'custom-checkpoint-icon',
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -20],
+  });
+};
+
+const userLocationIcon = L.divIcon({
+  html: `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="30" fill="#ef4444" stroke="white" stroke-width="4"/>
+      <circle cx="50" cy="50" r="15" fill="white"/>
+    </svg>
+  `,
+  className: 'user-location-icon',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+});
+
+interface Checkpoint {
+  id: number;
+  displayName: string;
+  description?: string;
+  actionId: number;
+  latitude?: number;
+  longitude?: number;
+  altitude?: number;
+  index: number;
+  isCheckedIn: boolean;
+  position: [number, number];
+}
+
+const CHECK_IN_RADIUS_METERS = 20;
+
+function RecenterMap({coords}: {coords: [number, number]}) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(coords, map.getZoom());
+  }, [coords, map]);
+  return null;
+}
+
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371000;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function processCheckpointsFromAction(action: ActionDto): Checkpoint[] {
+  if (!action.subActions || action.subActions.length === 0) {
+    return [];
+  }
+
+  return action.subActions
+    .filter((sub) => sub.latitude !== undefined && sub.longitude !== undefined)
+    .map((sub, idx) => ({
+      id: sub.id,
+      displayName: sub.displayName,
+      description: sub.description,
+      actionId: sub.actionId,
+      latitude: sub.latitude,
+      longitude: sub.longitude,
+      altitude: sub.altitude,
+      index: idx + 1,
+      isCheckedIn: false,
+      position: [sub.latitude, sub.longitude] as [number, number],
+    }));
+}
+
+export function GpsActionDetailPage() {
+  const {id} = useParams<{id: string}>();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const {t} = useTranslation();
+
+  const {selectedAction, loading, error} = useAppSelector((state) => state.actions);
+
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [checkedInCheckpointIds, setCheckedInCheckpointIds] = useState<Set<number>>(new Set());
+  const [isTrackingLocation, setIsTrackingLocation] = useState(false);
+
+  const watchIdRef = useRef<number | null>(null);
+
+  const initialCheckpoints = useMemo(() => {
+    if (!selectedAction) {
+      return [];
+    }
+    return processCheckpointsFromAction(selectedAction);
+  }, [selectedAction]);
+
+  const mapCenter = useMemo((): [number, number] => {
+    if (initialCheckpoints.length === 0) {
+      return [47.3769, 8.5417];
+    }
+    const avgLat = initialCheckpoints.reduce((sum, cp) => sum + cp.position[0], 0) / initialCheckpoints.length;
+    const avgLng = initialCheckpoints.reduce((sum, cp) => sum + cp.position[1], 0) / initialCheckpoints.length;
+    return [avgLat, avgLng];
+  }, [initialCheckpoints]);
+
+  const checkpoints = useMemo(() => {
+    return initialCheckpoints.map((cp) => ({
+      ...cp,
+      isCheckedIn: checkedInCheckpointIds.has(cp.id),
+    }));
+  }, [initialCheckpoints, checkedInCheckpointIds]);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchActionById(Number(id)));
+    }
+
+    return () => {
+      dispatch(clearSelectedAction());
+    };
+  }, [id, dispatch]);
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      toast.error(t('gpsActionDetail.geolocationError'));
+      return;
+    }
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      (position) => {
+        const {latitude, longitude} = position.coords;
+        const newLocation: [number, number] = [latitude, longitude];
+        setUserLocation(newLocation);
+
+        initialCheckpoints.forEach((cp) => {
+          if (checkedInCheckpointIds.has(cp.id)) return;
+
+          const distance = calculateDistance(latitude, longitude, cp.position[0], cp.position[1]);
+
+          if (distance <= CHECK_IN_RADIUS_METERS) {
+            setCheckedInCheckpointIds((prev) => {
+              if (prev.has(cp.id)) return prev;
+              const next = new Set(prev);
+              next.add(cp.id);
+              return next;
+            });
+            toast.success(
+              t('gpsActionDetail.checkpointReached', {
+                checkpoint: cp.index,
+                name: cp.displayName,
+              }),
+            );
+          }
+        });
+      },
+      (err) => {
+        console.error('Geolocation error:', err);
+        toast.error(t('gpsActionDetail.locationError'));
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      },
+    );
+
+    requestAnimationFrame(() => {
+      setIsTrackingLocation(true);
+    });
+
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+      setIsTrackingLocation(false);
+    };
+  }, [t, initialCheckpoints, checkedInCheckpointIds]);
+
+  const allCheckpointsCheckedIn = checkpoints.length > 0 && checkpoints.every((cp) => cp.isCheckedIn);
+  const checkedInCount = checkpoints.filter((cp) => cp.isCheckedIn).length;
+  const polylinePositions = checkpoints.map((cp) => cp.position);
+
+  const handleBack = () => {
+    navigate('/dashboard');
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !selectedAction) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card className="p-6">
+          <p className="text-red-600">{error || t('gpsActionDetail.actionNotFound')}</p>
+          <Button onClick={handleBack} className="mt-4">
+            {t('gpsActionDetail.back')}
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Button variant="ghost" onClick={handleBack} className="mb-4 pl-0">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          {t('gpsActionDetail.back')}
+        </Button>
+
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">{selectedAction.displayName}</h1>
+            <p className="text-gray-600">{selectedAction.description}</p>
+          </div>
+          <Badge variant="secondary" className="text-lg px-4 py-2 bg-green-100 text-green-700">
+            <Award className="h-4 w-4 mr-1" />
+            {selectedAction.points} {t('points')}
+          </Badge>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Card className="overflow-hidden h-[620px] shadow-lg">
+            <MapContainer center={mapCenter} zoom={14} style={{height: '100%', width: '100%'}}>
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+
+              {polylinePositions.length > 1 && (
+                <Polyline positions={polylinePositions} color="#3b82f6" weight={4} dashArray="10, 10" opacity={0.7} />
+              )}
+
+              {checkpoints.map((checkpoint) => (
+                <Marker
+                  key={checkpoint.id}
+                  position={checkpoint.position}
+                  icon={createCheckpointIcon(checkpoint.index, checkpoint.isCheckedIn)}
+                >
+                  <Popup>
+                    <div className="text-center p-2">
+                      <p className="font-bold">Checkpoint {checkpoint.index}</p>
+                      <p className="text-sm">{checkpoint.displayName}</p>
+                      {checkpoint.isCheckedIn && <Badge className="mt-2 bg-green-500">Checked In</Badge>}
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+
+              {userLocation && (
+                <>
+                  <Marker position={userLocation} icon={userLocationIcon}>
+                    <Popup>{t('gpsActionDetail.yourLocation')}</Popup>
+                  </Marker>
+                  <RecenterMap coords={userLocation} />
+                </>
+              )}
+            </MapContainer>
+          </Card>
+        </div>
+
+        <div className="space-y-6">
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Target className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">{t('gpsActionDetail.progress')}</h3>
+                <p className="text-sm text-gray-500">
+                  {checkedInCount} / {checkpoints.length} {t('gpsActionDetail.checkpoints')}
+                </p>
+              </div>
+            </div>
+
+            <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+              <div
+                className="bg-green-500 h-3 rounded-full transition-all duration-500"
+                style={{
+                  width: `${checkpoints.length > 0 ? (checkedInCount / checkpoints.length) * 100 : 0}%`,
+                }}
+              ></div>
+            </div>
+
+            {allCheckpointsCheckedIn && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-2 text-green-700">
+                  <CheckCircle2 className="h-5 w-5" />
+                  <span className="font-semibold">{t('gpsActionDetail.allCheckpointsReached')}</span>
+                </div>
+              </div>
+            )}
+          </Card>
+
+          <Card className="p-6">
+            <h3 className="font-semibold mb-4">{t('gpsActionDetail.checkpointList')}</h3>
+            <div className="space-y-3">
+              {checkpoints.map((checkpoint) => (
+                <div
+                  key={checkpoint.id}
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                    checkpoint.isCheckedIn ? 'bg-green-100 dark:bg-card/40 border border-green-200 dark:border-green-400' : 'bg-gray-50 dark:bg-card/40 border border-gray-200'
+                  }`}
+                >
+                  <div
+                    className={`p-2 rounded-full ${
+                      checkpoint.isCheckedIn ? 'bg-green-500 text-white' : 'bg-blue-100 text-blue-600'
+                    }`}
+                  >
+                    {checkpoint.isCheckedIn ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium">
+                      {t('gpsActionDetail.checkpoint')} {checkpoint.index}
+                    </p>
+                    <p className="text-sm text-gray-500">{checkpoint.displayName}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-400">
+                      {checkpoint.position[0].toFixed(4)}, {checkpoint.position[1].toFixed(4)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+
+              {checkpoints.length === 0 && (
+                <p className="text-gray-500 text-center py-4">{t('gpsActionDetail.noCheckpoints')}</p>
+              )}
+            </div>
+          </Card>
+
+          <Card className="p-6 bg-card">
+            <div className="flex items-start gap-3">
+              <Navigation className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-semibold text-blue-700 mb-1">{t('gpsActionDetail.trackingActive')}</p>
+                <p className="text-blue-600">
+                  {isTrackingLocation ? t('gpsActionDetail.trackingEnabled') : t('gpsActionDetail.trackingDisabled')}
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          {userLocation && (
+            <Card className="p-6">
+              <div className="flex items-center gap-3">
+                <MapPin className="h-5 w-5 text-red-500" />
+                <div>
+                  <p className="text-sm text-gray-500">{t('gpsActionDetail.yourLocation')}</p>
+                  <p className="font-mono text-sm">
+                    {userLocation[0].toFixed(6)}, {userLocation[1].toFixed(6)}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

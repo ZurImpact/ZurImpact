@@ -7,6 +7,20 @@ const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
+
+// Root route - friendly message
+app.get('/', (req, res) => {
+  res.json({
+    message: 'ZurImpact Mock API Server',
+    version: '1.0.0',
+    endpoints: [
+      'GET /backend_war_exploded/api/actions',
+      'GET /backend_war_exploded/api/action/getAction?id={id}',
+      'GET /backend_war_exploded/api/action/getUserActions?userId={id}',
+    ],
+  });
+});
+
 const BASE_URL = '/backend_war_exploded/api';
 const mockActions = loadJSON('get_actions.json');
 const mockUserActions = loadJSON('get_useractions.json');
@@ -44,8 +58,8 @@ app.get(BASE_URL + '/actions/:id', (req, res) => {
   }
 });
 
-// GET action by ID (for /api/actions/getAction?id=...)
-app.get(BASE_URL + '/actions/getAction', (req, res) => {
+// GET action by ID (for /api/action/getAction?id=...)
+app.get(BASE_URL + '/action/getAction', (req, res) => {
   const action = mockActions.find((a) => a.id === parseInt(req.query.id));
   if (action) {
     res.json(action);

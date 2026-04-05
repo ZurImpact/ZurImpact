@@ -1,40 +1,92 @@
 [
   {
     "id": 1,
-    "description": "Walk to the checkpoints and earn points for each checkpoint you reach.",
+    "description": "Walk through the city center and visit all the checkpoints. Earn points for each checkpoint you reach!",
     "displayName": "Walk for Coffee",
     "points": 10,
-    "tags": "GPS",
-    "subActionDtoList": [],
+    "tags": ["GPS"],
+    "subActions": [
+      {
+        "id": 1,
+        "displayName": "Start: Main Square",
+        "actionId": 1,
+        "latitude": 47.388757,
+        "longitude": 8.488917
+      },
+      {
+        "id": 2,
+        "displayName": "Checkpoint 1: City Park",
+        "actionId": 1,
+        "latitude": 47.378,
+        "longitude": 8.473
+      },
+      {
+        "id": 3,
+        "displayName": "Checkpoint 2: Old Town",
+        "actionId": 1,
+        "latitude": 47.3792,
+        "longitude": 8.4745
+      },
+      {
+        "id": 4,
+        "displayName": "Destination: Coffee Shop",
+        "actionId": 1,
+        "latitude": 47.3805,
+        "longitude": 8.476
+      }
+    ],
+    "subActionDtoIdList": [1, 2, 3, 4],
     "type": "GPS",
-    "hasSubtasks": false,
-    "validUntil": "2023-12-31",
-    "createdOn": "2023-01-01"
+    "hasSubtasks": true,
+    "validUntil": "2026-12-31",
+    "createdOn": "2026-01-01"
   },
   {
     "id": 2,
-    "description": "Walk to the checkpoints and earn points for each checkpoint you reach.",
-    "displayName": "Walk for Lunch",
+    "description": "Cycle through the park and check in at each station.",
+    "displayName": "Cycle for Lunch",
     "points": 50,
-    "tags": "GPS",
-    "subActionDtoList": [],
-    "subActionDtoIdList": [],
+    "tags": ["GPS"],
+    "subActions": [
+      {
+        "id": 5,
+        "displayName": "Start: Bike Station",
+        "actionId": 2,
+        "latitude": 47.382,
+        "longitude": 8.538
+      },
+      {
+        "id": 6,
+        "displayName": "Checkpoint 1: Lake View",
+        "actionId": 2,
+        "latitude": 47.384,
+        "longitude": 8.54
+      },
+      {
+        "id": 7,
+        "displayName": "Destination: Restaurant",
+        "actionId": 2,
+        "latitude": 47.386,
+        "longitude": 8.542
+      }
+    ],
+    "subActionDtoIdList": [5, 6, 7],
     "type": "GPS",
-    "hasSubtasks": false,
-    "validUntil": "2023-12-31",
-    "createdOn": "2023-01-01"
+    "hasSubtasks": true,
+    "validUntil": "2026-12-31",
+    "createdOn": "2026-01-01"
   },
   {
     "id": 3,
-    "description": "Walk to the checkpoints and earn points for each checkpoint you reach.",
-    "displayName": "Walk for Sandwich",
+    "description": "Take photos at each landmark and collect your points!",
+    "displayName": "Photo Challenge",
     "points": 100,
-    "tags": "GPS",
-    "subActionDtoList": [],
+    "tags": ["PHOTO"],
+    "subActions": [],
     "subActionDtoIdList": [],
-    "type": "GPS",
+    "type": "PHOTO",
     "hasSubtasks": false,
-    "validUntil": "2023-12-31",
-    "createdOn": "2023-01-01"
+    "validUntil": "2026-12-31",
+    "createdOn": "2026-01-01"
   }
 ]
