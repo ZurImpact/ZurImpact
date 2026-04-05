@@ -11,7 +11,7 @@ export const ActionCard = ({action, onClick}: {action: ActionDto; onClick?: () =
 
   const handleClick = () => {
     if (action.type === 'GPS') {
-      navigate(`/action/${action.id}`);
+      navigate(`/actions/${action.id}`);
     } else if (onClick) {
       onClick();
     } else {

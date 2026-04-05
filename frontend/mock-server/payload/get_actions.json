@@ -10,32 +10,31 @@
         "id": 1,
         "displayName": "Start: Main Square",
         "actionId": 1,
-        "latitude": 47.388757,
-        "longitude": 8.488917
+        "latitude": 47.3769,
+        "longitude": 8.5417
       },
       {
         "id": 2,
         "displayName": "Checkpoint 1: City Park",
         "actionId": 1,
         "latitude": 47.378,
-        "longitude": 8.473
+        "longitude": 8.543
       },
       {
         "id": 3,
         "displayName": "Checkpoint 2: Old Town",
         "actionId": 1,
         "latitude": 47.3792,
-        "longitude": 8.4745
+        "longitude": 8.5445
       },
       {
         "id": 4,
         "displayName": "Destination: Coffee Shop",
         "actionId": 1,
         "latitude": 47.3805,
-        "longitude": 8.476
+        "longitude": 8.546
       }
     ],
-    "subActionDtoIdList": [1, 2, 3, 4],
     "type": "GPS",
     "hasSubtasks": true,
     "validUntil": "2026-12-31",
@@ -70,7 +69,6 @@
         "longitude": 8.542
       }
     ],
-    "subActionDtoIdList": [5, 6, 7],
     "type": "GPS",
     "hasSubtasks": true,
     "validUntil": "2026-12-31",
@@ -78,15 +76,15 @@
   },
   {
     "id": 3,
-    "description": "Take photos at each landmark and collect your points!",
-    "displayName": "Photo Challenge",
+    "description": "Walk to the checkpoints and earn points for each checkpoint you reach.",
+    "displayName": "Walk for Sandwich",
     "points": 100,
-    "tags": ["PHOTO"],
+    "tags": ["GPS"],
     "subActions": [],
     "subActionDtoIdList": [],
-    "type": "PHOTO",
+    "type": "GPS",
     "hasSubtasks": false,
-    "validUntil": "2026-12-31",
-    "createdOn": "2026-01-01"
+    "validUntil": "2023-12-31",
+    "createdOn": "2023-01-01"
   }
 ]
