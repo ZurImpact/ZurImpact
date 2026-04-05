@@ -31,7 +31,6 @@ class SubActionMapperTest {
         entity.setActionId(9L);
         entity.setGpsX(1.5f);
         entity.setGpsY(2.5f);
-        entity.setGpsZ(3.5f);
 
         SubActionDto dto = SubActionMapper.GpsActionTaskToDto(entity);
 
@@ -43,7 +42,6 @@ class SubActionMapperTest {
         assertEquals(9L, gpsDto.getActionId());
         assertEquals(1.5f, gpsDto.getGpsX());
         assertEquals(2.5f, gpsDto.getGpsY());
-        assertEquals(3.5f, gpsDto.getGpsZ());
     }
 
     @Test
@@ -55,7 +53,6 @@ class SubActionMapperTest {
         dto.setActionId(11L);
         dto.setGpsX(4.0f);
         dto.setGpsY(5.0f);
-        dto.setGpsZ(6.0f);
 
         SubAction entity = SubActionMapper.GpsActionTaskToEntity(dto);
 
@@ -67,7 +64,6 @@ class SubActionMapperTest {
         assertEquals(11L, gpsEntity.getActionId());
         assertEquals(4.0f, gpsEntity.getGpsX());
         assertEquals(5.0f, gpsEntity.getGpsY());
-        assertEquals(6.0f, gpsEntity.getGpsZ());
     }
 
     @Test
@@ -118,7 +114,6 @@ class SubActionMapperTest {
         GpsActionTaskDto gpsDto = new GpsActionTaskDto();
         gpsDto.setGpsX(1.0f);
         gpsDto.setGpsY(2.0f);
-        gpsDto.setGpsZ(3.0f);
 
         List<SubAction> entities = SubActionMapper.GpsActionTaskToEntityList(List.of(gpsDto));
 

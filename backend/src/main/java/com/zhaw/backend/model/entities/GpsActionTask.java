@@ -16,7 +16,4 @@ public class GpsActionTask extends SubAction{
 
     @Column(name = "gps_y", nullable = false)
     private Float gpsY;
-
-    @Column(name = "gps_z")
-    private Float gpsZ;
 }

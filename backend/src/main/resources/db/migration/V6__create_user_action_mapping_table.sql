@@ -7,5 +7,5 @@ CREATE TABLE user_action_mapping (
                         completion_state    VARCHAR(50)                                 NOT NULL,
                         created_on          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP   NOT NULL,
                         FOREIGN KEY (user_id) REFERENCES users(id),
-                        FOREIGN KEY (action_id) REFERENCES voucher(id)
+                        FOREIGN KEY (action_id) REFERENCES action(id)
 );
