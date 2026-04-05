@@ -1,25 +1,29 @@
 package com.zhaw.backend.controller;
 
 import com.zhaw.backend.model.dto.ActionDto;
+import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.service.ActionService;
-import org.hibernate.type.descriptor.jdbc.TimestampWithTimeZoneJdbcType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Controller for Actions, takes request from frontend, passes to Service.
- * Builds response with success and return values or returns error
+ * REST controller for Actions.
+ * Exposes endpoints for browsing actions, managing action content (admin/partner only),
+ * and tracking user progress against actions.
  */
 @RestController
 @RequestMapping("/api/actions")
+@Tag(name = "Actions", description = "Endpoints for browsing and managing actions and subactions")
 public class ActionController {
 
     @Autowired
@@ -27,15 +31,19 @@ public class ActionController {
 
     private static final Logger logger = LoggerFactory.getLogger(ActionController.class);
 
+    // ── Browsing ─────────────────────────────────────────────────────────────
+
     /**
-     * Gets all Actions in DB available with filtering options for text, points, tags and validUntil
-     * @param text gets all Actions with text in description or displayName, case-insensitive
-     * @param points points limit
-     * @param tags filters on specific tasks
-     * @param validUntil filters on validUntil, gets all Actions with validUntil before the given date
-     * @return List of all Actions available in DB with filtering options for text, points, tags and validUntil
+     * Returns all actions, optionally filtered by text, points, tags, and expiry date.
+     *
+     * @param text      case-insensitive search across description and displayName
+     * @param points    exact points value to filter by
+     * @param tags      comma-separated tag names to filter by
+     * @param validUntil only return actions valid up to this timestamp
+     * @return list of matching actions including their subactions
      */
     @GetMapping
+    @Operation(summary = "List actions", description = "Returns all actions with optional filtering. Open to all users.", tags = "Actions")
     public ResponseEntity<List<ActionDto>> getActions(
             @RequestParam(name = "text", required = false) String text,
             @RequestParam(name = "points", required = false) Integer points,
@@ -50,7 +58,14 @@ public class ActionController {
         }
     }
 
+    /**
+     * Returns a single action by its ID, including its subactions if any.
+     *
+     * @param id the action ID
+     * @return the action, or 404 if not found
+     */
     @GetMapping("/{id}")
+    @Operation(summary = "Get action by ID", description = "Returns a single action including subactions. Open to all users.", tags = "Actions")
     public ResponseEntity<ActionDto> getAction(@PathVariable("id") Long id) {
         try {
             ActionDto actionDto = actionService.getActionById(id);
@@ -66,12 +81,133 @@ public class ActionController {
         }
     }
 
+    // ── Action management (admin / partner only) ──────────────────────────────
+
     /**
-     * Get all actions with a user has done
-     * @param userId id of the user for which the action history should be retrieved
-     * @return all actions done by that user
+     * Creates a new action. If {@code hasSubtasks} is true and {@code subActions} is provided,
+     * the subactions are persisted in the same transaction.
+     *
+     * @param dto the action data including optional subactions
+     * @return the created action with its generated ID (HTTP 201)
+     */
+    @PostMapping
+    @Operation(summary = "Create action", description = "Creates a new action, optionally with subactions. Requires ADMIN or PARTNER role.", tags = "Action Management")
+    public ResponseEntity<ActionDto> createAction(@RequestBody ActionDto dto) {
+        try {
+            ActionDto created = actionService.createAction(dto);
+            logger.info("CREATED ACTION - id: {}", created.getId());
+            return ResponseEntity.status(201).body(created);
+        } catch (Exception e) {
+            logger.error("ERROR CREATING ACTION - error: {}", e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    /**
+     * Updates an existing action by ID.
+     *
+     * @param id  the action ID
+     * @param dto the updated action data
+     * @return 204 on success
+     */
+    @PutMapping("/{id}")
+    @Operation(summary = "Update action", description = "Updates an existing action. Requires ADMIN or PARTNER role.", tags = "Action Management")
+    public ResponseEntity<Void> updateAction(@PathVariable("id") Long id, @RequestBody ActionDto dto) {
+        try {
+            boolean updated = actionService.updateAction(id, dto);
+            if (!updated) {
+                logger.warn("ACTION NOT FOUND FOR UPDATE - id: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+            logger.info("UPDATED ACTION - id: {}", id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            logger.error("ERROR UPDATING ACTION - id: {}, error: {}", id, e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    /**
+     * Deletes an action by ID.
+     *
+     * @param id the action ID
+     * @return 204 on success, 404 if not found
+     */
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete action", description = "Permanently deletes an action. Requires ADMIN or PARTNER role.", tags = "Action Management")
+    public ResponseEntity<Void> deleteAction(@PathVariable("id") Long id) {
+        try {
+            boolean deleted = actionService.deleteAction(id);
+            if (!deleted) {
+                logger.warn("ACTION NOT FOUND FOR DELETE - id: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+            logger.info("DELETED ACTION - id: {}", id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            logger.error("ERROR DELETING ACTION - id: {}, error: {}", id, e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    /**
+     * Updates an existing GPS subaction by ID.
+     *
+     * @param id  the subaction ID
+     * @param dto the updated subaction data
+     * @return 204 on success, 404 if not found
+     */
+    @PutMapping("/subaction/{id}")
+    @Operation(summary = "Update subaction", description = "Updates an existing GPS subaction. Requires ADMIN or PARTNER role.", tags = "Action Management")
+    public ResponseEntity<Void> updateSubAction(@PathVariable("id") Long id, @RequestBody GpsActionTaskDto dto) {
+        try {
+            boolean updated = actionService.updateSubAction(id, dto);
+            if (!updated) {
+                logger.warn("SUBACTION NOT FOUND FOR UPDATE - id: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+            logger.info("UPDATED SUBACTION - id: {}", id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            logger.error("ERROR UPDATING SUBACTION - id: {}, error: {}", id, e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    /**
+     * Deletes a subaction by ID.
+     *
+     * @param id the subaction ID
+     * @return 204 on success, 404 if not found
+     */
+    @DeleteMapping("/subaction/{id}")
+    @Operation(summary = "Delete subaction", description = "Permanently deletes a subaction. Requires ADMIN or PARTNER role.", tags = "Action Management")
+    public ResponseEntity<Void> deleteSubAction(@PathVariable("id") Long id) {
+        try {
+            boolean deleted = actionService.deleteSubAction(id);
+            if (!deleted) {
+                logger.warn("SUBACTION NOT FOUND FOR DELETE - id: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+            logger.info("DELETED SUBACTION - id: {}", id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            logger.error("ERROR DELETING SUBACTION - id: {}, error: {}", id, e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    // ── User progress ─────────────────────────────────────────────────────────
+
+    /**
+     * Returns the action history for a user, optionally filtered to active (in-progress) or completed actions.
+     *
+     * @param userId the user ID
+     * @param active if true returns only in-progress actions, if false only completed, if omitted returns all
+     * @return list of the user's action history entries
      */
     @GetMapping("/getUserActions")
+    @Operation(summary = "Get user action history", description = "Returns all actions a user has interacted with.", tags = "User Progress")
     public ResponseEntity<List<UserActionHistoryDto>> getUserActions(
             @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "active", required = false) Boolean active){
@@ -84,12 +220,16 @@ public class ActionController {
     }
 
     /**
-     * Start a new action for user
-     * @param userId id of the user for which the action should be started
-     * @param actionId id of the action which should be started
-     * @return success or error
+     * Starts an action for a user by creating an IN_PROGRESS mapping in the database.
+     *
+     * @param userId      the user ID
+     * @param actionId    the action ID to start
+     * @param isSubtask   whether this is a subtask interaction
+     * @param subactionId the subtask ID, if applicable
+     * @return 200 on success
      */
     @PostMapping("/startAction")
+    @Operation(summary = "Start action", description = "Records that a user has started an action.", tags = "User Progress")
     public ResponseEntity<Void> startAction(
             @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "actionId") Long actionId,
@@ -106,20 +246,20 @@ public class ActionController {
     }
 
     /**
-     * Completes an action for a user, updates the mapping in DB to state "COMPLETED"
-     * @param userId id of the user for which the action should be completed
-     * @param actionId id of the action which should be completed
-     * @return true if the action was successfully completed, false if not (e.g. if the mapping does not exist or is already completed)
+     * Marks an action as completed for a user by adding a COMPLETED mapping in the database.
+     *
+     * @param userId      the user ID
+     * @param actionId    the action ID to complete
+     * @return 200 on success
      */
     @PostMapping("/completeAction")
+    @Operation(summary = "Complete action", description = "Records that a user has completed an action.", tags = "User Progress")
     public ResponseEntity<Void> completeAction(
             @RequestParam(name = "userId") Long userId,
-            @RequestParam(name = "actionId") Long actionId,
-            @RequestParam(name = "isSubtask", required = false) Boolean isSubtask,
-            @RequestParam(name = "subactionId", required = false) String subactionId) {
+            @RequestParam(name = "actionId") Long actionId){
         try {
-            actionService.completeActionForUser(userId, actionId, isSubtask, subactionId);
-            logger.info("COMPLETED ACTION - userId: {}, actionId: {}, isSubtask: {}, subactionId: {}", userId, actionId, isSubtask, subactionId);
+            actionService.completeActionForUser(userId, actionId);
+            logger.info("COMPLETED ACTION - userId: {}, actionId: {}", userId, actionId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             logger.error("ERROR COMPLETING ACTION - userId: {}, actionId: {}, error: {}", userId, actionId, e.getMessage());
@@ -128,12 +268,14 @@ public class ActionController {
     }
 
     /**
-     * Deletes the action mapping for a user, effectively deleting the action for that user
-     * @param userId id of the user for which the action should be deleted
-     * @param actionId id of the action which should be deleted
-     * @return true if the action was successfully deleted, false otherwise
+     * Cancels an action for a user by removing their action mapping from the database.
+     *
+     * @param userId   the user ID
+     * @param actionId the action ID to cancel
+     * @return 200 on success
      */
     @PostMapping("/cancelAction")
+    @Operation(summary = "Cancel action", description = "Removes a user's in-progress action mapping.", tags = "User Progress")
     public ResponseEntity<Void> cancelAction(@RequestParam(name = "userId") Long userId, @RequestParam(name = "actionId") Long actionId) {
         try {
             actionService.deleteActionForUser(userId, actionId);

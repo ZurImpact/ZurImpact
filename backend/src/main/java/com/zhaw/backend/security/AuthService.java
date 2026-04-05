@@ -28,6 +28,11 @@ public class AuthService {
                 passwordEncoder.encode("secret"),
                 Set.of(Role.ROLE_USER)
         ));
+        users.put("partner", new UserRecord(
+                "partner",
+                passwordEncoder.encode("secret"),
+                Set.of(Role.ROLE_PARTNER)
+        ));
     }
 
     public AuthResult authenticate(String username, String rawPassword) {

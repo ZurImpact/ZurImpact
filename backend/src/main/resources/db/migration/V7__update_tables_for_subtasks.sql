@@ -16,6 +16,5 @@ CREATE TABLE gps_action_tasks (
     action_id INTEGER NOT NULL,
     gps_x FLOAT NOT NULL,
     gps_y FLOAT NOT NULL,
-    gps_z FLOAT,
     FOREIGN KEY (action_id) REFERENCES action(id)
 );

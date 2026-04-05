@@ -1,6 +1,7 @@
 import {render, type RenderOptions} from '@testing-library/react';
 import {Provider} from 'react-redux';
 import {setupStore, type DeepPartial, type RootState} from '../store/store';
+import {ThemeProvider} from 'next-themes';
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
   preloadedState?: DeepPartial<RootState>;
@@ -24,7 +25,11 @@ export const renderWithProviders = (
   }: ExtendedRenderOptions = {},
 ) => {
   function Wrapper({children}: {children: React.ReactNode}) {
-    return <Provider store={store}>{children}</Provider>;
+    return (
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <Provider store={store}>{children}</Provider>
+      </ThemeProvider>
+    );
   }
   return {store, ...render(ui, {wrapper: Wrapper, ...renderOptions})};
 };

@@ -1,16 +1,23 @@
 package com.zhaw.backend.model.dao;
 
 import com.zhaw.backend.enums.CompletionState;
-import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
+import com.zhaw.backend.model.entities.UserActionHistory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Data Access Object for Action entity.
@@ -46,7 +53,7 @@ public class ActionDao {
     /**
      * Helper method to map resultset to ActionHistoryDto, used for user action history query
      */
-    private static final RowMapper<UserActionHistoryDto> HISTORY_ROW_MAPPER = (rs, rowNum) -> UserActionHistoryDto.builder()
+    private static final RowMapper<UserActionHistory> HISTORY_ROW_MAPPER = (rs, rowNum) -> UserActionHistory.builder()
             .actionId(rs.getLong("action_id"))
             .description(rs.getString("description"))
             .displayName(rs.getString("display_name"))
@@ -96,7 +103,7 @@ public class ActionDao {
      * @param userId User to search for
      * @return Actions which the user did
      */
-    public List<UserActionHistoryDto> findUserActionHistory(Long userId, Boolean active) {
+    public List<UserActionHistory> findUserActionHistory(Long userId, Boolean active) {
         StringBuilder sql = new StringBuilder(
                 "SELECT a.id AS action_id, a.description, a.display_name, a.points, a.tags, "
                         + "a.valid_until, a.created_on AS action_created_on, "
@@ -127,7 +134,7 @@ public class ActionDao {
     public boolean startAction(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
         int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subaction_id) " +
                                 "VALUES (?, ?, ?, ?, ?, ?)",
-                userId, actionId, CompletionState.IN_PROGRESS, Timestamp.valueOf(java.time.LocalDateTime.now()),
+                userId, actionId, CompletionState.IN_PROGRESS.name(), Timestamp.valueOf(java.time.LocalDateTime.now()),
                 isSubtask != null && isSubtask, subactionId);
         return rows > 0;
     }
@@ -141,10 +148,48 @@ public class ActionDao {
      * @return true if the action was successfully completed, false otherwise
      */
     public boolean completeAction(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
-        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subaction_id)" +
+        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subaction_id) " +
                                 "VALUES(?,?,?,?,?,?)",
-                userId,actionId,CompletionState.COMPLETED,Timestamp.valueOf(java.time.LocalDateTime.now()),
+                userId,actionId,CompletionState.COMPLETED.name(),Timestamp.valueOf(java.time.LocalDateTime.now()),
                 isSubtask != null && isSubtask, subactionId);
+        return rows > 0;
+    }
+
+    public Long createAction(Action action) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbc.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO action (description, display_name, points, tags, type, has_subtasks, valid_until, created_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, action.getDescription());
+            ps.setString(2, action.getDisplayName());
+            ps.setInt(3, action.getPoints());
+            ps.setString(4, action.getTags());
+            ps.setString(5, action.getType());
+            ps.setBoolean(6, action.getHasSubtasks() != null && action.getHasSubtasks());
+            ps.setTimestamp(7, action.getValidUntil() != null ? Timestamp.valueOf(action.getValidUntil()) : null);
+            ps.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now()));
+            return ps;
+        }, keyHolder);
+        Map<String, Object> keys = keyHolder.getKeys();
+        if (keys != null && keys.containsKey("id")) {
+            return ((Number) keys.get("id")).longValue();
+        }
+        return Objects.requireNonNull(keyHolder.getKey()).longValue();
+    }
+
+    public boolean updateAction(Action action) {
+        int rows = jdbc.update(
+                "UPDATE action SET description = ?, display_name = ?, points = ?, tags = ?, type = ?, has_subtasks = ?, valid_until = ? WHERE id = ?",
+                action.getDescription(), action.getDisplayName(), action.getPoints(), action.getTags(),
+                action.getType(), action.getHasSubtasks(),
+                action.getValidUntil() != null ? Timestamp.valueOf(action.getValidUntil()) : null,
+                action.getId());
+        return rows > 0;
+    }
+
+    public boolean deleteActionById(Long id) {
+        int rows = jdbc.update("DELETE FROM action WHERE id = ?", id);
         return rows > 0;
     }
 
@@ -161,6 +206,26 @@ public class ActionDao {
                     ps.setLong(2, actionId);
                 });
         return rows > 0;
+    }
+
+    /**
+     * Checks if an action has been completed by a user
+     *
+     * @param userId   id of the user
+     * @param actionId id of the action
+     * @return true if the action is completed, false otherwise
+     */
+    public boolean isActionCompleted(Long userId, Long actionId) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) FROM user_action_mapping " +
+                "WHERE user_id = ? AND action_id = ? AND completion_state = ?");
+        List<Object> params = new ArrayList<>();
+        params.add(userId);
+        params.add(actionId);
+        params.add(CompletionState.COMPLETED.name());
+
+        Integer count = jdbc.queryForObject(sql.toString(), Integer.class, params.toArray());
+        return count != null && count > 0;
     }
 
     /**

@@ -28,7 +28,7 @@ export function ActionDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">{t('actionDashboard.header')}</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2 dark:text-white">{t('actionDashboard.header')}</h1>
           <p className="text-gray-600">{t('actionDashboard.subheader')}</p>
         </div>
       </div>
@@ -68,13 +68,13 @@ export function ActionDashboard() {
               return (
                 <div
                   key={userAction.actionId}
-                  className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors "
                 >
-                  <div className={`p-3 rounded-lg`}>
+                  <div className={`p-3 rounded-lg dark:bg-green-500/20`}>
                     <Icon className={`h-6 w-6`} />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold">{userAction?.displayName || 'Activity'}</h4>
+                    <h4 className="font-semibold dark:text-green-600">{userAction?.displayName || 'Activity'}</h4>
                     <p className="text-sm text-gray-500">
                       {new Date(userAction.actionCreatedOn || '').toLocaleDateString()}
                     </p>

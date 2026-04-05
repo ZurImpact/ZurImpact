@@ -22,7 +22,6 @@ public final class SubActionMapper {
             mapCommonFields(gpsActionTask, dto);
             dto.setGpsX(gpsActionTask.getGpsX());
             dto.setGpsY(gpsActionTask.getGpsY());
-            dto.setGpsZ(gpsActionTask.getGpsZ());
             return dto;
         }
 
@@ -41,7 +40,6 @@ public final class SubActionMapper {
             mapCommonFields(gpsDto, entity);
             entity.setGpsX(gpsDto.getGpsX());
             entity.setGpsY(gpsDto.getGpsY());
-            entity.setGpsZ(gpsDto.getGpsZ());
             return entity;
         }
 

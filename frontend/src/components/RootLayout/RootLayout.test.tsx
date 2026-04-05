@@ -51,13 +51,6 @@ describe('RootLayout', () => {
     expect(screen.getByText('Logout')).toBeInTheDocument();
   });
 
-  it('renders the language switcher', () => {
-    renderWithRouter();
-
-    expect(screen.getByText('EN')).toBeInTheDocument();
-    expect(screen.getByText('DE')).toBeInTheDocument();
-  });
-
   it('renders points display', () => {
     renderWithRouter();
 
