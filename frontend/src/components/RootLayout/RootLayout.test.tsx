@@ -16,8 +16,14 @@ vi.mock('react-i18next', () => ({
       };
       return translations[key] ?? key;
     },
-    i18n: {changeLanguage: vi.fn()},
+    i18n: {changeLanguage: vi.fn(), language: 'en'},
   }),
+  initReactI18next: {type: '3rdParty'},
+}));
+
+vi.mock('../../utility/i18n', () => ({
+  __esModule: true,
+  default: {changeLanguage: vi.fn(), language: 'en'},
 }));
 
 const renderWithRouter = (initialRoute = '/') => {

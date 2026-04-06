@@ -26,9 +26,11 @@ export const renderWithProviders = (
 ) => {
   function Wrapper({children}: {children: React.ReactNode}) {
     return (
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-        <Provider store={store}>{children}</Provider>
-      </ThemeProvider>
+      <Provider store={store}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          {children}
+        </ThemeProvider>
+      </Provider>
     );
   }
   return {store, ...render(ui, {wrapper: Wrapper, ...renderOptions})};
