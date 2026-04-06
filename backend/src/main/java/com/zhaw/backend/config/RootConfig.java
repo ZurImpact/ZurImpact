@@ -8,7 +8,10 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan(basePackages = {
-        "com.zhaw.backend.security" // SessionService, AuthService, AuthCookieFilter, SecurityConfig
+        "com.zhaw.backend.config",
+        "com.zhaw.backend.security",
+        "com.zhaw.backend.model.dao",
+        "com.zhaw.backend.service"
 })
 public class RootConfig {
 }

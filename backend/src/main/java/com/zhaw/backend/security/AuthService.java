@@ -1,6 +1,8 @@
 package com.zhaw.backend.security;
 
 import com.zhaw.backend.enums.Role;
+import com.zhaw.backend.model.dao.UserDao;
+import com.zhaw.backend.model.entities.User;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,42 +13,26 @@ import java.util.*;
 public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
+    private final UserDao userDao;
 
-    // MVP: In-Memory User. change to db.
-    private final Map<String, UserRecord> users = new HashMap<>();
-
-    public AuthService(PasswordEncoder passwordEncoder) {
+    public AuthService(PasswordEncoder passwordEncoder, UserDao userDao) {
         this.passwordEncoder = passwordEncoder;
-
-        users.put("admin", new UserRecord(
-                "admin",
-                passwordEncoder.encode("secret"),
-                Set.of(Role.ROLE_ADMIN, Role.ROLE_USER)
-        ));
-        users.put("user", new UserRecord(
-                "user",
-                passwordEncoder.encode("secret"),
-                Set.of(Role.ROLE_USER)
-        ));
-        users.put("partner", new UserRecord(
-                "partner",
-                passwordEncoder.encode("secret"),
-                Set.of(Role.ROLE_PARTNER)
-        ));
+        this.userDao = userDao;
     }
 
     public AuthResult authenticate(String username, String rawPassword) {
-        UserRecord record = users.get(username);
-        if (record == null || !passwordEncoder.matches(rawPassword, record.passwordHash())) {
+        User user = userDao.findByUsername(username)
+                .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
+
+        if (!passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
             throw new BadCredentialsException("Invalid username or password");
         }
 
         // In echt: session id / signed token erzeugen und persistieren/verifizieren
         String sessionToken = UUID.randomUUID().toString();
 
-        return new AuthResult(record.username(), record.roles(), sessionToken);
+        return new AuthResult(user, sessionToken);
     }
 
-    public record AuthResult(String username, Set<Role> roles, String sessionToken) {}
-    private record UserRecord(String username, String passwordHash, Set<Role> roles) {}
+    public record AuthResult(User user, String sessionToken) {}
 }

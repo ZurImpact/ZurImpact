@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = {
-        "com.zhaw.backend",
+        "com.zhaw.backend.controller",
         "org.springdoc" // IMPORTANT: registers /v3/api-docs + swagger-ui controllers in non-Boot setup
 })
 public class AppConfig implements WebMvcConfigurer {

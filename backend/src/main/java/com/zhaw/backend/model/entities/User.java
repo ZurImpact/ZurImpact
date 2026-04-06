@@ -1,5 +1,6 @@
 package com.zhaw.backend.model.entities;
 
+import com.zhaw.backend.enums.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,11 +8,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * JPA entity mapped to the "users" table.
@@ -37,6 +38,9 @@ public class User {
 
     @Column(name = "address_id", unique = true, nullable = false)
     private Long address;
+
+    @Column(name = "roles")
+    private Set<Role> roles;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

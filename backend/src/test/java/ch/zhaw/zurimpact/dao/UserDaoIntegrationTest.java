@@ -60,6 +60,9 @@ class UserDaoIntegrationTest {
         user.setUsername(username);
         user.setEmail(email);
         user.setPasswordHash("hashed_pw");
+        // We use a unique address_id for each user to avoid UNIQUE constraint violations.
+        // In a real scenario, we might want to insert an address first.
+        user.setAddress((long) (username + email).hashCode());
         return user;
     }
 

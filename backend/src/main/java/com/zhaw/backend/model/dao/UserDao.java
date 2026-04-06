@@ -1,5 +1,6 @@
 package com.zhaw.backend.model.dao;
 
+import com.zhaw.backend.enums.Role;
 import com.zhaw.backend.model.entities.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,8 +12,11 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Data-access object for {@link User} entities.
@@ -34,8 +38,17 @@ public class UserDao {
         u.setId(rs.getLong("id"));
         u.setUsername(rs.getString("username"));
         u.setEmail(rs.getString("email"));
+        u.setAddress(rs.getLong("address_id"));
         u.setPasswordHash(rs.getString("password_hash"));
         u.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+
+        String rolesStr = rs.getString("roles");
+        if (rolesStr != null && !rolesStr.isBlank()) {
+            Set<Role> roles = Arrays.stream(rolesStr.split(","))
+                    .map(Role::valueOf)
+                    .collect(Collectors.toSet());
+            u.setRoles(roles);
+        }
         return u;
     };
 
@@ -77,16 +90,25 @@ public class UserDao {
             user.setCreatedAt(LocalDateTime.now());
         }
 
+        String rolesStr = user.getRoles() == null ? null :
+                user.getRoles().stream().map(Enum::name).collect(Collectors.joining(","));
+
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO users (username, email, password_hash, created_at) "
-                            + "VALUES (?, ?, ?, ?)",
+                    "INSERT INTO users (username, email, address_id, password_hash, roles, created_at) "
+                            + "VALUES (?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPasswordHash());
-            ps.setTimestamp(4, Timestamp.valueOf(user.getCreatedAt()));
+            if (user.getAddress() != null) {
+                ps.setLong(3, user.getAddress());
+            } else {
+                ps.setNull(3, java.sql.Types.BIGINT);
+            }
+            ps.setString(4, user.getPasswordHash());
+            ps.setString(5, rolesStr);
+            ps.setTimestamp(6, Timestamp.valueOf(user.getCreatedAt()));
             return ps;
         }, keyHolder);
 
@@ -101,9 +123,12 @@ public class UserDao {
     }
 
     private User update(User user) {
+        String rolesStr = user.getRoles() == null ? null :
+                user.getRoles().stream().map(Enum::name).collect(Collectors.joining(","));
+
         jdbc.update(
-                "UPDATE users SET username = ?, email = ?, password_hash = ? WHERE id = ?",
-                user.getUsername(), user.getEmail(), user.getPasswordHash(), user.getId());
+                "UPDATE users SET username = ?, email = ?, address_id = ?, password_hash = ?, roles = ? WHERE id = ?",
+                user.getUsername(), user.getEmail(), user.getAddress(), user.getPasswordHash(), rolesStr, user.getId());
         return user;
     }
 }

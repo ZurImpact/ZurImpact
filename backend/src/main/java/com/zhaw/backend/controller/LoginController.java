@@ -1,6 +1,7 @@
 package com.zhaw.backend.controller;
 
 import com.zhaw.backend.enums.Role;
+import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.security.AuthService;
 import com.zhaw.backend.security.SessionService;
 import jakarta.servlet.http.Cookie;
@@ -37,7 +38,7 @@ public class LoginController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             AuthService.AuthResult result = authService.authenticate(request.username(), request.password());
-            String sessionToken = sessionService.createSession(result.username(), result.roles());
+            String sessionToken = sessionService.createSession(result.user().getUsername(), result.user().getRoles());
 
             ResponseCookie cookie = ResponseCookie.from(AUTH_COOKIE_NAME, sessionToken)
                     .httpOnly(true)
@@ -50,8 +51,7 @@ public class LoginController {
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, cookie.toString())
                     .body(new LoginResponse(
-                            result.username(),
-                            result.roles().stream().map(Role::name).collect(Collectors.toSet())
+                            com.zhaw.backend.mappers.UserMapper.toDto(result.user())
                     ));
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -96,7 +96,6 @@ public class LoginController {
     ) {}
 
     public record LoginResponse(
-            String username,
-            Set<String> roles
+            UserDto user
     ) {}
 }
