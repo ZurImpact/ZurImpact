@@ -1,9 +1,9 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.ActionType;
-import com.zhaw.backend.model.dao.SubActionDao;
-import com.zhaw.backend.model.dto.SubActionCompletionRequestDto;
-import com.zhaw.backend.model.dto.SubActionDto;
+import com.zhaw.backend.model.dao.SubTaskDao;
+import com.zhaw.backend.model.dto.SubTaskCompletionRequestDto;
+import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,22 +21,22 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("SubActionServiceImpl - Unit Tests")
-class SubActionServiceImplTest {
+@DisplayName("SubTaskServiceImpl - Unit Tests")
+class SubTaskServiceImplTest {
 
     @Mock
-    private SubActionDao subActionDao;
+    private SubTaskDao subTaskDao;
 
     @InjectMocks
-    private SubActionServiceImpl subActionService;
+    private SubTaskServiceImpl subTaskService;
 
     @Nested
-    @DisplayName("getSubActions")
-    class GetSubActionsTests {
+    @DisplayName("getSubTasks")
+    class GetSubTasksTests {
 
         @Test
-        @DisplayName("Should return GPS subactions for GPS action type")
-        void shouldReturnGpsSubActionsForGpsType() throws Exception {
+        @DisplayName("Should return GPS subtasks for GPS action type")
+        void shouldReturnGpsSubTasksForGpsType() throws Exception {
             // Given
             Long actionId = 1L;
             GpsActionTask gpsTask = new GpsActionTask();
@@ -47,10 +47,10 @@ class SubActionServiceImplTest {
             gpsTask.setGpsX(10.0f);
             gpsTask.setGpsY(20.0f);
             List<GpsActionTask> gpsTasks = List.of(gpsTask);
-            when(subActionDao.findGpsSubAction(actionId)).thenReturn(gpsTasks);
+            when(subTaskDao.findGpsSubTask(actionId)).thenReturn(gpsTasks);
 
             // When
-            List<SubActionDto> result = subActionService.getSubActions(actionId, ActionType.GPS);
+            List<SubTaskDto> result = subTaskService.getSubTasks(actionId, ActionType.GPS);
 
             // Then
             assertEquals(1, result.size());
@@ -62,7 +62,7 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionWhenActionIdIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.getSubActions(null, ActionType.GPS));
+                subTaskService.getSubTasks(null, ActionType.GPS));
             assertEquals("Action ID and Action Type must not be null", exception.getMessage());
         }
 
@@ -71,22 +71,22 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionWhenActionTypeIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.getSubActions(1L, null));
+                subTaskService.getSubTasks(1L, null));
             assertEquals("Action ID and Action Type must not be null", exception.getMessage());
         }
     }
 
     @Nested
     @DisplayName("completeSubActionForUser")
-    class CompleteSubActionForUserTests {
+    class CompleteSubTaskForUserTests {
 
         @Test
-        @DisplayName("Should complete GPS subaction successfully when coordinates match")
-        void shouldCompleteGpsSubactionSuccessfully() throws Exception {
+        @DisplayName("Should complete GPS subtask successfully when coordinates match")
+        void shouldCompleteGpsSubTaskSuccessfully() throws Exception {
             // Given
             Long userId = 1L;
             Long actionId = 1L;
-            Long subactionId = 10L;
+            Long subtaskId = 10L;
             Float gpsx = 10.0f;
             Float gpsy = 20.0f;
 
@@ -94,10 +94,10 @@ class SubActionServiceImplTest {
             additionalData.put("gpsX", gpsx);
             additionalData.put("gpsY", gpsy);
 
-            SubActionCompletionRequestDto requestDto = SubActionCompletionRequestDto.builder()
+            SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
                     .userId(userId)
                     .actionId(actionId)
-                    .subActionId(subactionId)
+                    .subTaskId(subtaskId)
                     .actionType(ActionType.GPS)
                     .additionalData(additionalData)
                     .build();
@@ -106,11 +106,11 @@ class SubActionServiceImplTest {
             gpsTask.setId(10L);
             gpsTask.setGpsX(10.0f);
             gpsTask.setGpsY(20.0f);
-            when(subActionDao.findGpsSubActionById(10L)).thenReturn(gpsTask);
-            when(subActionDao.completeSubActionForUser(userId, actionId, true, subactionId.toString())).thenReturn(true);
+            when(subTaskDao.findGpsSubTaskById(10L)).thenReturn(gpsTask);
+            when(subTaskDao.completeSubTaskForUser(userId, actionId, true, subtaskId.toString())).thenReturn(true);
 
             // When
-            boolean result = subActionService.completeSubActionForUser(requestDto);
+            boolean result = subTaskService.completeSubTaskForUser(requestDto);
 
             // Then
             assertTrue(result);
@@ -122,7 +122,7 @@ class SubActionServiceImplTest {
             // Given
             Long userId = 1L;
             Long actionId = 1L;
-            Long subactionId = 10L;
+            Long subtaskId = 10L;
             Float gpsx = 25.0f; // Outside 10.0 threshold from target 10.0
             Float gpsy = 20.0f;
 
@@ -130,10 +130,10 @@ class SubActionServiceImplTest {
             additionalData.put("gpsX", gpsx);
             additionalData.put("gpsY", gpsy);
 
-            SubActionCompletionRequestDto requestDto = SubActionCompletionRequestDto.builder()
+            SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
                     .userId(userId)
                     .actionId(actionId)
-                    .subActionId(subactionId)
+                    .subTaskId(subtaskId)
                     .actionType(ActionType.GPS)
                     .additionalData(additionalData)
                     .build();
@@ -142,10 +142,10 @@ class SubActionServiceImplTest {
             gpsTask.setId(10L);
             gpsTask.setGpsX(10.0f);
             gpsTask.setGpsY(20.0f);
-            when(subActionDao.findGpsSubActionById(10L)).thenReturn(gpsTask);
+            when(subTaskDao.findGpsSubTaskById(10L)).thenReturn(gpsTask);
 
             // When
-            boolean result = subActionService.completeSubActionForUser(requestDto);
+            boolean result = subTaskService.completeSubTaskForUser(requestDto);
 
             // Then
             assertFalse(result);
@@ -159,42 +159,42 @@ class SubActionServiceImplTest {
             additionalData.put("gpsX", null);
             additionalData.put("gpsY", null);
 
-            SubActionCompletionRequestDto requestDto = SubActionCompletionRequestDto.builder()
+            SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
                     .userId(1L)
                     .actionId(1L)
-                    .subActionId(10L)
+                    .subTaskId(10L)
                     .actionType(ActionType.GPS)
                     .additionalData(additionalData)
                     .build();
 
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeSubActionForUser(requestDto));
+                subTaskService.completeSubTaskForUser(requestDto));
             assertEquals("GPS coordinates must not be null", exception.getMessage());
         }
 
         @Test
-        @DisplayName("Should throw exception when GPS subaction is not found")
+        @DisplayName("Should throw exception when GPS subtask is not found")
         void shouldThrowExceptionWhenGpsSubactionNotFound() {
             // Given
             Map<String, Object> additionalData = new HashMap<>();
             additionalData.put("gpsX", 10.0f);
             additionalData.put("gpsY", 20.0f);
 
-            SubActionCompletionRequestDto requestDto = SubActionCompletionRequestDto.builder()
+            SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
                     .userId(1L)
                     .actionId(1L)
-                    .subActionId(10L)
+                    .subTaskId(10L)
                     .actionType(ActionType.GPS)
                     .additionalData(additionalData)
                     .build();
 
-            when(subActionDao.findGpsSubActionById(10L)).thenReturn(null);
+            when(subTaskDao.findGpsSubTaskById(10L)).thenReturn(null);
 
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeSubActionForUser(requestDto));
-            assertTrue(exception.getMessage().contains("GPS SubAction not found"));
+                subTaskService.completeSubTaskForUser(requestDto));
+            assertTrue(exception.getMessage().contains("GPS SubTask not found"));
         }
 
         @Test
@@ -202,18 +202,18 @@ class SubActionServiceImplTest {
         void shouldThrowExceptionWhenUnsupportedActionType() {
             // Given
             Map<String, Object> additionalData = new HashMap<>();
-            SubActionCompletionRequestDto requestDto = SubActionCompletionRequestDto.builder()
+            SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
                     .userId(1L)
                     .actionId(1L)
-                    .subActionId(10L)
+                    .subTaskId(10L)
                     .actionType(ActionType.PHOTO)  // Unsupported
                     .additionalData(additionalData)
                     .build();
 
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subActionService.completeSubActionForUser(requestDto));
-            assertTrue(exception.getMessage().contains("Unsupported SubAction Type"));
+                subTaskService.completeSubTaskForUser(requestDto));
+            assertTrue(exception.getMessage().contains("Unsupported SubTask Type"));
         }
     }
 }

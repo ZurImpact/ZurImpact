@@ -27,7 +27,7 @@ public interface ActionService {
 
     boolean deleteAction(Long id);
 
-    boolean updateSubAction(Long id, GpsActionTaskDto dto);
+    boolean updateSubTask(Long id, GpsActionTaskDto dto);
 
-    boolean deleteSubAction(Long id);
+    boolean deleteSubTask(Long id);
 }
