@@ -12,7 +12,7 @@ import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
 import com.zhaw.backend.validator.ActionValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +24,11 @@ import java.util.List;
  * Service implementation for managing actions.
  */
 @Service
+@RequiredArgsConstructor
 public class ActionServiceImpl implements ActionService {
 
-    @Autowired
-    private ActionDao actionDao;
-
-    @Autowired
-    private SubActionService subActionService;
+    private final ActionDao actionDao;
+    private final SubActionService subActionService;
 
     /**
      * Gets all Actions in DB available with filtering options for text, points, tags and validUntil

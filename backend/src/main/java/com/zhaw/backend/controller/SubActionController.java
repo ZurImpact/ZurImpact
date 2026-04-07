@@ -3,9 +3,9 @@ package com.zhaw.backend.controller;
 import com.zhaw.backend.model.dto.SubActionCompletionRequestDto;
 import com.zhaw.backend.service.SubActionService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/subActions")
+@RequiredArgsConstructor
 public class SubActionController {
-    @Autowired
-    private SubActionService subActionService;
+    private final SubActionService subActionService;
 
     private static final Logger logger = LoggerFactory.getLogger(SubActionController.class);
 

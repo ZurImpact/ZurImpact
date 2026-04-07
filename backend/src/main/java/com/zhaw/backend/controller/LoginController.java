@@ -7,6 +7,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -21,17 +22,13 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class LoginController {
 
     private static final String AUTH_COOKIE_NAME = "AUTH_SESSION";
 
     private final AuthService authService;
     private final SessionService sessionService;
-
-    public LoginController(AuthService authService, SessionService sessionService) {
-        this.authService = authService;
-        this.sessionService = sessionService;
-    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -40,13 +39,13 @@ class UserServiceImplTest {
     @Mock
     private UserDao userDao;
 
-    @InjectMocks
     private UserServiceImpl userService;
 
     private User sampleUser;
 
     @BeforeEach
     void setUp() {
+        userService = new UserServiceImpl(userDao);
         sampleUser = new User();
         sampleUser.setId(1L);
         sampleUser.setUsername("testuser");

@@ -4,17 +4,17 @@ import com.zhaw.backend.mappers.VoucherMapper;
 import com.zhaw.backend.model.dao.VoucherDao;
 import com.zhaw.backend.model.dto.VoucherDto;
 import com.zhaw.backend.model.entities.Voucher;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class VoucherServiceImpl implements VoucherService {
 
-    @Autowired
-    VoucherDao voucherDao;
+    private final VoucherDao voucherDao;
 
     @Override
     public boolean createVoucher(VoucherDto voucherDto) {
