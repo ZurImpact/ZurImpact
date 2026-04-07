@@ -1,5 +1,6 @@
 import {describe, it, expect, vi, beforeEach} from 'vitest';
 import {screen, waitFor} from '@testing-library/react';
+import {BrowserRouter} from 'react-router';
 import {renderWithProviders} from '../../test/test.utils';
 import {ActionDashboard} from './ActionDashboard';
 import type {ActionDto} from '../../store/slices/ActionSlice';
@@ -42,7 +43,11 @@ beforeEach(() => {
 describe('ActionDashboard', () => {
   it('renders the header and subheader translation keys', () => {
     mockGet.mockResolvedValue({data: []});
-    renderWithProviders(<ActionDashboard />);
+    renderWithProviders(
+      <BrowserRouter>
+        <ActionDashboard />
+      </BrowserRouter>,
+    );
 
     expect(screen.getByText('actionDashboard.header')).toBeInTheDocument();
     expect(screen.getByText('actionDashboard.subheader')).toBeInTheDocument();
@@ -51,14 +56,22 @@ describe('ActionDashboard', () => {
   it('shows loading state while fetching', () => {
     // Never resolve — keeps the component in loading state
     mockGet.mockReturnValue(new Promise(() => {}));
-    renderWithProviders(<ActionDashboard />);
+    renderWithProviders(
+      <BrowserRouter>
+        <ActionDashboard />
+      </BrowserRouter>,
+    );
 
     expect(screen.getByText('actionDashboard.loading')).toBeInTheDocument();
   });
 
   it('shows empty state when API returns no actions', async () => {
     mockGet.mockResolvedValue({data: []});
-    renderWithProviders(<ActionDashboard />);
+    renderWithProviders(
+      <BrowserRouter>
+        <ActionDashboard />
+      </BrowserRouter>,
+    );
 
     await waitFor(() => {
       expect(screen.getByText('actionDashboard.noActions')).toBeInTheDocument();
@@ -70,7 +83,11 @@ describe('ActionDashboard', () => {
       if (url === '/actions') return Promise.resolve({data: mockActions});
       return Promise.resolve({data: []});
     });
-    renderWithProviders(<ActionDashboard />);
+    renderWithProviders(
+      <BrowserRouter>
+        <ActionDashboard />
+      </BrowserRouter>,
+    );
 
     expect(await screen.findByText('Clean Park')).toBeInTheDocument();
     expect(screen.getByText('Plant Tree')).toBeInTheDocument();
@@ -82,7 +99,11 @@ describe('ActionDashboard', () => {
       if (url.includes('getUserActions')) return Promise.resolve({data: mockUserActions});
       return Promise.resolve({data: []});
     });
-    renderWithProviders(<ActionDashboard />);
+    renderWithProviders(
+      <BrowserRouter>
+        <ActionDashboard />
+      </BrowserRouter>,
+    );
 
     await waitFor(() => {
       expect(screen.getByText('+50')).toBeInTheDocument();
@@ -91,14 +112,22 @@ describe('ActionDashboard', () => {
 
   it('displays error message when fetch fails', async () => {
     mockGet.mockRejectedValue(new Error('Network error'));
-    renderWithProviders(<ActionDashboard />);
+    renderWithProviders(
+      <BrowserRouter>
+        <ActionDashboard />
+      </BrowserRouter>,
+    );
 
     expect(await screen.findByText('Network error')).toBeInTheDocument();
   });
 
   it('renders activity history section title', () => {
     mockGet.mockResolvedValue({data: []});
-    renderWithProviders(<ActionDashboard />);
+    renderWithProviders(
+      <BrowserRouter>
+        <ActionDashboard />
+      </BrowserRouter>,
+    );
 
     expect(screen.getByText('actionDashboard.historyTitle')).toBeInTheDocument();
   });

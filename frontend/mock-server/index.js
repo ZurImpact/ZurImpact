@@ -34,9 +34,9 @@ app.get(BASE_URL + '/actions', (req, res) => {
   res.json(filtered);
 });
 
-// GET action by ID (for /api/actions/:id)
-app.get(BASE_URL + '/actions/:id', (req, res) => {
-  const action = mockActions.find((a) => a.id === parseInt(req.params.id));
+// GET action by ID (for /api/actions/getAction?id=...) - MUST come before /actions/:id
+app.get(BASE_URL + '/action/getAction', (req, res) => {
+  const action = mockActions.find((a) => a.id === parseInt(req.query.id));
   if (action) {
     res.json(action);
   } else {
@@ -44,9 +44,9 @@ app.get(BASE_URL + '/actions/:id', (req, res) => {
   }
 });
 
-// GET action by ID (for /api/actions/getAction?id=...)
-app.get(BASE_URL + '/actions/getAction', (req, res) => {
-  const action = mockActions.find((a) => a.id === parseInt(req.query.id));
+// GET action by ID (for /api/actions/:id)
+app.get(BASE_URL + '/actions/:id', (req, res) => {
+  const action = mockActions.find((a) => a.id === parseInt(req.params.id));
   if (action) {
     res.json(action);
   } else {
@@ -88,27 +88,22 @@ app.delete(BASE_URL + '/actions/:id', (req, res) => {
 
 // GET user actions (aligned with UserActionHistoryDto)
 app.get(BASE_URL + '/action/getUserActions', (req, res) => {
-  //const userId = parseInt(req.query.userId);
-  // Only return actions for the given userId
   const userActions = mockUserActions;
   res.json(userActions);
 });
 
 // POST startAction
 app.post(BASE_URL + '/actions/startAction', (req, res) => {
-  // Just return success for mock
   res.status(200).json({message: 'Action started (mock)'});
 });
 
 // POST completeAction
 app.post(BASE_URL + '/actions/completeAction', (req, res) => {
-  // Just return success for mock
   res.status(200).json({message: 'Action completed (mock)'});
 });
 
 // POST cancelAction
 app.post(BASE_URL + '/actions/cancelAction', (req, res) => {
-  // Just return success for mock
   res.status(200).json({message: 'Action cancelled (mock)'});
 });
 
