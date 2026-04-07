@@ -74,15 +74,7 @@ public class ActionServiceImpl implements ActionService {
         return subActionService.getSubActions(actionId, actionType);
     }
 
-    /**
-     * Get all actions with a user has done
-     * @param userId id of the user for which the action history should be retrieved
-     * @return all actions done by that user
-     */
-    @Override
-    public List<UserActionHistoryDto> getUserActions(Long userId, Boolean active){
-        return UserActionHistoryMapper.toDtoList(actionDao.findUserActionHistory(userId, active));
-    }
+
 
     /**
      * Starts an action for a user, creates a mapping in DB with state "IN_PROGRESS"
