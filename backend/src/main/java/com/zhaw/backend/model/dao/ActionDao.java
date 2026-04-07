@@ -4,6 +4,7 @@ import com.zhaw.backend.enums.CompletionState;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
 import com.zhaw.backend.model.entities.UserActionHistory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -25,13 +26,10 @@ import java.util.Objects;
  */
 
 @Repository
+@RequiredArgsConstructor
 public class ActionDao {
 
     private final JdbcTemplate jdbc;
-
-    public ActionDao(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
-    }
 
     /**
      * Helper method to map resultset to Action entity

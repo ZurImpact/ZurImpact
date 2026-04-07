@@ -1,6 +1,7 @@
 package com.zhaw.backend.model.dao;
 
 import com.zhaw.backend.model.entities.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -19,13 +20,10 @@ import java.util.Optional;
  * Uses native SQL via JdbcTemplate — no EntityManager / Hibernate magic.
  */
 @Repository
+@RequiredArgsConstructor
 public class UserDao {
 
     private final JdbcTemplate jdbc;
-
-    public UserDao(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
-    }
 
     // ── Row mapper ──────────────────────────────────────────────────────
 
