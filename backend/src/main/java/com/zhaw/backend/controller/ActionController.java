@@ -2,7 +2,6 @@ package com.zhaw.backend.controller;
 
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
-import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.service.ActionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

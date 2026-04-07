@@ -3,7 +3,6 @@ package com.zhaw.backend.model.dao;
 import com.zhaw.backend.enums.CompletionState;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
-import com.zhaw.backend.model.entities.UserActionHistory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

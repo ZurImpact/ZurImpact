@@ -7,7 +7,6 @@ import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubActionDto;
 import com.zhaw.backend.model.entities.Action;
-import com.zhaw.backend.model.entities.UserActionHistory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,19 +16,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ActionServiceImpl - Unit Tests")
@@ -270,19 +263,6 @@ class ActionServiceImplTest {
         @Nested
         @DisplayName("delegation methods")
         class DelegationMethods {
-
-            @Test
-            @DisplayName("getUserActions delegates to DAO")
-            void getUserActionsDelegatesToDao() {
-                List<UserActionHistory> history = Collections.singletonList(UserActionHistory.builder().actionId(1L).build());
-                when(actionDao.findUserActionHistory(5L, true)).thenReturn(history);
-
-                var result = actionService.getUserActions(5L, true);
-
-                assertEquals(1, result.size());
-                assertEquals(1L, result.getFirst().getActionId());
-                verify(actionDao).findUserActionHistory(5L, true);
-            }
 
             @Test
             @DisplayName("startActionForUser delegates to DAO")

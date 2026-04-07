@@ -1,13 +1,18 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.mappers.UserActionHistoryMapper;
+import com.zhaw.backend.model.dao.UserActionHistoryDao;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserActionHistoryServiceImpl implements UserActionHistoryService{
+
+    private final UserActionHistoryDao userActionHistoryDao;
 
     /**
      * Get all actions with a user has done
@@ -16,6 +21,6 @@ public class UserActionHistoryServiceImpl implements UserActionHistoryService{
      */
     @Override
     public List<UserActionHistoryDto> getUserActions(Long userId, Boolean active){
-        return UserActionHistoryMapper.toDtoList(actionDao.findUserActionHistory(userId, active));
+        return UserActionHistoryMapper.toDtoList(userActionHistoryDao.findUserActionHistory(userId, active));
     }
 }
