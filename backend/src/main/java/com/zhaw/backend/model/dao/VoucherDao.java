@@ -1,6 +1,7 @@
 package com.zhaw.backend.model.dao;
 
 import com.zhaw.backend.model.entities.Voucher;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -19,13 +20,10 @@ import java.util.Optional;
  * Uses native SQL via JdbcTemplate.
  */
 @Repository
+@RequiredArgsConstructor
 public class VoucherDao {
 
     private final JdbcTemplate jdbc;
-
-    public VoucherDao(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
-    }
 
     // ── Row mapper ──────────────────────────────────────────────────────────────
 

@@ -3,6 +3,7 @@ package com.zhaw.backend.model.dao;
 import com.zhaw.backend.enums.CompletionState;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
+@RequiredArgsConstructor
 public class SubActionDao {
 
     private static final RowMapper<GpsActionTask> GPS_ROW_MAPPER = (rs, rowNum) -> {
@@ -27,10 +29,6 @@ public class SubActionDao {
     };
 
     private final JdbcTemplate jdbc;
-
-    public SubActionDao(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
-    }
 
     public List<GpsActionTask> findGpsSubAction(Long actionId) {
         return jdbc.query(
