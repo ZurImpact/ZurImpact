@@ -6,16 +6,7 @@ import {RootLayout} from './RootLayout';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        appName: 'ZurImpact',
-        'rootLayout.dashboard': 'Dashboard',
-        'rootLayout.logout': 'Logout',
-        points: 'Points',
-        language: 'Language',
-      };
-      return translations[key] ?? key;
-    },
+    t: (key: string) => key,
     i18n: {changeLanguage: vi.fn()},
   }),
 }));
@@ -33,22 +24,22 @@ const renderWithRouter = (initialRoute = '/') => {
 };
 
 describe('RootLayout', () => {
-  it('renders the app name in the nav bar', () => {
+  it('renders the app name translation key', () => {
     renderWithRouter();
 
-    expect(screen.getByText('ZurImpact')).toBeInTheDocument();
+    expect(screen.getByText('appName')).toBeInTheDocument();
   });
 
   it('renders the dashboard navigation link', () => {
     renderWithRouter();
 
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('rootLayout.dashboard')).toBeInTheDocument();
   });
 
   it('renders the logout button', () => {
     renderWithRouter();
 
-    expect(screen.getByText('Logout')).toBeInTheDocument();
+    expect(screen.getByText('rootLayout.logout')).toBeInTheDocument();
   });
 
   it('renders the language switcher', () => {
@@ -61,9 +52,9 @@ describe('RootLayout', () => {
   it('renders points display', () => {
     renderWithRouter();
 
-    // "123 Points" is combined in a single span
+    // "123 points" is combined in a single span
     expect(screen.getByText(/123/)).toBeInTheDocument();
-    expect(screen.getByText(/Points/)).toBeInTheDocument();
+    expect(screen.getByText(/points/)).toBeInTheDocument();
   });
 
   it('renders the child route via Outlet', () => {
@@ -75,7 +66,7 @@ describe('RootLayout', () => {
   it('highlights dashboard link when on dashboard route', () => {
     renderWithRouter('/dashboard');
 
-    const dashboardLink = screen.getByText('Dashboard');
+    const dashboardLink = screen.getByText('rootLayout.dashboard');
     expect(dashboardLink).toHaveClass('text-green-600');
   });
 });

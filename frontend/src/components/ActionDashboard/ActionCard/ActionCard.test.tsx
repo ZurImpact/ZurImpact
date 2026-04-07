@@ -6,7 +6,7 @@ import type {ActionDto} from '../../../store/slices/ActionSlice';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => (key === 'points' ? 'Points' : key),
+    t: (key: string) => key,
     i18n: {changeLanguage: vi.fn()},
   }),
 }));
@@ -32,10 +32,10 @@ describe('ActionCard', () => {
     expect(screen.getByText('Help clean the local park')).toBeInTheDocument();
   });
 
-  it('renders points with translated label', () => {
+  it('renders points with the points label key', () => {
     render(<ActionCard action={baseAction} onClick={vi.fn()} />);
 
-    expect(screen.getByText('50 Points')).toBeInTheDocument();
+    expect(screen.getByText('50 points')).toBeInTheDocument();
   });
 
   it('calls onClick when card is clicked', async () => {
@@ -54,7 +54,7 @@ describe('ActionCard', () => {
     render(<ActionCard action={action} onClick={vi.fn()} />);
 
     expect(screen.getByText('Walk')).toBeInTheDocument();
-    expect(screen.getByText('10 Points')).toBeInTheDocument();
+    expect(screen.getByText('10 points')).toBeInTheDocument();
   });
 
   it('renders with zero points', () => {
@@ -62,6 +62,6 @@ describe('ActionCard', () => {
 
     render(<ActionCard action={action} onClick={vi.fn()} />);
 
-    expect(screen.getByText('0 Points')).toBeInTheDocument();
+    expect(screen.getByText('0 points')).toBeInTheDocument();
   });
 });
