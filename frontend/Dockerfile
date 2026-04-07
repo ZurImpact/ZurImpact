@@ -17,30 +17,15 @@ RUN yarn install --immutable
 COPY . .
 RUN yarn build
 
-# ── Stage 2: Runtime ─────────────────────────────────────────────────────────
-# Lean Nginx image — only the static build output, no Node or build tools.
-FROM nginx:alpine
+# ── Stage 2: Runtime (Unprivileged & Secure) ─────────────────────────────────
+# Using the official unprivileged image to run as non-root (User 101)
+FROM nginxinc/nginx-unprivileged:alpine
 
-# Remove default Nginx content
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copy the Vite build output
+# Copy the Vite build output to Nginx's default serving directory
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# SPA routing: fall back to index.html for client-side routes
-COPY <<'EOF' /etc/nginx/conf.d/default.conf
-server {
-    listen 80;
-    server_name _;
-    root /usr/share/nginx/html;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-}
-EOF
-
-EXPOSE 80
+# nginx config will be mapped via config map to keep the image clean
+# Non-root Nginx uses port 8080 by default (cannot bind to port 80)
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]

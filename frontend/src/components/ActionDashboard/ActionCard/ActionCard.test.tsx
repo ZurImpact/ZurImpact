@@ -1,6 +1,7 @@
 import {describe, it, expect, vi} from 'vitest';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {BrowserRouter} from 'react-router';
 import {ActionCard} from './ActionCard';
 import type {ActionDto} from '../../../store/slices/ActionSlice';
 
@@ -21,19 +22,31 @@ const baseAction: ActionDto = {
 
 describe('ActionCard', () => {
   it('renders the action display name', () => {
-    render(<ActionCard action={baseAction} onClick={vi.fn()} />);
+    render(
+      <BrowserRouter>
+        <ActionCard action={baseAction} onClick={vi.fn()} />
+      </BrowserRouter>,
+    );
 
     expect(screen.getByText('Clean Park')).toBeInTheDocument();
   });
 
   it('renders the action description', () => {
-    render(<ActionCard action={baseAction} onClick={vi.fn()} />);
+    render(
+      <BrowserRouter>
+        <ActionCard action={baseAction} onClick={vi.fn()} />
+      </BrowserRouter>,
+    );
 
     expect(screen.getByText('Help clean the local park')).toBeInTheDocument();
   });
 
   it('renders points with the points label key', () => {
-    render(<ActionCard action={baseAction} onClick={vi.fn()} />);
+    render(
+      <BrowserRouter>
+        <ActionCard action={baseAction} onClick={vi.fn()} />
+      </BrowserRouter>,
+    );
 
     expect(screen.getByText('50 points')).toBeInTheDocument();
   });
@@ -42,7 +55,11 @@ describe('ActionCard', () => {
     const user = userEvent.setup();
     const handleClick = vi.fn();
 
-    render(<ActionCard action={baseAction} onClick={handleClick} />);
+    render(
+      <BrowserRouter>
+        <ActionCard action={baseAction} onClick={handleClick} />
+      </BrowserRouter>,
+    );
 
     await user.click(screen.getByText('Clean Park'));
     expect(handleClick).toHaveBeenCalledTimes(1);
@@ -51,7 +68,11 @@ describe('ActionCard', () => {
   it('renders without description when not provided', () => {
     const action: ActionDto = {id: 2, displayName: 'Walk', points: 10};
 
-    render(<ActionCard action={action} onClick={vi.fn()} />);
+    render(
+      <BrowserRouter>
+        <ActionCard action={action} onClick={vi.fn()} />
+      </BrowserRouter>,
+    );
 
     expect(screen.getByText('Walk')).toBeInTheDocument();
     expect(screen.getByText('10 points')).toBeInTheDocument();
@@ -60,7 +81,11 @@ describe('ActionCard', () => {
   it('renders with zero points', () => {
     const action: ActionDto = {id: 3, displayName: 'Free Action', points: 0};
 
-    render(<ActionCard action={action} onClick={vi.fn()} />);
+    render(
+      <BrowserRouter>
+        <ActionCard action={action} onClick={vi.fn()} />
+      </BrowserRouter>,
+    );
 
     expect(screen.getByText('0 points')).toBeInTheDocument();
   });

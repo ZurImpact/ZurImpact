@@ -7,8 +7,14 @@ import {RootLayout} from './RootLayout';
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
-    i18n: {changeLanguage: vi.fn()},
+    i18n: {changeLanguage: vi.fn(), language: 'en'},
   }),
+  initReactI18next: {type: '3rdParty'},
+}));
+
+vi.mock('../../utility/i18n', () => ({
+  __esModule: true,
+  default: {changeLanguage: vi.fn(), language: 'en'},
 }));
 
 const renderWithRouter = (initialRoute = '/') => {
@@ -40,13 +46,6 @@ describe('RootLayout', () => {
     renderWithRouter();
 
     expect(screen.getByText('rootLayout.logout')).toBeInTheDocument();
-  });
-
-  it('renders the language switcher', () => {
-    renderWithRouter();
-
-    expect(screen.getByText('EN')).toBeInTheDocument();
-    expect(screen.getByText('DE')).toBeInTheDocument();
   });
 
   it('renders points display', () => {

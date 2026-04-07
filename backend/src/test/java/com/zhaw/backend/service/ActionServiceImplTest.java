@@ -1,10 +1,13 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.ActionType;
+import com.zhaw.backend.enums.CompletionState;
 import com.zhaw.backend.model.dao.ActionDao;
+import com.zhaw.backend.model.dto.ActionDto;
+import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubActionDto;
-import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.entities.Action;
+import com.zhaw.backend.model.entities.UserActionHistory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,11 +19,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,116 +71,292 @@ class ActionServiceImplTest {
             List<?> result = actionService.getActions(null, null, null, null);
 
             assertEquals(1, result.size());
-            verify(subActionService, never()).getSubActionIds(any(), any());
-        }
-
-        @Test
-        @DisplayName("populates subActionDtoIdList when subtasks exist")
-        void populatesSubActionIdsWhenSubtasksExist() throws Exception {
-            Action action = buildAction(2L, true);
-            when(actionDao.findAllFiltered(any())).thenReturn(List.of(action));
-            when(subActionService.getSubActionIds(2L, ActionType.GPS)).thenReturn(List.of(11L, 12L));
-
-            var result = actionService.getActions("text", 10, "food", null);
-
-            assertEquals(1, result.size());
-            assertEquals(List.of(11L, 12L), result.get(0).getSubActionDtoIdList());
-            verify(subActionService).getSubActionIds(2L, ActionType.GPS);
-        }
-    }
-
-    @Nested
-    @DisplayName("getActionById")
-    class GetActionById {
-
-        @Test
-        @DisplayName("returns null when action not found")
-        void returnsNullWhenNotFound() throws Exception {
-            when(actionDao.findById(404L)).thenReturn(null);
-
-            var result = actionService.getActionById(404L);
-
-            assertNull(result);
             verify(subActionService, never()).getSubActions(any(), any());
         }
 
-        @Test
-        @DisplayName("does not call SubActionService when no subtasks")
-        void doesNotCallSubActionServiceWhenNoSubtasks() throws Exception {
-            Action action = buildAction(3L, false);
-            when(actionDao.findById(3L)).thenReturn(action);
+        @Nested
+        @DisplayName("getActionById")
+        class GetActionById {
 
-            var result = actionService.getActionById(3L);
+            @Test
+            @DisplayName("returns null when action not found")
+            void returnsNullWhenNotFound() throws Exception {
+                when(actionDao.findById(404L)).thenReturn(null);
 
-            assertEquals(3L, result.getId());
-            assertNull(result.getSubActionDtoList());
-            verify(subActionService, never()).getSubActions(any(), any());
+                var result = actionService.getActionById(404L);
+
+                assertNull(result);
+                verify(subActionService, never()).getSubActions(any(), any());
+            }
+
+            @Test
+            @DisplayName("does not call SubActionService when no subtasks")
+            void doesNotCallSubActionServiceWhenNoSubtasks() throws Exception {
+                Action action = buildAction(3L, false);
+                when(actionDao.findById(3L)).thenReturn(action);
+
+                var result = actionService.getActionById(3L);
+
+                assertEquals(3L, result.getId());
+                assertNull(result.getSubActions());
+                verify(subActionService, never()).getSubActions(any(), any());
+            }
+
+            @Test
+            @DisplayName("populates subActions when subtasks exist")
+            void populatesSubActionListWhenSubtasksExist() throws Exception {
+                Action action = buildAction(4L, true);
+                when(actionDao.findById(4L)).thenReturn(action);
+                List<SubActionDto> subActions = List.of(SubActionDto.builder().id(21L).actionId(4L).build());
+                when(subActionService.getSubActions(4L, ActionType.GPS)).thenReturn(subActions);
+
+                var result = actionService.getActionById(4L);
+
+                assertEquals(4L, result.getId());
+                assertEquals(subActions, result.getSubActions());
+                verify(subActionService).getSubActions(4L, ActionType.GPS);
+            }
         }
 
-        @Test
-        @DisplayName("populates subActionDtoList when subtasks exist")
-        void populatesSubActionListWhenSubtasksExist() throws Exception {
-            Action action = buildAction(4L, true);
-            when(actionDao.findById(4L)).thenReturn(action);
-            List<SubActionDto> subActions = List.of(SubActionDto.builder().id(21L).actionId(4L).build());
-            when(subActionService.getSubActions(4L, ActionType.GPS)).thenReturn(subActions);
+        @Nested
+        @DisplayName("createAction")
+        class CreateAction {
 
-            var result = actionService.getActionById(4L);
+            @Test
+            @DisplayName("creates action and returns DTO with generated ID")
+            void createsActionAndSetsId() {
+                ActionDto dto = ActionDto.builder()
+                        .description("desc").displayName("name").points(10)
+                        .type(ActionType.GPS).hasSubtasks(false).build();
+                when(actionDao.createAction(any(Action.class))).thenReturn(42L);
 
-            assertEquals(4L, result.getId());
-            assertEquals(subActions, result.getSubActionDtoList());
-            verify(subActionService).getSubActions(4L, ActionType.GPS);
+                ActionDto result = actionService.createAction(dto);
+
+                assertEquals(42L, result.getId());
+                verify(actionDao).createAction(any(Action.class));
+                verify(subActionService, never()).createSubAction(any(), any());
+            }
+
+            @Test
+            @DisplayName("inserts GPS subactions when hasSubtasks is true")
+            void insertsGpsSubactionsWhenHasSubtasks() {
+                GpsActionTaskDto gpsDto = new GpsActionTaskDto();
+                gpsDto.setDescription("checkpoint");
+                gpsDto.setGpsX(47.3f);
+                gpsDto.setGpsY(8.5f);
+
+                ActionDto dto = ActionDto.builder()
+                        .description("desc").displayName("name").points(10)
+                        .type(ActionType.GPS).hasSubtasks(true)
+                        .subActions(List.of(gpsDto)).build();
+                when(actionDao.createAction(any(Action.class))).thenReturn(5L);
+
+                ActionDto result = actionService.createAction(dto);
+
+                assertEquals(5L, result.getId());
+                verify(subActionService).createSubAction(5L, gpsDto);
+            }
+
+            @Test
+            @DisplayName("does not insert subactions when subActions list is null")
+            void doesNotInsertSubactionsWhenListIsNull() {
+                ActionDto dto = ActionDto.builder()
+                        .description("desc").displayName("name").points(10)
+                        .type(ActionType.GPS).hasSubtasks(true).subActions(null).build();
+                when(actionDao.createAction(any(Action.class))).thenReturn(6L);
+
+                actionService.createAction(dto);
+
+                verify(subActionService, never()).createSubAction(any(), any());
+            }
         }
-    }
 
-    @Nested
-    @DisplayName("delegation methods")
-    class DelegationMethods {
+        @Nested
+        @DisplayName("updateAction")
+        class UpdateAction {
 
-        @Test
-        @DisplayName("getUserActions delegates to DAO")
-        void getUserActionsDelegatesToDao() {
-            List<UserActionHistoryDto> history = Collections.singletonList(UserActionHistoryDto.builder().actionId(1L).build());
-            when(actionDao.findUserActionHistory(5L, true)).thenReturn(history);
+            @Test
+            @DisplayName("returns true when action updated")
+            void returnsTrueWhenUpdated() {
+                ActionDto dto = ActionDto.builder().description("updated").build();
+                when(actionDao.updateAction(any(Action.class))).thenReturn(true);
 
-            var result = actionService.getUserActions(5L, true);
+                assertTrue(actionService.updateAction(1L, dto));
+                verify(actionDao).updateAction(any(Action.class));
+            }
 
-            assertEquals(1, result.size());
-            verify(actionDao).findUserActionHistory(5L, true);
+            @Test
+            @DisplayName("returns false when action not found")
+            void returnsFalseWhenNotFound() {
+                ActionDto dto = ActionDto.builder().description("updated").build();
+                when(actionDao.updateAction(any(Action.class))).thenReturn(false);
+
+                assertFalse(actionService.updateAction(99L, dto));
+            }
         }
 
-        @Test
-        @DisplayName("startActionForUser delegates to DAO")
-        void startActionForUserDelegatesToDao() {
-            when(actionDao.startAction(7L, 8L, true, "sub-1")).thenReturn(true);
+        @Nested
+        @DisplayName("deleteAction")
+        class DeleteAction {
 
-            boolean result = actionService.startActionForUser(7L, 8L, true, "sub-1");
+            @Test
+            @DisplayName("returns true when action deleted")
+            void returnsTrueWhenDeleted() {
+                when(actionDao.deleteActionById(1L)).thenReturn(true);
 
-            assertTrue(result);
-            verify(actionDao).startAction(7L, 8L, true, "sub-1");
+                assertTrue(actionService.deleteAction(1L));
+                verify(actionDao).deleteActionById(1L);
+            }
+
+            @Test
+            @DisplayName("returns false when action not found")
+            void returnsFalseWhenNotFound() {
+                when(actionDao.deleteActionById(99L)).thenReturn(false);
+
+                assertFalse(actionService.deleteAction(99L));
+            }
         }
 
-        @Test
-        @DisplayName("completeActionForUser delegates to DAO")
-        void completeActionForUserDelegatesToDao() {
-            when(actionDao.completeAction(7L, 8L, false, null)).thenReturn(true);
+        @Nested
+        @DisplayName("updateSubAction")
+        class UpdateSubAction {
 
-            boolean result = actionService.completeActionForUser(7L, 8L, false, null);
+            @Test
+            @DisplayName("delegates to SubActionService and returns true")
+            void delegatesToSubActionService() {
+                GpsActionTaskDto dto = new GpsActionTaskDto();
+                when(subActionService.updateSubAction(1L, dto)).thenReturn(true);
 
-            assertTrue(result);
-            verify(actionDao).completeAction(7L, 8L, false, null);
+                assertTrue(actionService.updateSubAction(1L, dto));
+                verify(subActionService).updateSubAction(1L, dto);
+            }
+
+            @Test
+            @DisplayName("returns false when subaction not found")
+            void returnsFalseWhenNotFound() {
+                GpsActionTaskDto dto = new GpsActionTaskDto();
+                when(subActionService.updateSubAction(99L, dto)).thenReturn(false);
+
+                assertFalse(actionService.updateSubAction(99L, dto));
+            }
         }
 
-        @Test
-        @DisplayName("deleteActionForUser delegates to DAO")
-        void deleteActionForUserDelegatesToDao() {
-            when(actionDao.deleteAction(9L, 10L)).thenReturn(true);
+        @Nested
+        @DisplayName("deleteSubAction")
+        class DeleteSubAction {
 
-            boolean result = actionService.deleteActionForUser(9L, 10L);
+            @Test
+            @DisplayName("delegates to SubActionService and returns true")
+            void delegatesToSubActionService() {
+                when(subActionService.deleteSubAction(1L)).thenReturn(true);
 
-            assertTrue(result);
-            verify(actionDao).deleteAction(9L, 10L);
+                assertTrue(actionService.deleteSubAction(1L));
+                verify(subActionService).deleteSubAction(1L);
+            }
+
+            @Test
+            @DisplayName("returns false when subaction not found")
+            void returnsFalseWhenNotFound() {
+                when(subActionService.deleteSubAction(99L)).thenReturn(false);
+
+                assertFalse(actionService.deleteSubAction(99L));
+            }
+        }
+
+        @Nested
+        @DisplayName("delegation methods")
+        class DelegationMethods {
+
+            @Test
+            @DisplayName("getUserActions delegates to DAO")
+            void getUserActionsDelegatesToDao() {
+                List<UserActionHistory> history = Collections.singletonList(UserActionHistory.builder().actionId(1L).build());
+                when(actionDao.findUserActionHistory(5L, true)).thenReturn(history);
+
+                var result = actionService.getUserActions(5L, true);
+
+                assertEquals(1, result.size());
+                assertEquals(1L, result.getFirst().getActionId());
+                verify(actionDao).findUserActionHistory(5L, true);
+            }
+
+            @Test
+            @DisplayName("startActionForUser delegates to DAO")
+            void startActionForUserDelegatesToDao() {
+                when(actionDao.startAction(7L, 8L, true, "sub-1")).thenReturn(true);
+
+                boolean result = actionService.startActionForUser(7L, 8L, true, "sub-1");
+
+                assertTrue(result);
+                verify(actionDao).startAction(7L, 8L, true, "sub-1");
+            }
+
+            @Test
+            @DisplayName("completeActionForUser with non-subtask delegates to DAO")
+            void completeActionForUserWithNonSubtaskDelegatesToDao() {
+                when(subActionService.getSubActionsCompletionStatesForUser(7L, 8L)).thenReturn(null);
+                when(actionDao.completeAction(7L, 8L, false, null)).thenReturn(true);
+
+                boolean result = actionService.completeActionForUser(7L, 8L);
+
+                assertTrue(result);
+                verify(subActionService).getSubActionsCompletionStatesForUser(7L, 8L);
+                verify(actionDao).completeAction(7L, 8L, false, null);
+            }
+
+            @Test
+            @DisplayName("deleteActionForUser delegates to DAO")
+            void deleteActionForUserDelegatesToDao() {
+                when(actionDao.deleteAction(9L, 10L)).thenReturn(true);
+
+                boolean result = actionService.deleteActionForUser(9L, 10L);
+
+                assertTrue(result);
+                verify(actionDao).deleteAction(9L, 10L);
+            }
+        }
+
+        @Nested
+        @DisplayName("completeActionForUser")
+        class CompleteActionForUserTests {
+
+            @Test
+            @DisplayName("completes action when there are no sub-action completion states")
+            void completesActionWhenNoSubActionStatesExist() {
+                when(subActionService.getSubActionsCompletionStatesForUser(1L, 2L)).thenReturn(null);
+                when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(true);
+
+                boolean result = actionService.completeActionForUser(1L, 2L);
+
+                assertTrue(result);
+                verify(subActionService).getSubActionsCompletionStatesForUser(1L, 2L);
+                verify(actionDao).completeAction(1L, 2L, false, null);
+            }
+
+            @Test
+            @DisplayName("returns false and does not call DAO when any sub-action is not completed")
+            void returnsFalseWhenACompletionStateIsNotCompleted() {
+                when(subActionService.getSubActionsCompletionStatesForUser(1L, 2L))
+                        .thenReturn(Map.of(1L, CompletionState.IN_PROGRESS));
+
+                boolean result = actionService.completeActionForUser(1L, 2L);
+
+                assertFalse(result);
+                verify(subActionService).getSubActionsCompletionStatesForUser(1L, 2L);
+                verify(actionDao, never()).completeAction(anyLong(), anyLong(), any(), any());
+            }
+
+            @Test
+            @DisplayName("returns false when DAO fails to complete action")
+            void returnsFalseWhenDaoFailsToCompleteAction() {
+                when(subActionService.getSubActionsCompletionStatesForUser(1L, 2L)).thenReturn(Map.of());
+                when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(false);
+
+                boolean result = actionService.completeActionForUser(1L, 2L);
+
+                assertFalse(result);
+                verify(actionDao).completeAction(1L, 2L, false, null);
+            }
         }
     }
 }
-
