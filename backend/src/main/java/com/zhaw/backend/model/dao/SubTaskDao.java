@@ -56,7 +56,7 @@ public class SubTaskDao {
      * @param userId id of the user for which the action should be completed
      * @param actionId id of the action which should be completed
      * @param isSubtask if it is a subtask
-     * @param subtaskId subtask id
+     * @param subTaskId subtask id
      * @return true if the action was successfully completed, false otherwise
      */
     public boolean completeSubTaskForUser(Long userId, Long actionId, Boolean isSubtask, String subTaskId) {
