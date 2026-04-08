@@ -16,17 +16,7 @@ vi.mock('../../api/apiClient', () => ({
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        'actionDashboard.header': 'Activities',
-        'actionDashboard.subheader': 'Log your sustainable activities and earn points',
-        'actionDashboard.historyTitle': 'Your Activity History',
-        'actionDashboard.loading': 'Loading actions...',
-        'actionDashboard.noActions': 'No actions yet',
-        points: 'Points',
-      };
-      return translations[key] ?? key;
-    },
+    t: (key: string) => key,
     i18n: {changeLanguage: vi.fn()},
   }),
 }));
@@ -51,7 +41,7 @@ beforeEach(() => {
 });
 
 describe('ActionDashboard', () => {
-  it('renders the header and subheader', () => {
+  it('renders the header and subheader translation keys', () => {
     mockGet.mockResolvedValue({data: []});
     renderWithProviders(
       <BrowserRouter>
@@ -59,11 +49,12 @@ describe('ActionDashboard', () => {
       </BrowserRouter>,
     );
 
-    expect(screen.getByText('Activities')).toBeInTheDocument();
-    expect(screen.getByText('Log your sustainable activities and earn points')).toBeInTheDocument();
+    expect(screen.getByText('actionDashboard.header')).toBeInTheDocument();
+    expect(screen.getByText('actionDashboard.subheader')).toBeInTheDocument();
   });
 
-  it('shows loading spinner while fetching', () => {
+  it('shows loading state while fetching', () => {
+    // Never resolve — keeps the component in loading state
     mockGet.mockReturnValue(new Promise(() => {}));
     renderWithProviders(
       <BrowserRouter>
@@ -71,7 +62,7 @@ describe('ActionDashboard', () => {
       </BrowserRouter>,
     );
 
-    expect(screen.getByText('Loading actions...')).toBeInTheDocument();
+    expect(screen.getByText('actionDashboard.loading')).toBeInTheDocument();
   });
 
   it('shows empty state when API returns no actions', async () => {
@@ -83,7 +74,7 @@ describe('ActionDashboard', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('No actions yet')).toBeInTheDocument();
+      expect(screen.getByText('actionDashboard.noActions')).toBeInTheDocument();
     });
   });
 
@@ -138,6 +129,6 @@ describe('ActionDashboard', () => {
       </BrowserRouter>,
     );
 
-    expect(screen.getByText('Your Activity History')).toBeInTheDocument();
+    expect(screen.getByText('actionDashboard.historyTitle')).toBeInTheDocument();
   });
 });
