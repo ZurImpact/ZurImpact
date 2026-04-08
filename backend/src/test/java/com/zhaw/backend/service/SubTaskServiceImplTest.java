@@ -86,7 +86,7 @@ class SubTaskServiceImplTest {
             // Given
             Long userId = 1L;
             Long actionId = 1L;
-            Long subtaskId = 10L;
+            long subtaskId = 10L;
             Float gpsx = 10.0f;
             Float gpsy = 20.0f;
 
