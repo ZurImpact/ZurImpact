@@ -1,7 +1,6 @@
 package com.zhaw.backend.controller;
 
 import com.zhaw.backend.model.dto.ActionDto;
-import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.service.ActionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -146,53 +145,6 @@ public class ActionController {
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             logger.error("ERROR DELETING ACTION - id: {}, error: {}", id, e.getMessage());
-            return ResponseEntity.status(500).build();
-        }
-    }
-
-    /**
-     * Updates an existing GPS subtask by ID.
-     *
-     * @param id  the subtask ID
-     * @param dto the updated subtask data
-     * @return 204 on success, 404 if not found
-     */
-    @PutMapping("/subtask/{id}")
-    @Operation(summary = "Update subtask", description = "Updates an existing GPS subtask. Requires ADMIN or PARTNER role.", tags = "Action Management")
-    public ResponseEntity<Void> updatesubtask(@PathVariable("id") Long id, @RequestBody GpsActionTaskDto dto) {
-        try {
-            boolean updated = actionService.updateSubTask(id, dto);
-            if (!updated) {
-                logger.warn("subtask NOT FOUND FOR UPDATE - id: {}", id);
-                return ResponseEntity.notFound().build();
-            }
-            logger.info("UPDATED subtask - id: {}", id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            logger.error("ERROR UPDATING subtask - id: {}, error: {}", id, e.getMessage());
-            return ResponseEntity.status(500).build();
-        }
-    }
-
-    /**
-     * Deletes a subtask by ID.
-     *
-     * @param id the subtask ID
-     * @return 204 on success, 404 if not found
-     */
-    @DeleteMapping("/subtask/{id}")
-    @Operation(summary = "Delete subtask", description = "Permanently deletes a subtask. Requires ADMIN or PARTNER role.", tags = "Action Management")
-    public ResponseEntity<Void> deleteSubTask(@PathVariable("id") Long id) {
-        try {
-            boolean deleted = actionService.deleteSubTask(id);
-            if (!deleted) {
-                logger.warn("subtask NOT FOUND FOR DELETE - id: {}", id);
-                return ResponseEntity.notFound().build();
-            }
-            logger.info("DELETED subtask - id: {}", id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            logger.error("ERROR DELETING subtask - id: {}, error: {}", id, e.getMessage());
             return ResponseEntity.status(500).build();
         }
     }

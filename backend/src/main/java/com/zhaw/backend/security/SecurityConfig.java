@@ -60,6 +60,8 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/api/actions", HttpMethod.POST.name())).hasAnyRole("ADMIN", "PARTNER")
                         .requestMatchers(new AntPathRequestMatcher("/api/actions/**", HttpMethod.PUT.name())).hasAnyRole("ADMIN", "PARTNER")
                         .requestMatchers(new AntPathRequestMatcher("/api/actions/**", HttpMethod.DELETE.name())).hasAnyRole("ADMIN", "PARTNER")
+                        .requestMatchers(new AntPathRequestMatcher("/api/subTasks/**", HttpMethod.PUT.name())).hasAnyRole("ADMIN", "PARTNER")
+                        .requestMatchers(new AntPathRequestMatcher("/api/subTasks/**", HttpMethod.DELETE.name())).hasAnyRole("ADMIN", "PARTNER")
                         .requestMatchers(new AntPathRequestMatcher("/api/settings/**")).authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasRole("ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/api/user/**")).hasAnyRole("USER", "ADMIN")

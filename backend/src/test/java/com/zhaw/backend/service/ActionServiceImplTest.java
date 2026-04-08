@@ -218,52 +218,6 @@ class ActionServiceImplTest {
         }
 
         @Nested
-        @DisplayName("updateSubAction")
-        class UpdateSubTask {
-
-            @Test
-            @DisplayName("delegates to SubTaskService and returns true")
-            void delegatesToSubActionService() {
-                GpsActionTaskDto dto = new GpsActionTaskDto();
-                when(subTaskService.updateSubTask(1L, dto)).thenReturn(true);
-
-                assertTrue(actionService.updateSubTask(1L, dto));
-                verify(subTaskService).updateSubTask(1L, dto);
-            }
-
-            @Test
-            @DisplayName("returns false when subtask not found")
-            void returnsFalseWhenNotFound() {
-                GpsActionTaskDto dto = new GpsActionTaskDto();
-                when(subTaskService.updateSubTask(99L, dto)).thenReturn(false);
-
-                assertFalse(actionService.updateSubTask(99L, dto));
-            }
-        }
-
-        @Nested
-        @DisplayName("deleteSubAction")
-        class DeleteSubTask {
-
-            @Test
-            @DisplayName("delegates to SubTaskService and returns true")
-            void delegatesToSubTaskService() {
-                when(subTaskService.deleteSubTask(1L)).thenReturn(true);
-
-                assertTrue(actionService.deleteSubTask(1L));
-                verify(subTaskService).deleteSubTask(1L);
-            }
-
-            @Test
-            @DisplayName("returns false when subtask not found")
-            void returnsFalseWhenNotFound() {
-                when(subTaskService.deleteSubTask(99L)).thenReturn(false);
-
-                assertFalse(actionService.deleteSubTask(99L));
-            }
-        }
-
-        @Nested
         @DisplayName("delegation methods")
         class DelegationMethods {
 

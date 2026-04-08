@@ -1,7 +1,6 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.model.dto.ActionDto;
-import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 
 import java.time.LocalDateTime;
@@ -26,8 +25,4 @@ public interface ActionService {
     boolean updateAction(Long id, ActionDto dto);
 
     boolean deleteAction(Long id);
-
-    boolean updateSubTask(Long id, GpsActionTaskDto dto);
-
-    boolean deleteSubTask(Long id);
 }
