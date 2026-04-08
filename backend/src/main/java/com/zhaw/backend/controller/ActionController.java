@@ -23,7 +23,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/actions")
-@Tag(name = "Actions", description = "Endpoints for browsing and managing actions and subactions")
+@Tag(name = "Actions", description = "Endpoints for browsing and managing actions and subtasks")
 public class ActionController {
 
     @Autowired
@@ -40,7 +40,7 @@ public class ActionController {
      * @param points    exact points value to filter by
      * @param tags      comma-separated tag names to filter by
      * @param validUntil only return actions valid up to this timestamp
-     * @return list of matching actions including their subactions
+     * @return list of matching actions including their subtasks
      */
     @GetMapping
     @Operation(summary = "List actions", description = "Returns all actions with optional filtering. Open to all users.", tags = "Actions")
@@ -59,13 +59,13 @@ public class ActionController {
     }
 
     /**
-     * Returns a single action by its ID, including its subactions if any.
+     * Returns a single action by its ID, including its subtasks if any.
      *
      * @param id the action ID
      * @return the action, or 404 if not found
      */
     @GetMapping("/{id}")
-    @Operation(summary = "Get action by ID", description = "Returns a single action including subactions. Open to all users.", tags = "Actions")
+    @Operation(summary = "Get action by ID", description = "Returns a single action including subtasks. Open to all users.", tags = "Actions")
     public ResponseEntity<ActionDto> getAction(@PathVariable("id") Long id) {
         try {
             ActionDto actionDto = actionService.getActionById(id);
@@ -84,14 +84,14 @@ public class ActionController {
     // ── Action management (admin / partner only) ──────────────────────────────
 
     /**
-     * Creates a new action. If {@code hasSubtasks} is true and {@code subActions} is provided,
-     * the subactions are persisted in the same transaction.
+     * Creates a new action. If {@code hasSubtasks} is true and {@code subtasks} is provided,
+     * the subtasks are persisted in the same transaction.
      *
-     * @param dto the action data including optional subactions
+     * @param dto the action data including optional subtasks
      * @return the created action with its generated ID (HTTP 201)
      */
     @PostMapping
-    @Operation(summary = "Create action", description = "Creates a new action, optionally with subactions. Requires ADMIN or PARTNER role.", tags = "Action Management")
+    @Operation(summary = "Create action", description = "Creates a new action, optionally with subtasks. Requires ADMIN or PARTNER role.", tags = "Action Management")
     public ResponseEntity<ActionDto> createAction(@RequestBody ActionDto dto) {
         try {
             ActionDto created = actionService.createAction(dto);
@@ -151,48 +151,48 @@ public class ActionController {
     }
 
     /**
-     * Updates an existing GPS subaction by ID.
+     * Updates an existing GPS subtask by ID.
      *
-     * @param id  the subaction ID
-     * @param dto the updated subaction data
+     * @param id  the subtask ID
+     * @param dto the updated subtask data
      * @return 204 on success, 404 if not found
      */
-    @PutMapping("/subaction/{id}")
-    @Operation(summary = "Update subaction", description = "Updates an existing GPS subaction. Requires ADMIN or PARTNER role.", tags = "Action Management")
-    public ResponseEntity<Void> updateSubAction(@PathVariable("id") Long id, @RequestBody GpsActionTaskDto dto) {
+    @PutMapping("/subtask/{id}")
+    @Operation(summary = "Update subtask", description = "Updates an existing GPS subtask. Requires ADMIN or PARTNER role.", tags = "Action Management")
+    public ResponseEntity<Void> updatesubtask(@PathVariable("id") Long id, @RequestBody GpsActionTaskDto dto) {
         try {
-            boolean updated = actionService.updateSubAction(id, dto);
+            boolean updated = actionService.updateSubTask(id, dto);
             if (!updated) {
-                logger.warn("SUBACTION NOT FOUND FOR UPDATE - id: {}", id);
+                logger.warn("subtask NOT FOUND FOR UPDATE - id: {}", id);
                 return ResponseEntity.notFound().build();
             }
-            logger.info("UPDATED SUBACTION - id: {}", id);
+            logger.info("UPDATED subtask - id: {}", id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            logger.error("ERROR UPDATING SUBACTION - id: {}, error: {}", id, e.getMessage());
+            logger.error("ERROR UPDATING subtask - id: {}, error: {}", id, e.getMessage());
             return ResponseEntity.status(500).build();
         }
     }
 
     /**
-     * Deletes a subaction by ID.
+     * Deletes a subtask by ID.
      *
-     * @param id the subaction ID
+     * @param id the subtask ID
      * @return 204 on success, 404 if not found
      */
-    @DeleteMapping("/subaction/{id}")
-    @Operation(summary = "Delete subaction", description = "Permanently deletes a subaction. Requires ADMIN or PARTNER role.", tags = "Action Management")
-    public ResponseEntity<Void> deleteSubAction(@PathVariable("id") Long id) {
+    @DeleteMapping("/subtask/{id}")
+    @Operation(summary = "Delete subtask", description = "Permanently deletes a subtask. Requires ADMIN or PARTNER role.", tags = "Action Management")
+    public ResponseEntity<Void> deleteSubTask(@PathVariable("id") Long id) {
         try {
-            boolean deleted = actionService.deleteSubAction(id);
+            boolean deleted = actionService.deleteSubTask(id);
             if (!deleted) {
-                logger.warn("SUBACTION NOT FOUND FOR DELETE - id: {}", id);
+                logger.warn("subtask NOT FOUND FOR DELETE - id: {}", id);
                 return ResponseEntity.notFound().build();
             }
-            logger.info("DELETED SUBACTION - id: {}", id);
+            logger.info("DELETED subtask - id: {}", id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            logger.error("ERROR DELETING SUBACTION - id: {}, error: {}", id, e.getMessage());
+            logger.error("ERROR DELETING subtask - id: {}, error: {}", id, e.getMessage());
             return ResponseEntity.status(500).build();
         }
     }
@@ -225,7 +225,7 @@ public class ActionController {
      * @param userId      the user ID
      * @param actionId    the action ID to start
      * @param isSubtask   whether this is a subtask interaction
-     * @param subactionId the subtask ID, if applicable
+     * @param subtaskId the subtask ID, if applicable
      * @return 200 on success
      */
     @PostMapping("/startAction")
@@ -234,10 +234,10 @@ public class ActionController {
             @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "actionId") Long actionId,
             @RequestParam(name = "isSubtask", required = false) Boolean isSubtask,
-            @RequestParam(name = "subactionId", required = false) String subactionId) {
+            @RequestParam(name = "subtaskId", required = false) String subtaskId) {
         try {
-            actionService.startActionForUser(userId, actionId, isSubtask, subactionId);
-            logger.info("STARTED ACTION - userId: {}, actionId: {}, isSubtask: {}, subactionId: {}", userId, actionId, isSubtask, subactionId);
+            actionService.startActionForUser(userId, actionId, isSubtask, subtaskId);
+            logger.info("STARTED ACTION - userId: {}, actionId: {}, isSubtask: {}, subtaskId: {}", userId, actionId, isSubtask, subtaskId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             logger.error("ERROR STARTING ACTION - userId: {}, actionId: {}, error: {}", userId, actionId, e.getMessage());

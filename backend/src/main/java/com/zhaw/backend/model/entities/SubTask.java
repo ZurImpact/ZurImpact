@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @MappedSuperclass
-public class SubAction {
+public class SubTask {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

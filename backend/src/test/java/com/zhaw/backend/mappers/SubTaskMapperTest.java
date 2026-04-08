@@ -1,25 +1,25 @@
 package com.zhaw.backend.mappers;
 
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
-import com.zhaw.backend.model.dto.SubActionDto;
+import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
-import com.zhaw.backend.model.entities.SubAction;
+import com.zhaw.backend.model.entities.SubTask;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SubActionMapperTest {
+class SubTaskMapperTest {
 
     @Test
     void gpsActionTaskToDto_null_returnsNull() {
-        assertNull(SubActionMapper.GpsActionTaskToDto(null));
+        assertNull(SubTaskMapper.GpsActionTaskToDto(null));
     }
 
     @Test
     void gpsActionTaskToEntity_null_returnsNull() {
-        assertNull(SubActionMapper.GpsActionTaskToEntity(null));
+        assertNull(SubTaskMapper.GpsActionTaskToEntity(null));
     }
 
     @Test
@@ -32,7 +32,7 @@ class SubActionMapperTest {
         entity.setGpsX(1.5f);
         entity.setGpsY(2.5f);
 
-        SubActionDto dto = SubActionMapper.GpsActionTaskToDto(entity);
+        SubTaskDto dto = SubTaskMapper.GpsActionTaskToDto(entity);
 
         assertInstanceOf(GpsActionTaskDto.class, dto);
         GpsActionTaskDto gpsDto = (GpsActionTaskDto) dto;
@@ -54,7 +54,7 @@ class SubActionMapperTest {
         dto.setGpsX(4.0f);
         dto.setGpsY(5.0f);
 
-        SubAction entity = SubActionMapper.GpsActionTaskToEntity(dto);
+        SubTask entity = SubTaskMapper.GpsActionTaskToEntity(dto);
 
         assertInstanceOf(GpsActionTask.class, entity);
         GpsActionTask gpsEntity = (GpsActionTask) entity;
@@ -67,14 +67,14 @@ class SubActionMapperTest {
     }
 
     @Test
-    void subActionToDto_mapsCommonFields() {
-        SubAction entity = new SubAction();
+    void subTaskToDto_mapsCommonFields() {
+        SubTask entity = new SubTask();
         entity.setId(1L);
         entity.setDescription("desc");
         entity.setDisplayName("display");
         entity.setActionId(2L);
 
-        SubActionDto dto = SubActionMapper.GpsActionTaskToDto(entity);
+        SubTaskDto dto = SubTaskMapper.GpsActionTaskToDto(entity);
 
         assertNotNull(dto);
         assertEquals(1L, dto.getId());
@@ -84,14 +84,14 @@ class SubActionMapperTest {
     }
 
     @Test
-    void subActionDtoToEntity_mapsCommonFields() {
-        SubActionDto dto = new SubActionDto();
+    void subTaskDtoToEntity_mapsCommonFields() {
+        SubTaskDto dto = new SubTaskDto();
         dto.setId(3L);
         dto.setDescription("desc");
         dto.setDisplayName("display");
         dto.setActionId(4L);
 
-        SubAction entity = SubActionMapper.GpsActionTaskToEntity(dto);
+        SubTask entity = SubTaskMapper.GpsActionTaskToEntity(dto);
 
         assertNotNull(entity);
         assertEquals(3L, entity.getId());
@@ -102,8 +102,8 @@ class SubActionMapperTest {
 
     @Test
     void gpsActionTaskToDtoList_filtersNulls_andMaps() {
-        SubActionDto dto = SubActionMapper.GpsActionTaskToDto(new SubAction());
-        List<SubActionDto> dtos = SubActionMapper.GpsActionTaskToDtoList(List.of(new GpsActionTask()));
+        SubTaskDto dto = SubTaskMapper.GpsActionTaskToDto(new SubTask());
+        List<SubTaskDto> dtos = SubTaskMapper.GpsActionTaskToDtoList(List.of(new GpsActionTask()));
 
         assertNotNull(dto);
         assertEquals(1, dtos.size());
@@ -115,7 +115,7 @@ class SubActionMapperTest {
         gpsDto.setGpsX(1.0f);
         gpsDto.setGpsY(2.0f);
 
-        List<SubAction> entities = SubActionMapper.GpsActionTaskToEntityList(List.of(gpsDto));
+        List<SubTask> entities = SubTaskMapper.GpsActionTaskToEntityList(List.of(gpsDto));
 
         assertEquals(1, entities.size());
         assertInstanceOf(GpsActionTask.class, entities.getFirst());
@@ -123,14 +123,14 @@ class SubActionMapperTest {
 
     @Test
     void gpsActionTaskToDtoList_nullOrEmpty_returnsEmptyList() {
-        assertTrue(SubActionMapper.GpsActionTaskToDtoList(null).isEmpty());
-        assertTrue(SubActionMapper.GpsActionTaskToDtoList(List.of()).isEmpty());
+        assertTrue(SubTaskMapper.GpsActionTaskToDtoList(null).isEmpty());
+        assertTrue(SubTaskMapper.GpsActionTaskToDtoList(List.of()).isEmpty());
     }
 
     @Test
     void gpsActionTaskToEntityList_nullOrEmpty_returnsEmptyList() {
-        assertTrue(SubActionMapper.GpsActionTaskToEntityList(null).isEmpty());
-        assertTrue(SubActionMapper.GpsActionTaskToEntityList(List.of()).isEmpty());
+        assertTrue(SubTaskMapper.GpsActionTaskToEntityList(null).isEmpty());
+        assertTrue(SubTaskMapper.GpsActionTaskToEntityList(List.of()).isEmpty());
     }
 }
 
