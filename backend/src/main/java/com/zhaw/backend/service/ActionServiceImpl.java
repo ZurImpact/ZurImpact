@@ -11,6 +11,7 @@ import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
+import com.zhaw.backend.model.entities.SubTask;
 import com.zhaw.backend.validator.ActionValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ import java.util.List;
 public class ActionServiceImpl implements ActionService {
 
     private final ActionDao actionDao;
-    private final SubActionService subActionService;
+    private final SubTaskService subTaskService;
 
     /**
      * Gets all Actions in DB available with filtering options for text, points, tags and validUntil

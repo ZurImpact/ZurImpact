@@ -30,10 +30,6 @@ public class SubTaskDao {
 
     private final JdbcTemplate jdbc;
 
-    public SubTaskDao(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
-    }
-
     public List<GpsActionTask> findGpsSubTask(Long actionId) {
         return jdbc.query(
                 "SELECT id, description, display_name, action_id, gps_x, gps_y FROM gps_action_tasks WHERE action_id = ?",

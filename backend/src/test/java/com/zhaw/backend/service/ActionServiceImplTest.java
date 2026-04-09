@@ -45,7 +45,7 @@ class ActionServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        actionService = new ActionServiceImpl(actionDao, subActionService);
+        actionService = new ActionServiceImpl(actionDao, subTaskService);
     }
 
     private Action buildAction(Long id, boolean hasSubtasks) {

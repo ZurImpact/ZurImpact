@@ -9,6 +9,7 @@ import com.zhaw.backend.model.dto.SubTaskCompletionRequestDto;
 import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
 import com.zhaw.backend.validator.SubTaskValidator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,19 +19,20 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class SubTaskServiceImpl implements SubTaskService {
 
-    @Autowired
-    private SubTaskDao subTaskDao;
+    private final SubTaskDao subTaskDao;
 
-    private final Map<ActionType, Function<Long, List<SubTaskDto>>> handlersForEntities;
+    private final Map<ActionType, Function<Long, List<SubTaskDto>>> handlersForEntities = initHandlers();
     private final float gpsAccuracyThreshold = 10.0f; // Example threshold for GPS accuracy
 
-    public SubTaskServiceImpl() {
-        this.handlersForEntities = new EnumMap<>(ActionType.class);
-        this.handlersForEntities.put(ActionType.GPS, this::getGpsSubTask);
-        this.handlersForEntities.put(ActionType.PHOTO, this::getPhotoSubTask);
-        this.handlersForEntities.put(ActionType.TICKET, this::getTicketSubTask);
+    private Map<ActionType, Function<Long, List<SubTaskDto>>> initHandlers() {
+        Map<ActionType, Function<Long, List<SubTaskDto>>> handlers = new EnumMap<>(ActionType.class);
+        handlers.put(ActionType.GPS, this::getGpsSubTask);
+        handlers.put(ActionType.PHOTO, this::getPhotoSubTask);
+        handlers.put(ActionType.TICKET, this::getTicketSubTask);
+        return handlers;
     }
 
     @Override
