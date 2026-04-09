@@ -29,7 +29,7 @@ public class UserActionHistoryDao {
             .actionCreatedOn(rs.getTimestamp("action_created_on").toLocalDateTime())
             .completionState(String.valueOf(CompletionState.valueOf(rs.getString("completion_state"))))
             .isSubtask(rs.getBoolean("is_subtask"))
-            .subactionId(rs.getString("subaction_id"))
+            .subtaskId(rs.getString("subtask_id"))
             .mappingCreatedOn(rs.getTimestamp("mapping_created_on").toLocalDateTime())
             .build();
 
