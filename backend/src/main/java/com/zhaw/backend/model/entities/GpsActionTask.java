@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GpsActionTask extends SubAction{
+public class GpsActionTask extends SubTask {
 
     @Column(name = "gps_x", nullable = false)
     private Float gpsX;

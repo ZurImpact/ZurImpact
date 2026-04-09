@@ -80,14 +80,14 @@ public class ActionDao {
      * @param userId id of the user for which the action should be started
      * @param actionId id of the action which should be started
      * @param isSubtask if the action is a subtask
-     * @param subactionId id of the subtask
+     * @param subtaskId id of the subtask
      * @return true if the action was successfully started, false otherwise
      */
-    public boolean startAction(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
-        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subaction_id) " +
+    public boolean startAction(Long userId, Long actionId, Boolean isSubtask, String subtaskId) {
+        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subtask_id) " +
                                 "VALUES (?, ?, ?, ?, ?, ?)",
                 userId, actionId, CompletionState.IN_PROGRESS.name(), Timestamp.valueOf(java.time.LocalDateTime.now()),
-                isSubtask != null && isSubtask, subactionId);
+                isSubtask != null && isSubtask, subtaskId);
         return rows > 0;
     }
 
@@ -96,14 +96,14 @@ public class ActionDao {
      * @param userId id of the user for which the action should be completed
      * @param actionId id of the action which should be completed
      * @param isSubtask if it is a subtask
-     * @param subactionId subtask id
+     * @param subtaskId subtask id
      * @return true if the action was successfully completed, false otherwise
      */
-    public boolean completeAction(Long userId, Long actionId, Boolean isSubtask, String subactionId) {
-        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subaction_id) " +
+    public boolean completeAction(Long userId, Long actionId, Boolean isSubtask, String subtaskId) {
+        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subtask_id) " +
                                 "VALUES(?,?,?,?,?,?)",
                 userId,actionId,CompletionState.COMPLETED.name(),Timestamp.valueOf(java.time.LocalDateTime.now()),
-                isSubtask != null && isSubtask, subactionId);
+                isSubtask != null && isSubtask, subtaskId);
         return rows > 0;
     }
 

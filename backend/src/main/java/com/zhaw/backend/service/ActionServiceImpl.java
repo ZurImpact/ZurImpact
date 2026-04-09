@@ -6,9 +6,11 @@ import com.zhaw.backend.mappers.ActionMapper;
 import com.zhaw.backend.model.dao.ActionDao;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
-import com.zhaw.backend.model.dto.SubActionDto;
+import com.zhaw.backend.model.dto.SubTaskDto;
+import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
+import com.zhaw.backend.model.entities.SubTask;
 import com.zhaw.backend.validator.ActionValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,7 @@ import java.util.List;
 public class ActionServiceImpl implements ActionService {
 
     private final ActionDao actionDao;
-    private final SubActionService subActionService;
+    private final SubTaskService subTaskService;
 
     /**
      * Gets all Actions in DB available with filtering options for text, points, tags and validUntil
@@ -45,7 +47,7 @@ public class ActionServiceImpl implements ActionService {
 
         for(ActionDto actionDto : actionDtoList){
             if(actionDto.getHasSubtasks()) {
-                actionDto.setSubActions(getSubActions(actionDto.getId(), actionDto.getType()));
+                actionDto.setSubTasks(getSubTasks(actionDto.getId(), actionDto.getType()));
             }
         }
 
@@ -59,7 +61,7 @@ public class ActionServiceImpl implements ActionService {
             ActionDto actionDto = ActionMapper.toDto(action);
 
             if(actionDto.getHasSubtasks()){
-                actionDto.setSubActions(getSubActions(actionDto.getId(), actionDto.getType()));
+                actionDto.setSubTasks(getSubTasks(actionDto.getId(), actionDto.getType()));
             }
 
             return actionDto;
@@ -68,8 +70,8 @@ public class ActionServiceImpl implements ActionService {
         }
     }
 
-    private List<SubActionDto> getSubActions(Long actionId, ActionType actionType) throws Exception {
-        return subActionService.getSubActions(actionId, actionType);
+    private List<SubTaskDto> getSubTasks(Long actionId, ActionType actionType) throws Exception {
+        return subTaskService.getSubTasks(actionId, actionType);
     }
 
 
@@ -93,7 +95,7 @@ public class ActionServiceImpl implements ActionService {
      */
     @Override
     public boolean completeActionForUser(Long userId, Long actionId) {
-        if(ActionValidator.validateActionCompletion(subActionService.getSubActionsCompletionStatesForUser(userId,actionId)) ){
+        if(ActionValidator.validateActionCompletion(subTaskService.getSubTasksCompletionStatesForUser(userId,actionId)) ){
             return actionDao.completeAction(userId, actionId, false, null);
         }
         return false;
@@ -110,10 +112,10 @@ public class ActionServiceImpl implements ActionService {
         Action entity = ActionMapper.toEntity(dto);
         Long newId = actionDao.createAction(entity);
         dto.setId(newId);
-        if (Boolean.TRUE.equals(dto.getHasSubtasks()) && dto.getSubActions() != null) {
-            for (SubActionDto subAction : dto.getSubActions()) {
+        if (Boolean.TRUE.equals(dto.getHasSubtasks()) && dto.getSubTasks() != null) {
+            for (SubTaskDto subAction : dto.getSubTasks()) {
                 if (subAction instanceof GpsActionTaskDto gpsDto) {
-                    subActionService.createSubAction(newId, gpsDto);
+                    subTaskService.createSubTask(newId, gpsDto);
                 }
             }
         }
@@ -133,12 +135,12 @@ public class ActionServiceImpl implements ActionService {
     }
 
     @Override
-    public boolean updateSubAction(Long id, GpsActionTaskDto dto) {
-        return subActionService.updateSubAction(id, dto);
+    public boolean updateSubTask(Long id, GpsActionTaskDto dto) {
+        return subTaskService.updateSubTask(id, dto);
     }
 
     @Override
-    public boolean deleteSubAction(Long id) {
-        return subActionService.deleteSubAction(id);
+    public boolean deleteSubTask(Long id) {
+        return subTaskService.deleteSubTask(id);
     }
 }
