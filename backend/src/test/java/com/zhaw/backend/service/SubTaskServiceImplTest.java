@@ -5,11 +5,11 @@ import com.zhaw.backend.model.dao.SubTaskDao;
 import com.zhaw.backend.model.dto.SubTaskCompletionRequestDto;
 import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -27,8 +27,12 @@ class SubTaskServiceImplTest {
     @Mock
     private SubTaskDao subTaskDao;
 
-    @InjectMocks
     private SubTaskServiceImpl subTaskService;
+
+    @BeforeEach
+    void setUp() {
+        subTaskService = new SubTaskServiceImpl(subTaskDao);
+    }
 
     @Nested
     @DisplayName("getSubTasks")

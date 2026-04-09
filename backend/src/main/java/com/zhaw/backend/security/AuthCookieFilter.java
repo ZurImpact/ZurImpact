@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,14 +18,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class AuthCookieFilter extends OncePerRequestFilter {
 
     private static final String AUTH_COOKIE_NAME = "AUTH_SESSION";
     private final SessionService sessionService;
-
-    public AuthCookieFilter(SessionService sessionService) {
-        this.sessionService = sessionService;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

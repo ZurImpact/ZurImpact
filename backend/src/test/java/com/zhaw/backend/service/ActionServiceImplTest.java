@@ -8,11 +8,11 @@ import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.entities.Action;
 import com.zhaw.backend.model.entities.UserActionHistory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -41,8 +41,12 @@ class ActionServiceImplTest {
     @Mock
     private SubTaskService subTaskService;
 
-    @InjectMocks
     private ActionServiceImpl actionService;
+
+    @BeforeEach
+    void setUp() {
+        actionService = new ActionServiceImpl(actionDao, subTaskService);
+    }
 
     private Action buildAction(Long id, boolean hasSubtasks) {
         return Action.builder()

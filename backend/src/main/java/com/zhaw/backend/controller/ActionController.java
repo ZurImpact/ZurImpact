@@ -6,9 +6,9 @@ import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.service.ActionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +24,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/actions")
 @Tag(name = "Actions", description = "Endpoints for browsing and managing actions and subtasks")
+@RequiredArgsConstructor
 public class ActionController {
 
-    @Autowired
-    private ActionService actionService;
+    private final ActionService actionService;
 
     private static final Logger logger = LoggerFactory.getLogger(ActionController.class);
 
