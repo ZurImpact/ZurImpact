@@ -24,7 +24,7 @@ public class UserActionHistoryDto {
     private LocalDateTime actionCreatedOn;
     private String completionState;
     private Boolean isSubtask;
-    private String subactionId;
+    private String subtaskId;
     private LocalDateTime mappingCreatedOn;
 }
 

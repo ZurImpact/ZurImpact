@@ -1,6 +1,6 @@
 package com.zhaw.backend.validator;
 
-public class SubActionValidator {
+public class SubTaskValidator {
     /**
      * validates if the current position and the targetPosition are close enought together
      * @param gpsX current Location latitude
@@ -10,7 +10,7 @@ public class SubActionValidator {
      * @param accuracyThreshold the maximum allowed distance between the current position and the target position for the validation to pass, in the same units as the input coordinates
      * @return
      */
-    public static boolean validateGpsSubAction(Float gpsX, Float gpsY, Float targetX, Float targetY, float accuracyThreshold) {
+    public static boolean validateGpsSubTask(Float gpsX, Float gpsY, Float targetX, Float targetY, float accuracyThreshold) {
             if (gpsX == null || gpsY == null || targetX == null || targetY == null) {
                 return false; // Invalid input
             }

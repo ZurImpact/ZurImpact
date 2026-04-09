@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
-public class SubActionDao {
+public class SubTaskDao {
 
     private static final RowMapper<GpsActionTask> GPS_ROW_MAPPER = (rs, rowNum) -> {
         GpsActionTask task = new GpsActionTask();
@@ -30,7 +30,11 @@ public class SubActionDao {
 
     private final JdbcTemplate jdbc;
 
-    public List<GpsActionTask> findGpsSubAction(Long actionId) {
+    public SubTaskDao(JdbcTemplate jdbc) {
+        this.jdbc = jdbc;
+    }
+
+    public List<GpsActionTask> findGpsSubTask(Long actionId) {
         return jdbc.query(
                 "SELECT id, description, display_name, action_id, gps_x, gps_y FROM gps_action_tasks WHERE action_id = ?",
                 GPS_ROW_MAPPER,
@@ -38,7 +42,7 @@ public class SubActionDao {
         );
     }
 
-    public GpsActionTask findGpsSubActionById(Long id) {
+    public GpsActionTask findGpsSubTaskById(Long id) {
         return jdbc.queryForObject(
                 "SELECT " +
                 "id, description, display_name, action_id, gpsX, gpsY" +
@@ -54,14 +58,14 @@ public class SubActionDao {
      * @param userId id of the user for which the action should be completed
      * @param actionId id of the action which should be completed
      * @param isSubtask if it is a subtask
-     * @param subActionId subtask id
+     * @param subTaskId subtask id
      * @return true if the action was successfully completed, false otherwise
      */
-    public boolean completeSubActionForUser(Long userId, Long actionId, Boolean isSubtask, String subActionId) {
-        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subaction_id) " +
+    public boolean completeSubTaskForUser(Long userId, Long actionId, Boolean isSubtask, String subTaskId) {
+        int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subtask_id) " +
                         "VALUES(?,?,?,?,?,?)",
                 userId,actionId, CompletionState.COMPLETED.name(), Timestamp.valueOf(java.time.LocalDateTime.now()),
-                isSubtask != null && isSubtask, subActionId);
+                isSubtask != null && isSubtask, subTaskId);
         return rows > 0;
     }
 
@@ -69,17 +73,17 @@ public class SubActionDao {
      * Returns a list of Subtasks and their coresponding CompletionState
      * @param userId id of the user
      * @param actionId id of the parent action
-     * @return Map with subaction_id and completion_state for the given user and action
+     * @return Map with subtask_id and completion_state for the given user and action
      */
-    public Map<Long, CompletionState> findSubActionCompletionStates(Long userId, Long actionId) {
+    public Map<Long, CompletionState> findSubTaskCompletionStates(Long userId, Long actionId) {
         return jdbc.query(
-                "SELECT subaction_id, completion_state FROM user_action_mapping " +
+                "SELECT subtask_id, completion_state FROM user_action_mapping " +
                         "WHERE user_id = ? AND action_id = ? AND is_subtask = true",
                 rs -> {
                     Map<Long, CompletionState> result = new HashMap<>();
                     while (rs.next()) {
                         result.put(
-                                rs.getLong("subaction_id"),
+                                rs.getLong("subtask_id"),
                                 CompletionState.valueOf(rs.getString("completion_state"))
                         );
                     }
@@ -89,20 +93,20 @@ public class SubActionDao {
         );
     }
 
-    public void createGpsSubAction(Long actionId, GpsActionTaskDto dto) {
+    public void createGpsSubTask(Long actionId, GpsActionTaskDto dto) {
         jdbc.update(
                 "INSERT INTO gps_action_tasks (description, display_name, action_id, gps_x, gps_y, gps_z) VALUES (?, ?, ?, ?, ?, ?)",
                 dto.getDescription(), dto.getDisplayName(), actionId, dto.getGpsX(), dto.getGpsY());
     }
 
-    public boolean updateGpsSubAction(Long id, GpsActionTaskDto dto) {
+    public boolean updateGpsSubTask(Long id, GpsActionTaskDto dto) {
         int rows = jdbc.update(
                 "UPDATE gps_action_tasks SET description = ?, display_name = ?, gps_x = ?, gps_y = ?, gps_z = ? WHERE id = ?",
                 dto.getDescription(), dto.getDisplayName(), dto.getGpsX(), dto.getGpsY(), id);
         return rows > 0;
     }
 
-    public boolean deleteSubAction(Long id) {
+    public boolean deleteSubTask(Long id) {
         int rows = jdbc.update("DELETE FROM gps_action_tasks WHERE id = ?", id);
         return rows > 0;
     }

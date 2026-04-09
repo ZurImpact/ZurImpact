@@ -7,7 +7,7 @@ const mockChangeLanguage = vi.fn();
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => (key === 'language' ? 'Language' : key),
+    t: (key: string) => key,
     i18n: {changeLanguage: mockChangeLanguage},
   }),
 }));
@@ -16,7 +16,7 @@ describe('LanguageSwitcher', () => {
   it('renders the language label', () => {
     render(<LanguageSwitcher />);
 
-    expect(screen.getByText(/Language/)).toBeInTheDocument();
+    expect(screen.getByText(/language/)).toBeInTheDocument();
   });
 
   it('renders EN and DE buttons', () => {

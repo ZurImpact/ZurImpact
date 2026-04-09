@@ -6,7 +6,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GpsActionTaskDto extends SubActionDto{
+public class GpsActionTaskDto extends SubTaskDto {
 
     private Float gpsX;
     private Float gpsY;

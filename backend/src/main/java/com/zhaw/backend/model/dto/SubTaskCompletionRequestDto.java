@@ -11,7 +11,7 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubActionCompletionRequestDto {
+public class SubTaskCompletionRequestDto {
     @NotNull
     private Long userId;
 
@@ -19,7 +19,7 @@ public class SubActionCompletionRequestDto {
     private Long actionId;
 
     @NotNull
-    private Long subActionId;
+    private Long subTaskId;
 
     @NotNull
     private ActionType actionType;

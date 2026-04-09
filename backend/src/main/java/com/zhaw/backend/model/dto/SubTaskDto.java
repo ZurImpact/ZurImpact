@@ -15,7 +15,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @MappedSuperclass
-public class SubActionDto {
+public class SubTaskDto {
 
     private Long id;
     private String description;

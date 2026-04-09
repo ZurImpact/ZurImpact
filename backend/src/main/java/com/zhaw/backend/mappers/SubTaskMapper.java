@@ -1,18 +1,18 @@
 package com.zhaw.backend.mappers;
 
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
-import com.zhaw.backend.model.dto.SubActionDto;
+import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
-import com.zhaw.backend.model.entities.SubAction;
+import com.zhaw.backend.model.entities.SubTask;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public final class SubActionMapper {
+public final class SubTaskMapper {
 
-    public static SubActionDto GpsActionTaskToDto(SubAction entity) {
+    public static SubTaskDto GpsActionTaskToDto(SubTask entity) {
         if (entity == null) {
             return null;
         }
@@ -25,12 +25,12 @@ public final class SubActionMapper {
             return dto;
         }
 
-        SubActionDto dto = new SubActionDto();
+        SubTaskDto dto = new SubTaskDto();
         mapCommonFields(entity, dto);
         return dto;
     }
 
-    public static SubAction GpsActionTaskToEntity(SubActionDto dto) {
+    public static SubTask GpsActionTaskToEntity(SubTaskDto dto) {
         if (dto == null) {
             return null;
         }
@@ -43,39 +43,39 @@ public final class SubActionMapper {
             return entity;
         }
 
-        SubAction entity = new SubAction();
+        SubTask entity = new SubTask();
         mapCommonFields(dto, entity);
         return entity;
     }
 
-    public static List<SubActionDto> GpsActionTaskToDtoList(List<? extends SubAction> entities) {
+    public static List<SubTaskDto> GpsActionTaskToDtoList(List<? extends SubTask> entities) {
         if (entities == null || entities.isEmpty()) {
             return Collections.emptyList();
         }
         return entities.stream()
                 .filter(Objects::nonNull)
-                .map(SubActionMapper::GpsActionTaskToDto)
+                .map(SubTaskMapper::GpsActionTaskToDto)
                 .collect(Collectors.toList());
     }
 
-    public static List<SubAction> GpsActionTaskToEntityList(List<? extends SubActionDto> dtos) {
+    public static List<SubTask> GpsActionTaskToEntityList(List<? extends SubTaskDto> dtos) {
         if (dtos == null || dtos.isEmpty()) {
             return Collections.emptyList();
         }
         return dtos.stream()
                 .filter(Objects::nonNull)
-                .map(SubActionMapper::GpsActionTaskToEntity)
+                .map(SubTaskMapper::GpsActionTaskToEntity)
                 .collect(Collectors.toList());
     }
 
-    private static void mapCommonFields(SubAction source, SubActionDto target) {
+    private static void mapCommonFields(SubTask source, SubTaskDto target) {
         target.setId(source.getId());
         target.setDescription(source.getDescription());
         target.setDisplayName(source.getDisplayName());
         target.setActionId(source.getActionId());
     }
 
-    private static void mapCommonFields(SubActionDto source, SubAction target) {
+    private static void mapCommonFields(SubTaskDto source, SubTask target) {
         target.setId(source.getId());
         target.setDescription(source.getDescription());
         target.setDisplayName(source.getDisplayName());

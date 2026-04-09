@@ -6,7 +6,7 @@ ALTER TABLE action ADD COLUMN has_subtasks BOOLEAN DEFAULT FALSE;
 
 -- Alter user_action_mapping table
 ALTER TABLE user_action_mapping ADD COLUMN is_subtask BOOLEAN DEFAULT FALSE;
-ALTER TABLE user_action_mapping ADD COLUMN subaction_id VARCHAR(255);
+ALTER TABLE user_action_mapping ADD COLUMN subtask_id VARCHAR(255);
 
 -- Create gps_action_tasks table
 CREATE TABLE gps_action_tasks (
