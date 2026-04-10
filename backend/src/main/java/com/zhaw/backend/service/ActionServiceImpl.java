@@ -3,7 +3,6 @@ package com.zhaw.backend.service;
 import com.zhaw.backend.enums.ActionType;
 import com.zhaw.backend.mappers.ActionFilterMapper;
 import com.zhaw.backend.mappers.ActionMapper;
-import com.zhaw.backend.mappers.UserActionHistoryMapper;
 import com.zhaw.backend.model.dao.ActionDao;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
@@ -11,8 +10,9 @@ import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
+import com.zhaw.backend.model.entities.SubTask;
 import com.zhaw.backend.validator.ActionValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +24,11 @@ import java.util.List;
  * Service implementation for managing actions.
  */
 @Service
+@RequiredArgsConstructor
 public class ActionServiceImpl implements ActionService {
 
-    @Autowired
-    private ActionDao actionDao;
-
-    @Autowired
-    private SubTaskService subTaskService;
+    private final ActionDao actionDao;
+    private final SubTaskService subTaskService;
 
     /**
      * Gets all Actions in DB available with filtering options for text, points, tags and validUntil
@@ -76,15 +74,7 @@ public class ActionServiceImpl implements ActionService {
         return subTaskService.getSubTasks(actionId, actionType);
     }
 
-    /**
-     * Get all actions with a user has done
-     * @param userId id of the user for which the action history should be retrieved
-     * @return all actions done by that user
-     */
-    @Override
-    public List<UserActionHistoryDto> getUserActions(Long userId, Boolean active){
-        return UserActionHistoryMapper.toDtoList(actionDao.findUserActionHistory(userId, active));
-    }
+
 
     /**
      * Starts an action for a user, creates a mapping in DB with state "IN_PROGRESS"

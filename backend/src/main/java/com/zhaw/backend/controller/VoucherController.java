@@ -2,7 +2,7 @@ package com.zhaw.backend.controller;
 
 import com.zhaw.backend.model.dto.VoucherDto;
 import com.zhaw.backend.service.VoucherService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,10 +12,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/vouchers")
+@RequiredArgsConstructor
 public class VoucherController {
 
-    @Autowired
-    VoucherService voucherService;
+    private final VoucherService voucherService;
 
     @GetMapping
     public ResponseEntity<List<VoucherDto>> getAllVouchers() {
