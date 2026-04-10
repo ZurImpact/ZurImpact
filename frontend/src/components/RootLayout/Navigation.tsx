@@ -1,11 +1,9 @@
 import {Link, useLocation} from 'react-router';
 import {ROUTES} from '../../routes';
-import {Mountain, LogOut, Award, Menu, Moon, Sun, Languages} from 'lucide-react';
-import {Button} from '../ui/button';
+import {Mountain, Award, Menu, Moon, Sun} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from 'next-themes';
 import {Sheet, SheetContent, SheetTrigger} from '../ui/sheet';
-import i18n from '../../utility/i18n';
 
 export const Navigation = () => {
   const location = useLocation();
@@ -17,13 +15,17 @@ export const Navigation = () => {
     {to: ROUTES.track, label: t('rootLayout.track')},
   ];
 
-  const toggleLanguage = () => {
+  /**
+   * const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'de' : 'en';
     i18n.changeLanguage(newLang);
   };
+   */
 
   const renderLanguageButton = () => (
-    <button
+    <></>
+    /**
+     * <button
       onClick={toggleLanguage}
       className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-1"
       title="Toggle language"
@@ -31,6 +33,7 @@ export const Navigation = () => {
       <Languages className="h-5 w-5" />
       <span className="text-xs font-medium">{i18n.language.toUpperCase()}</span>
     </button>
+     */
   );
 
   const renderThemeButton = () => (
@@ -70,10 +73,12 @@ export const Navigation = () => {
                   {123} {t('points') /*TODO Get actual points from auth state*/}
                 </span>
               </div>
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
+              {/**
+               * <Button variant="outline" size="sm" className="flex items-center gap-2">
                 <LogOut className="h-4 w-4" />
                 {t('rootLayout.logout')}
               </Button>
+               */}
             </div>
           </div>
           <div className="flex md:hidden items-center gap-4">
