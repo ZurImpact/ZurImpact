@@ -133,14 +133,4 @@ public class ActionServiceImpl implements ActionService {
     public boolean deleteAction(Long id) {
         return actionDao.deleteActionById(id);
     }
-
-    @Override
-    public boolean updateSubTask(Long id, GpsActionTaskDto dto) {
-        return subTaskService.updateSubTask(id, dto);
-    }
-
-    @Override
-    public boolean deleteSubTask(Long id) {
-        return subTaskService.deleteSubTask(id);
-    }
 }
