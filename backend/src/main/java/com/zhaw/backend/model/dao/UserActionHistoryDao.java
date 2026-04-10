@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,13 +26,17 @@ public class UserActionHistoryDao {
             .displayName(rs.getString("display_name"))
             .points(rs.getInt("points"))
             .tags(rs.getString("tags"))
-            .validUntil(rs.getTimestamp("valid_until").toLocalDateTime())
-            .actionCreatedOn(rs.getTimestamp("action_created_on").toLocalDateTime())
+            .validUntil(toLocalDateTime(rs.getTimestamp("valid_until")))
+            .actionCreatedOn(toLocalDateTime(rs.getTimestamp("action_created_on")))
             .completionState(String.valueOf(CompletionState.valueOf(rs.getString("completion_state"))))
             .isSubtask(rs.getBoolean("is_subtask"))
             .subtaskId(rs.getString("subtask_id"))
-            .mappingCreatedOn(rs.getTimestamp("mapping_created_on").toLocalDateTime())
+            .mappingCreatedOn(toLocalDateTime(rs.getTimestamp("mapping_created_on")))
             .build();
+
+    private static java.time.LocalDateTime toLocalDateTime(Timestamp timestamp) {
+        return timestamp == null ? null : timestamp.toLocalDateTime();
+    }
 
     /**
      * Finds all Actions a user did
@@ -42,7 +47,7 @@ public class UserActionHistoryDao {
         StringBuilder sql = new StringBuilder(
                 "SELECT a.id AS action_id, a.description, a.display_name, a.points, a.tags, "
                         + "a.valid_until, a.created_on AS action_created_on, "
-                        + "uam.completion_state, uam.is_subtask, uam.subaction_id, uam.created_on AS mapping_created_on "
+                        + "uam.completion_state, uam.is_subtask, uam.subtask_id, uam.created_on AS mapping_created_on "
                         + "FROM user_action_mapping uam "
                         + "JOIN action a ON a.id = uam.action_id "
                         + "WHERE uam.user_id = ?");
