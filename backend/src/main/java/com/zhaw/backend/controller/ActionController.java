@@ -1,7 +1,6 @@
 package com.zhaw.backend.controller;
 
 import com.zhaw.backend.model.dto.ActionDto;
-import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.service.ActionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -149,27 +148,6 @@ public class ActionController {
         }
     }
 
-    // ── User progress ─────────────────────────────────────────────────────────
-
-    /**
-     * Returns the action history for a user, optionally filtered to active (in-progress) or completed actions.
-     *
-     * @param userId the user ID
-     * @param active if true returns only in-progress actions, if false only completed, if omitted returns all
-     * @return list of the user's action history entries
-     */
-    @GetMapping("/getUserActions")
-    @Operation(summary = "Get user action history", description = "Returns all actions a user has interacted with.", tags = "User Progress")
-    public ResponseEntity<List<UserActionHistoryDto>> getUserActions(
-            @RequestParam(name = "userId") Long userId,
-            @RequestParam(name = "active", required = false) Boolean active){
-        try {
-            List<UserActionHistoryDto> dto = actionService.getUserActions(userId, active);
-            return ResponseEntity.ok(dto);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
-        }
-    }
 
     /**
      * Starts an action for a user by creating an IN_PROGRESS mapping in the database.
