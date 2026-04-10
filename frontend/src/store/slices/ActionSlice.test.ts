@@ -135,7 +135,7 @@ describe('ActionSlice', () => {
       const state = store.getState().actions;
       expect(state.selectedAction).toEqual(mockAction);
       expect(state.loading).toBe(false);
-      expect(mockedGet).toHaveBeenCalledWith('/action/getAction?id=1');
+      expect(mockedGet).toHaveBeenCalledWith('/actions/1');
     });
 
     it('sets error on failure', async () => {
@@ -168,7 +168,7 @@ describe('ActionSlice', () => {
       const state = store.getState().actions;
       expect(state.userActions).toEqual([mockUserAction]);
       expect(state.loading).toBe(false);
-      expect(mockedGet).toHaveBeenCalledWith('/action/getUserActions?userId=123');
+      expect(mockedGet).toHaveBeenCalledWith('/userActionHistory/getUserActions?userId=123');
     });
 
     it('sets error on failure', async () => {
@@ -200,7 +200,7 @@ describe('ActionSlice', () => {
       const state = store.getState().actions;
       expect(state.loading).toBe(false);
       expect(state.error).toBeNull();
-      expect(mockedPost).toHaveBeenCalledWith('/action/startAction?userId=123&actionId=1');
+      expect(mockedPost).toHaveBeenCalledWith('/actions/startAction', {userId: 123, actionId: 1});
     });
 
     it('sets error on failure', async () => {
@@ -232,7 +232,7 @@ describe('ActionSlice', () => {
       const state = store.getState().actions;
       expect(state.loading).toBe(false);
       expect(state.error).toBeNull();
-      expect(mockedPost).toHaveBeenCalledWith('/action/completeAction?userId=123&actionId=1');
+      expect(mockedPost).toHaveBeenCalledWith('/actions/completeAction', {userId: 123, actionId: 1});
     });
 
     it('sets error on failure', async () => {
