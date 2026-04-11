@@ -2,33 +2,38 @@ package com.zhaw.backend.validator;
 
 public class SubTaskValidator {
     /**
-     * validates if the current position and the targetPosition are close enought together
-     * @param gpsX current Location latitude
-     * @param gpsY current Location longitude
-     * @param targetX target Location latitude
-     * @param targetY target Location longitude
-     * @param accuracyThreshold the maximum allowed distance between the current position and the target position for the validation to pass, in the same units as the input coordinates
-     * @return
+     * Validates if the current position and the target position are close enough together.
+     * @param latitude current location latitude in decimal degrees
+     * @param longitude current location longitude in decimal degrees
+     * @param targetLatitude target location latitude in decimal degrees
+     * @param targetLongitude target location longitude in decimal degrees
+     * @param accuracyThreshold maximum allowed distance in meters
+     * @return true if the distance is within the threshold
      */
-    public static boolean validateGpsSubTask(Float gpsX, Float gpsY, Float targetX, Float targetY, float accuracyThreshold) {
-            if (gpsX == null || gpsY == null || targetX == null || targetY == null) {
-                return false; // Invalid input
+    public static boolean validateGpsSubTask(Double latitude, Double longitude, Double targetLatitude, Double targetLongitude, double accuracyThreshold) {
+            if (latitude == null || longitude == null || targetLatitude == null || targetLongitude == null) {
+                return false;
             }
-            double distance = calculateDistance(gpsX, gpsY, targetX, targetY);
+            double distance = calculateDistance(latitude, longitude, targetLatitude, targetLongitude);
             return distance <= accuracyThreshold;
         }
 
         /**
-        calculates the distance between two GPS coordinates using the Euclidean distance formula.
-         * @param x1 the x-coordinate (latitude) of the first point
-         * @param y1 the y-coordinate (longitude) of the first point
-         * @param x2 the x-coordinate (latitude) of the second point
-         * @param y2 the y-coordinate (longitude) of the second point
-         * @return the distance between the two points in the same units as the input coordinates
-         * */
-        private static double calculateDistance(float x1, float y1, float x2, float y2) {
-            double dx = x2 - x1;
-            double dy = y2 - y1;
-            return Math.sqrt(dx * dx + dy * dy);
+         * Calculates the distance between two GPS coordinates using the Haversine formula.
+         * @param lat1 latitude of the first point in decimal degrees
+         * @param lon1 longitude of the first point in decimal degrees
+         * @param lat2 latitude of the second point in decimal degrees
+         * @param lon2 longitude of the second point in decimal degrees
+         * @return distance in meters
+         */
+        private static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+            final double R = 6371000; // Earth radius in meters
+            double dLat = Math.toRadians(lat2 - lat1);
+            double dLon = Math.toRadians(lon2 - lon1);
+            double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                     + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                     * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
         }
 }

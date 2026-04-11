@@ -48,8 +48,8 @@ class SubTaskServiceImplTest {
             gpsTask.setDescription("GPS Task 1");
             gpsTask.setDisplayName("Task 1");
             gpsTask.setActionId(actionId);
-            gpsTask.setGpsX(10.0f);
-            gpsTask.setGpsY(20.0f);
+            gpsTask.setLatitude(10.0);
+            gpsTask.setLongitude(20.0);
             List<GpsActionTask> gpsTasks = List.of(gpsTask);
             when(subTaskDao.findGpsSubTask(actionId)).thenReturn(gpsTasks);
 
@@ -91,12 +91,12 @@ class SubTaskServiceImplTest {
             Long userId = 1L;
             Long actionId = 1L;
             Long subtaskId = 10L;
-            Float gpsx = 10.0f;
-            Float gpsy = 20.0f;
+            Double gpsx = 10.0;
+            Double gpsy = 20.0;
 
             Map<String, Object> additionalData = new HashMap<>();
-            additionalData.put("gpsX", gpsx);
-            additionalData.put("gpsY", gpsy);
+            additionalData.put("latitude", gpsx);
+            additionalData.put("longitude", gpsy);
 
             SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
                     .userId(userId)
@@ -108,8 +108,8 @@ class SubTaskServiceImplTest {
 
             GpsActionTask gpsTask = new GpsActionTask();
             gpsTask.setId(10L);
-            gpsTask.setGpsX(10.0f);
-            gpsTask.setGpsY(20.0f);
+            gpsTask.setLatitude(10.0);
+            gpsTask.setLongitude(20.0);
             when(subTaskDao.findGpsSubTaskById(10L)).thenReturn(gpsTask);
             when(subTaskDao.completeSubTaskForUser(userId, actionId, true, subtaskId.toString())).thenReturn(true);
 
@@ -127,12 +127,12 @@ class SubTaskServiceImplTest {
             Long userId = 1L;
             Long actionId = 1L;
             Long subtaskId = 10L;
-            Float gpsx = 25.0f; // Outside 10.0 threshold from target 10.0
-            Float gpsy = 20.0f;
+            Double gpsx = 25.0; // ~1668 km from target at lat 10.0, well outside 10m threshold
+            Double gpsy = 20.0;
 
             Map<String, Object> additionalData = new HashMap<>();
-            additionalData.put("gpsX", gpsx);
-            additionalData.put("gpsY", gpsy);
+            additionalData.put("latitude", gpsx);
+            additionalData.put("longitude", gpsy);
 
             SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
                     .userId(userId)
@@ -144,8 +144,8 @@ class SubTaskServiceImplTest {
 
             GpsActionTask gpsTask = new GpsActionTask();
             gpsTask.setId(10L);
-            gpsTask.setGpsX(10.0f);
-            gpsTask.setGpsY(20.0f);
+            gpsTask.setLatitude(10.0);
+            gpsTask.setLongitude(20.0);
             when(subTaskDao.findGpsSubTaskById(10L)).thenReturn(gpsTask);
 
             // When
@@ -160,8 +160,8 @@ class SubTaskServiceImplTest {
         void shouldThrowExceptionWhenGpsCoordinatesAreNull() {
             // Given
             Map<String, Object> additionalData = new HashMap<>();
-            additionalData.put("gpsX", null);
-            additionalData.put("gpsY", null);
+            additionalData.put("latitude", null);
+            additionalData.put("longitude", null);
 
             SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
                     .userId(1L)
@@ -182,8 +182,8 @@ class SubTaskServiceImplTest {
         void shouldThrowExceptionWhenGpsSubactionNotFound() {
             // Given
             Map<String, Object> additionalData = new HashMap<>();
-            additionalData.put("gpsX", 10.0f);
-            additionalData.put("gpsY", 20.0f);
+            additionalData.put("latitude", 10.0);
+            additionalData.put("longitude", 20.0);
 
             SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
                     .userId(1L)

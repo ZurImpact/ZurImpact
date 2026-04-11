@@ -29,8 +29,8 @@ class SubTaskMapperTest {
         entity.setDescription("desc");
         entity.setDisplayName("display");
         entity.setActionId(9L);
-        entity.setGpsX(1.5f);
-        entity.setGpsY(2.5f);
+        entity.setLatitude(1.5);
+        entity.setLongitude(2.5);
 
         SubTaskDto dto = SubTaskMapper.GpsActionTaskToDto(entity);
 
@@ -40,8 +40,8 @@ class SubTaskMapperTest {
         assertEquals("desc", gpsDto.getDescription());
         assertEquals("display", gpsDto.getDisplayName());
         assertEquals(9L, gpsDto.getActionId());
-        assertEquals(1.5f, gpsDto.getGpsX());
-        assertEquals(2.5f, gpsDto.getGpsY());
+        assertEquals(1.5, gpsDto.getLatitude());
+        assertEquals(2.5, gpsDto.getLongitude());
     }
 
     @Test
@@ -51,8 +51,8 @@ class SubTaskMapperTest {
         dto.setDescription("desc");
         dto.setDisplayName("display");
         dto.setActionId(11L);
-        dto.setGpsX(4.0f);
-        dto.setGpsY(5.0f);
+        dto.setLatitude(4.0);
+        dto.setLongitude(5.0);
 
         SubTask entity = SubTaskMapper.GpsActionTaskToEntity(dto);
 
@@ -62,8 +62,8 @@ class SubTaskMapperTest {
         assertEquals("desc", gpsEntity.getDescription());
         assertEquals("display", gpsEntity.getDisplayName());
         assertEquals(11L, gpsEntity.getActionId());
-        assertEquals(4.0f, gpsEntity.getGpsX());
-        assertEquals(5.0f, gpsEntity.getGpsY());
+        assertEquals(4.0, gpsEntity.getLatitude());
+        assertEquals(5.0, gpsEntity.getLongitude());
     }
 
     @Test
@@ -112,8 +112,8 @@ class SubTaskMapperTest {
     @Test
     void gpsActionTaskToEntityList_filtersNulls_andMaps() {
         GpsActionTaskDto gpsDto = new GpsActionTaskDto();
-        gpsDto.setGpsX(1.0f);
-        gpsDto.setGpsY(2.0f);
+        gpsDto.setLatitude(1.0);
+        gpsDto.setLongitude(2.0);
 
         List<SubTask> entities = SubTaskMapper.GpsActionTaskToEntityList(List.of(gpsDto));
 
