@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 public class GpsActionTaskDto extends SubTaskDto {
 
-    private Float gpsX;
-    private Float gpsY;
+    private Double latitude;
+    private Double longitude;
 
 }

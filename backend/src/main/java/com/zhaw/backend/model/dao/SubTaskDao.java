@@ -23,8 +23,8 @@ public class SubTaskDao {
         task.setDescription(rs.getString("description"));
         task.setDisplayName(rs.getString("display_name"));
         task.setActionId(rs.getLong("action_id"));
-        task.setGpsX(rs.getFloat("gps_x"));
-        task.setGpsY(rs.getFloat("gps_y"));
+        task.setLatitude(rs.getDouble("latitude"));
+        task.setLongitude(rs.getDouble("longitude"));
         return task;
     };
 
@@ -32,7 +32,7 @@ public class SubTaskDao {
 
     public List<GpsActionTask> findGpsSubTask(Long actionId) {
         return jdbc.query(
-                "SELECT id, description, display_name, action_id, gps_x, gps_y FROM gps_action_tasks WHERE action_id = ?",
+                "SELECT id, description, display_name, action_id, latitude, longitude FROM gps_action_tasks WHERE action_id = ?",
                 GPS_ROW_MAPPER,
                 actionId
         );
@@ -40,11 +40,8 @@ public class SubTaskDao {
 
     public GpsActionTask findGpsSubTaskById(Long id) {
         return jdbc.queryForObject(
-                "SELECT " +
-                "id, description, display_name, action_id, gpsX, gpsY" +
-                " FROM gps_action_tasks " +
-                "WHERE id = ?",
-                GpsActionTask.class,
+                "SELECT id, description, display_name, action_id, latitude, longitude FROM gps_action_tasks WHERE id = ?",
+                GPS_ROW_MAPPER,
                 id
         );
     }
@@ -91,14 +88,14 @@ public class SubTaskDao {
 
     public void createGpsSubTask(Long actionId, GpsActionTaskDto dto) {
         jdbc.update(
-                "INSERT INTO gps_action_tasks (description, display_name, action_id, gps_x, gps_y, gps_z) VALUES (?, ?, ?, ?, ?, ?)",
-                dto.getDescription(), dto.getDisplayName(), actionId, dto.getGpsX(), dto.getGpsY());
+                "INSERT INTO gps_action_tasks (description, display_name, action_id, latitude, longitude) VALUES (?, ?, ?, ?, ?)",
+                dto.getDescription(), dto.getDisplayName(), actionId, dto.getLatitude(), dto.getLongitude());
     }
 
     public boolean updateGpsSubTask(Long id, GpsActionTaskDto dto) {
         int rows = jdbc.update(
-                "UPDATE gps_action_tasks SET description = ?, display_name = ?, gps_x = ?, gps_y = ?, gps_z = ? WHERE id = ?",
-                dto.getDescription(), dto.getDisplayName(), dto.getGpsX(), dto.getGpsY(), id);
+                "UPDATE gps_action_tasks SET description = ?, display_name = ?, latitude = ?, longitude = ? WHERE id = ?",
+                dto.getDescription(), dto.getDisplayName(), dto.getLatitude(), dto.getLongitude(), id);
         return rows > 0;
     }
 

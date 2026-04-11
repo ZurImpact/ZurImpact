@@ -11,9 +11,9 @@ import lombok.*;
 @NoArgsConstructor
 public class GpsActionTask extends SubTask {
 
-    @Column(name = "gps_x", nullable = false)
-    private Float gpsX;
+    @Column(name = "latitude", nullable = false)
+    private Double latitude;
 
-    @Column(name = "gps_y", nullable = false)
-    private Float gpsY;
+    @Column(name = "longitude", nullable = false)
+    private Double longitude;
 }

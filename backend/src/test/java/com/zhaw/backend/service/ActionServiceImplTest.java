@@ -139,8 +139,8 @@ class ActionServiceImplTest {
             void insertsGpsSubtasksWhenHasSubtasks() {
                 GpsActionTaskDto gpsDto = new GpsActionTaskDto();
                 gpsDto.setDescription("checkpoint");
-                gpsDto.setGpsX(47.3f);
-                gpsDto.setGpsY(8.5f);
+                gpsDto.setLatitude(47.3);
+                gpsDto.setLongitude(8.5);
 
                 ActionDto dto = ActionDto.builder()
                         .description("desc").displayName("name").points(10)
