@@ -19,4 +19,6 @@ public interface UserService {
     User saveUser(User user);
 
     void deleteUserById(Long id);
+
+    boolean addPointsToUser(Long userId, Integer points);
 }

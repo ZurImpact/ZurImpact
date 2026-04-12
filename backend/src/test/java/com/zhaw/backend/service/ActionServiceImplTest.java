@@ -231,7 +231,7 @@ class ActionServiceImplTest {
 
             @Test
             @DisplayName("completeActionForUser with non-subtask delegates to DAO")
-            void completeActionForUserWithNonSubtaskDelegatesToDao() {
+            void completeActionForUserWithNonSubtaskDelegatesToDao() throws Exception {
                 when(subTaskService.getSubTasksCompletionStatesForUser(7L, 8L)).thenReturn(null);
                 when(actionDao.completeAction(7L, 8L, false, null)).thenReturn(true);
 
@@ -260,7 +260,7 @@ class ActionServiceImplTest {
 
             @Test
             @DisplayName("completes action when there are no sub-action completion states")
-            void completesActionWhenNoSubActionStatesExist() {
+            void completesActionWhenNoSubActionStatesExist() throws Exception {
                 when(subTaskService.getSubTasksCompletionStatesForUser(1L, 2L)).thenReturn(null);
                 when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(true);
 
@@ -273,7 +273,7 @@ class ActionServiceImplTest {
 
             @Test
             @DisplayName("returns false and does not call DAO when any sub-action is not completed")
-            void returnsFalseWhenACompletionStateIsNotCompleted() {
+            void returnsFalseWhenACompletionStateIsNotCompleted() throws Exception {
                 when(subTaskService.getSubTasksCompletionStatesForUser(1L, 2L))
                         .thenReturn(Map.of(1L, CompletionState.IN_PROGRESS));
 
@@ -286,7 +286,7 @@ class ActionServiceImplTest {
 
             @Test
             @DisplayName("returns false when DAO fails to complete action")
-            void returnsFalseWhenDaoFailsToCompleteAction() {
+            void returnsFalseWhenDaoFailsToCompleteAction() throws Exception {
                 when(subTaskService.getSubTasksCompletionStatesForUser(1L, 2L)).thenReturn(Map.of());
                 when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(false);
 
