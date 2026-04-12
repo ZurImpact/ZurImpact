@@ -5,7 +5,7 @@
     "displayName": "Walk for Coffee",
     "points": 10,
     "tags": ["GPS"],
-    "subActions": [
+    "subTasks": [
       {
         "id": 1,
         "displayName": "Start: Main Square",
@@ -46,27 +46,27 @@
     "displayName": "Cycle for Lunch",
     "points": 50,
     "tags": ["GPS"],
-    "subActions": [
+    "subTasks": [
       {
         "id": 5,
         "displayName": "Start: Bike Station",
         "actionId": 2,
-        "latitude": 47.382,
-        "longitude": 8.538
+        "latitude": 47.388715,
+        "longitude": 8.488892
       },
       {
         "id": 6,
         "displayName": "Checkpoint 1: Lake View",
         "actionId": 2,
-        "latitude": 47.384,
-        "longitude": 8.54
+        "latitude": 47.378715,
+        "longitude": 8.488892
       },
       {
         "id": 7,
         "displayName": "Destination: Restaurant",
         "actionId": 2,
-        "latitude": 47.386,
-        "longitude": 8.542
+        "latitude": 47.377,
+        "longitude": 8.488892
       }
     ],
     "type": "GPS",
@@ -80,7 +80,7 @@
     "displayName": "Walk for Sandwich",
     "points": 100,
     "tags": ["GPS"],
-    "subActions": [],
+    "subTasks": [],
     "subActionDtoIdList": [],
     "type": "GPS",
     "hasSubtasks": false,
