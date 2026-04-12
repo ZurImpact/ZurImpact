@@ -7,7 +7,7 @@ export interface ActionDto {
   displayName: string;
   points?: number;
   tags?: Tag[];
-  subActions?: SubActionDto[];
+  subTasks?: SubActionDto[];
   type?: ActionType;
   hasSubtasks?: boolean;
   validUntil?: string;
@@ -151,6 +151,22 @@ export const completeAction = createAsyncThunk(
   },
 );
 
+// Async thunk for completing a subtask
+export const completeSubTask = createAsyncThunk(
+  'action/completeSubTask',
+  async (request: {userId: number; actionId: number; subTaskId: number; actionType: string}, {rejectWithValue}) => {
+    try {
+      const response = await apiClient.post('/subTasks/completeSubTask', request);
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue('Failed to complete subtask');
+    }
+  },
+);
+
 const actionSlice = createSlice({
   name: 'action',
   initialState,
@@ -233,6 +249,19 @@ const actionSlice = createSlice({
       })
       .addCase(completeAction.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // completeSubtask cases
+    builder
+      .addCase(completeSubTask.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(completeSubTask.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(completeSubTask.rejected, (state, action) => {
         state.error = action.payload as string;
       });
   },
