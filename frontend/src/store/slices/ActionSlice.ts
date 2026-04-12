@@ -164,7 +164,7 @@ export const completeSubTask = createAsyncThunk(
       }
       return rejectWithValue('Failed to complete subtask');
     }
-  }
+  },
 );
 
 const actionSlice = createSlice({
@@ -251,10 +251,10 @@ const actionSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       });
-    
+
     // completeSubtask cases
     builder
-    .addCase(completeSubTask.pending, (state) => {
+      .addCase(completeSubTask.pending, (state) => {
         state.loading = true;
         state.error = null;
       })

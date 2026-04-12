@@ -7,7 +7,14 @@ import {Card} from '../ui/card';
 import {Button} from '../ui/button';
 import {Badge} from '../ui/badge';
 import {useAppDispatch, useAppSelector} from '../../store/store';
-import {fetchActionById, clearSelectedAction, completeAction, startAction, completeSubTask, type ActionDto} from '../../store/slices/ActionSlice';
+import {
+  fetchActionById,
+  clearSelectedAction,
+  completeAction,
+  startAction,
+  completeSubTask,
+  type ActionDto,
+} from '../../store/slices/ActionSlice';
 import {useTranslation} from 'react-i18next';
 import {toast} from 'sonner';
 import {MapPin, Navigation, CheckCircle2, Circle, ArrowLeft, Award, Target, X} from 'lucide-react';
@@ -110,8 +117,6 @@ function processCheckpointsFromAction(action: ActionDto): Checkpoint[] {
     }));
 }
 
-
-
 export function GpsActionDetailPage() {
   const {id} = useParams<{id: string}>();
   const navigate = useNavigate();
@@ -128,19 +133,17 @@ export function GpsActionDetailPage() {
   const [checkedInCheckpointIds, setCheckedInCheckpointIds] = useState<Set<number>>(new Set());
   const [isTrackingLocation, setIsTrackingLocation] = useState(false);
 
-  
-
   const watchIdRef = useRef<number | null>(null);
   const hasCalledCompleteAction = useRef(false);
 
   const handleStartAction = async () => {
     const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
-    
+
     if (!userId || !id) {
       alert(`Missing userId or id. userId: ${userId}, id: ${id}`);
       return;
     }
-    
+
     setIsStartingAction(true);
     try {
       await dispatch(startAction({userId: Number(userId), actionId: Number(id)})).unwrap();
@@ -213,18 +216,20 @@ export function GpsActionDetailPage() {
               next.add(cp.id);
               return next;
             });
-            
+
             // Sync to backend (only once per checkpoint)
             if (!completedSubtasksRef.current.has(cp.id)) {
               completedSubtasksRef.current.add(cp.id);
               const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
               if (userId && id) {
-                dispatch(completeSubTask({
-                  userId: Number(userId),
-                  actionId: Number(id),
-                  subTaskId: cp.id,
-                  actionType: 'GPS'
-                }));
+                dispatch(
+                  completeSubTask({
+                    userId: Number(userId),
+                    actionId: Number(id),
+                    subTaskId: cp.id,
+                    actionType: 'GPS',
+                  }),
+                );
               }
             }
             toast.success(
@@ -325,7 +330,10 @@ export function GpsActionDetailPage() {
               {selectedAction.points} {t('points')}
             </Badge>
             {!hasStartedAction && (
-              <Button className="h-12 text-lg px-4 bg-green-600 text-primary-foreground" onClick={() => setShowStartDialog(true)}>
+              <Button
+                className="h-12 text-lg px-4 bg-green-600 text-primary-foreground"
+                onClick={() => setShowStartDialog(true)}
+              >
                 {t('gpsActionDetail.startAction')}
               </Button>
             )}
@@ -334,21 +342,22 @@ export function GpsActionDetailPage() {
       </div>
 
       {showStartDialog && (
-        <div className="fixed inset-0 z-1000 flex items-center justify-center bg-black/50" onClick={() => setShowStartDialog(false)}>
-          <div className="relative bg-card rounded-lg shadow-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}
+        <div
+          className="fixed inset-0 z-1000 flex items-center justify-center bg-black/50"
+          onClick={() => setShowStartDialog(false)}
+        >
+          <div
+            className="relative bg-card rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
           >
-            <button 
+            <button
               onClick={() => setShowStartDialog(false)}
               className="absolute top-3 right-3 p-1 hover:bg-gray-100 rounded"
             >
               <X className="h-5 w-5" />
             </button>
-            <h2 className="text-xl text-green-600 font-semibold mb-2">
-              {t('gpsActionDetail.startDialogTitle')}
-            </h2>
-            <p className="text-gray-600 mb-6">
-              {t('gpsActionDetail.startDialogDescription')}
-            </p>
+            <h2 className="text-xl text-green-600 font-semibold mb-2">{t('gpsActionDetail.startDialogTitle')}</h2>
+            <p className="text-gray-600 mb-6">{t('gpsActionDetail.startDialogDescription')}</p>
             <div className="flex gap-3 justify-end">
               <Button variant="outline" onClick={() => setShowStartDialog(false)}>
                 {t('gpsActionDetail.cancel')}
