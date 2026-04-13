@@ -1,8 +1,7 @@
-package ch.zhaw.zurimpact.service;
+package com.zhaw.backend.service;
 
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.entities.User;
-import com.zhaw.backend.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

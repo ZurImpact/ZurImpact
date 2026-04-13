@@ -1,7 +1,7 @@
-package ch.zhaw.zurimpact.dao;
+package com.zhaw.backend.dao;
 
-import ch.zhaw.zurimpact.config.DockerAvailableCondition;
-import ch.zhaw.zurimpact.config.TestDatabaseConfig;
+import com.zhaw.backend.config.DockerAvailableCondition;
+import com.zhaw.backend.config.TestDatabaseConfig;
 
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.entities.User;

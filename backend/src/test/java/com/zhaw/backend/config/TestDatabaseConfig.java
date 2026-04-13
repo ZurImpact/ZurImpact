@@ -1,4 +1,4 @@
-package ch.zhaw.zurimpact.config;
+package com.zhaw.backend.config;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.flywaydb.core.Flyway;
@@ -76,7 +76,7 @@ public class TestDatabaseConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
         emf.setDataSource(dataSource);
-        emf.setPackagesToScan("ch.zhaw.zurimpact.model");
+        emf.setPackagesToScan("com.zhaw.backend.model");
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setShowSql(true);
