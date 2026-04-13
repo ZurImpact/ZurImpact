@@ -50,4 +50,17 @@ public class UserServiceImpl implements UserService {
     public void deleteUserById(Long id) {
         userDao.deleteById(id);
     }
+
+    @Override
+    public boolean addPointsToUser(Long userId, Integer points) {
+        Optional<User> userOpt = userDao.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setPoints(user.getPoints() + points);
+            userDao.save(user);
+            return true;
+        }
+        return false;
+    }
+
 }

@@ -180,6 +180,12 @@ public class ActionDao {
         return count != null && count > 0;
     }
 
+    public int getPointsForAction(Long id){
+        Integer points = jdbc.queryForObject("SELECT points FROM action WHERE id = ?", Integer.class, id);
+        return points != null ? points : 0;
+    }
+
+
     /**
      * Adds a text filter to the query, which searches for the text in description and display_name, case-insensitive
      * @param sql query builder to append the filter to
@@ -261,4 +267,5 @@ public class ActionDao {
         sql.append(")");
         return true;
     }
+
 }
