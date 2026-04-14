@@ -21,4 +21,6 @@ public interface UserService {
     void deleteUserById(Long id);
 
     boolean addPointsToUser(Long userId, Integer points);
+
+    boolean deductPointsFromUser(Long userId, Integer points);
 }

@@ -52,11 +52,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public boolean addPointsToUser(Long userId, Integer points) {
         Optional<User> userOpt = userDao.findById(userId);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             user.setPoints(user.getPoints() + points);
+            userDao.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    @Transactional
+    public boolean deductPointsFromUser(Long userId, Integer points) {
+        Optional<User> userOpt = userDao.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (user.getPoints() < points) {
+                return false;
+            }
+            user.setPoints(user.getPoints() - points);
             userDao.save(user);
             return true;
         }
