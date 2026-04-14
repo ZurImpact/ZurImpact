@@ -23,31 +23,26 @@ const initialState: UserState = {
   error: null,
 };
 
-export const fetchCurrentUser = createAsyncThunk(
-  'user/fetchCurrentUser',
-  async (_, {rejectWithValue}) => {
-    try {
-      const response = await apiClient.get('/users/current');
-      return response.data as UserDto;
-    } catch (error: unknown) {
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as {
-          response?: {status?: number; data?: {error?: string}};
-        };
-        if (axiosError.response?.status === 401) {
-          return rejectWithValue('not_authenticated');
-        }
-        return rejectWithValue(
-          axiosError.response?.data?.error ?? 'Failed to fetch user',
-        );
+export const fetchCurrentUser = createAsyncThunk('user/fetchCurrentUser', async (_, {rejectWithValue}) => {
+  try {
+    const response = await apiClient.get('/users/current');
+    return response.data as UserDto;
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'response' in error) {
+      const axiosError = error as {
+        response?: {status?: number; data?: {error?: string}};
+      };
+      if (axiosError.response?.status === 401) {
+        return rejectWithValue('not_authenticated');
       }
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue('Failed to fetch user');
+      return rejectWithValue(axiosError.response?.data?.error ?? 'Failed to fetch user');
     }
-  },
-);
+    if (error instanceof Error) {
+      return rejectWithValue(error.message);
+    }
+    return rejectWithValue('Failed to fetch user');
+  }
+});
 
 const userSlice = createSlice({
   name: 'user',

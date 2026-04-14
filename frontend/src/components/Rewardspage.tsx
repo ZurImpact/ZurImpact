@@ -3,13 +3,7 @@ import {Card} from './ui/card';
 import {Button} from './ui/button';
 import {Badge} from './ui/badge';
 import {Gift, Coffee, Utensils, ShoppingBag, Ticket, Lock, User} from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from './ui/dialog';
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from './ui/dialog';
 import {toast} from 'sonner';
 import {useAppDispatch, useAppSelector} from '../store/store';
 import {fetchRewards, redeemVoucher, resetRedemptionStatus} from '../store/slices/RewardSlice';
@@ -39,10 +33,8 @@ export function RewardsPage() {
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [filter, setFilter] = useState<string>('all');
 
-  const {rewards, redemptionLoading, redemptionSuccess, redemptionError, loading} =
-    useAppSelector((s) => s.rewards);
-  const {currentUser, isAuthenticated, loading: userLoading, error: userError} =
-    useAppSelector((s) => s.user);
+  const {rewards, redemptionLoading, redemptionSuccess, redemptionError, loading} = useAppSelector((s) => s.rewards);
+  const {currentUser, isAuthenticated, loading: userLoading, error: userError} = useAppSelector((s) => s.user);
 
   useEffect(() => {
     dispatch(fetchCurrentUser());
@@ -54,7 +46,7 @@ export function RewardsPage() {
       toast.success(t('rewardsPage.redeemSuccess'));
       dispatch(resetRedemptionStatus());
       dispatch(fetchCurrentUser());
-      dispatch(fetchRewards()); // to sync backend with available vouchers? 
+      dispatch(fetchRewards()); // to sync backend with available vouchers?
     } else if (redemptionError) {
       toast.error(redemptionError);
       dispatch(resetRedemptionStatus());
@@ -82,16 +74,8 @@ export function RewardsPage() {
     dispatch(fetchCurrentUser());
   };
 
-  const categories = [
-    'all',
-    'Food & Drink',
-    'Shopping',
-    'Culture',
-    'Tourism',
-    'Services',
-  ];
-  const filteredRewards =
-    filter === 'all' ? rewards : rewards.filter((r) => r.category === filter);
+  const categories = ['all', 'Food & Drink', 'Shopping', 'Culture', 'Tourism', 'Services'];
+  const filteredRewards = filter === 'all' ? rewards : rewards.filter((r) => r.category === filter);
 
   const getIcon = (iconName: string) => {
     return ICON_MAP[iconName] || Gift;
@@ -111,9 +95,7 @@ export function RewardsPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">
-            {t('rewardsPage.header')}
-          </h1>
+          <h1 className="text-4xl font-bold text-primary mb-2">{t('rewardsPage.header')}</h1>
           <p className="text-primary">{t('rewardsPage.subheader')}</p>
         </div>
 
@@ -132,18 +114,14 @@ export function RewardsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-primary mb-2">
-          {t('rewardsPage.header')}
-        </h1>
+        <h1 className="text-4xl font-bold text-primary mb-2">{t('rewardsPage.header')}</h1>
         <p className="text-primary">{t('rewardsPage.subheader')}</p>
       </div>
 
       <Card className="p-6 mb-8 bg-green-600 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-green-100 mb-1">
-              {t('rewardsPage.availablePoints')}
-            </p>
+            <p className="text-green-100 mb-1">{t('rewardsPage.availablePoints')}</p>
             <p className="text-4xl font-bold">{currentUser?.points}</p>
           </div>
           <Gift className="h-16 w-16 opacity-20" />
@@ -156,25 +134,17 @@ export function RewardsPage() {
             key={category}
             variant={filter === category ? 'default' : 'outline'}
             onClick={() => setFilter(category)}
-            className={
-              filter === category ? 'bg-green-600 hover:bg-green-700' : ''
-            }
+            className={filter === category ? 'bg-green-600 hover:bg-green-700' : ''}
           >
             {category === 'all' ? t('rewardsPage.allRewards') : category}
           </Button>
         ))}
       </div>
 
-      {loading && (
-        <div className="text-center py-8 text-gray-500">
-          {t('rewardsPage.loading')}
-        </div>
-      )}
+      {loading && <div className="text-center py-8 text-gray-500">{t('rewardsPage.loading')}</div>}
 
       {!loading && filteredRewards.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          {t('rewardsPage.noRewards')}
-        </div>
+        <div className="text-center py-8 text-gray-500">{t('rewardsPage.noRewards')}</div>
       )}
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -185,9 +155,7 @@ export function RewardsPage() {
           return (
             <Card
               key={reward.id}
-              className={`p-6 relative ${
-                !canAfford ? 'opacity-60' : 'hover:shadow-lg transition-shadow'
-              }`}
+              className={`p-6 relative ${!canAfford ? 'opacity-60' : 'hover:shadow-lg transition-shadow'}`}
             >
               {!canAfford && (
                 <div className="absolute top-4 right-4">
@@ -221,11 +189,7 @@ export function RewardsPage() {
                 <Button
                   onClick={() => setSelectedReward(reward)}
                   disabled={!canAfford || redemptionLoading}
-                  className={
-                    canAfford
-                      ? 'bg-green-600 hover:bg-green-700'
-                      : 'bg-gray-300'
-                  }
+                  className={canAfford ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-300'}
                 >
                   {t('rewardsPage.redeem')}
                 </Button>
@@ -239,18 +203,14 @@ export function RewardsPage() {
         <DialogContent className="bg-card">
           <DialogHeader>
             <DialogTitle>{t('rewardsPage.redeemReward')}</DialogTitle>
-            <DialogDescription>
-              {t('rewardsPage.confirmRedemption')}
-            </DialogDescription>
+            <DialogDescription>{t('rewardsPage.confirmRedemption')}</DialogDescription>
           </DialogHeader>
 
           {selectedReward && (
             <div className="space-y-4 mt-4">
               <div className="p-4 bg-secondary rounded-lg">
                 <h4 className="font-semibold mb-2">{selectedReward.title}</h4>
-                <p className="text-sm mb-3">
-                  {selectedReward.description}
-                </p>
+                <p className="text-sm mb-3">{selectedReward.description}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-sm">{t('rewardsPage.cost')}:</span>
                   <span className="font-bold text-green-600">
@@ -261,15 +221,11 @@ export function RewardsPage() {
 
               <div className="p-4 bg-green-100 dark:bg-green-500/20 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm">
-                    {t('rewardsPage.currentPoints')}:
-                  </span>
+                  <span className="text-sm">{t('rewardsPage.currentPoints')}:</span>
                   <span className="font-semibold">{currentUser?.points}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">
-                    {t('rewardsPage.afterRedemption')}:
-                  </span>
+                  <span className="text-sm">{t('rewardsPage.afterRedemption')}:</span>
                   <span className="font-semibold text-green-700">
                     {(currentUser?.points ?? 0) - selectedReward.points}
                   </span>
@@ -290,9 +246,7 @@ export function RewardsPage() {
                   onClick={() => handleRedeem(selectedReward)}
                   disabled={redemptionLoading}
                 >
-                  {redemptionLoading
-                    ? t('rewardsPage.redeeming')
-                    : t('rewardsPage.confirmRedemptionBtn')}
+                  {redemptionLoading ? t('rewardsPage.redeeming') : t('rewardsPage.confirmRedemptionBtn')}
                 </Button>
               </div>
             </div>
@@ -304,9 +258,7 @@ export function RewardsPage() {
         <div className="flex items-start gap-4">
           <Gift className="h-8 w-8 text-primary-foreground flex-shrink-0 mt-1" />
           <div>
-            <h3 className="font-semibold text-primary-foreground text-lg mb-2">
-              {t('rewardsPage.howRewardsWork')}
-            </h3>
+            <h3 className="font-semibold text-primary-foreground text-lg mb-2">{t('rewardsPage.howRewardsWork')}</h3>
             <ul className="space-y-2 text-sm text-primary-foreground">
               <li>• {t('rewardsPage.howRewardsPoint1')}</li>
               <li>• {t('rewardsPage.howRewardsPoint2')}</li>

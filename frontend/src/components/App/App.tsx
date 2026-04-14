@@ -3,7 +3,7 @@ import {BrowserRouter, Route, Routes, Navigate} from 'react-router';
 import {RootLayout} from '../RootLayout/RootLayout';
 import {GpsActionDetailPage} from '../ActionDetailPage/GpsActionDetailPage';
 import {MapTrackingPage} from '../MapTrackingPage';
-import { RewardsPage } from '../Rewardspage';
+import {RewardsPage} from '../Rewardspage';
 
 import {ROUTES} from '../../routes';
 import {ThemeProvider} from 'next-themes';

@@ -33,40 +33,30 @@ const initialState: RewardState = {
   error: null,
 };
 
-export const fetchRewards = createAsyncThunk(
-  'reward/fetchRewards',
-  async (_, {rejectWithValue}) => {
-    try {
-      const response = await apiClient.get('/rewards');
-      return response.data;
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue('Failed to fetch rewards');
+export const fetchRewards = createAsyncThunk('reward/fetchRewards', async (_, {rejectWithValue}) => {
+  try {
+    const response = await apiClient.get('/rewards');
+    return response.data;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return rejectWithValue(error.message);
     }
-  },
-);
+    return rejectWithValue('Failed to fetch rewards');
+  }
+});
 
 export const redeemVoucher = createAsyncThunk(
   'reward/redeemVoucher',
-  async (
-    {userId, voucherId}: {userId: number; voucherId: string},
-    {rejectWithValue},
-  ) => {
+  async ({userId, voucherId}: {userId: number; voucherId: string}, {rejectWithValue}) => {
     try {
-      const response = await apiClient.post(
-        `/users/redemptions?userId=${userId}&voucherId=${voucherId}`,
-      );
+      const response = await apiClient.post(`/users/redemptions?userId=${userId}&voucherId=${voucherId}`);
       return response.data as RedemptionResult;
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as {
           response?: {data?: {error?: string}};
         };
-        return rejectWithValue(
-          axiosError.response?.data?.error ?? 'Failed to redeem voucher',
-        );
+        return rejectWithValue(axiosError.response?.data?.error ?? 'Failed to redeem voucher');
       }
       if (error instanceof Error) {
         return rejectWithValue(error.message);
