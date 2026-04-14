@@ -55,7 +55,7 @@ describe('RootLayout', () => {
     renderWithRouter('/', {
       preloadedState: {
         user: {
-          currentUser: { id: 1, points: 123, name: 'Test User', email: 'test@test.com' },
+          currentUser: {id: 1, points: 123, name: 'Test User', email: 'test@test.com'},
           isAuthenticated: true,
           loading: false,
           error: null,
