@@ -1,8 +1,7 @@
-package ch.zhaw.zurimpact.service;
+package com.zhaw.backend.service;
 
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.entities.User;
-import com.zhaw.backend.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,7 +27,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link com.zhaw.backend.service.UserServiceImpl}.
+ * Unit tests for {@link UserServiceImpl}.
  * Uses Mockito to isolate the service layer from the DAO.
  * No database is involved — these tests are fast and deterministic.
  */

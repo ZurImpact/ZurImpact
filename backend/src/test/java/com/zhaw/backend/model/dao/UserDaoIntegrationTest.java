@@ -1,9 +1,8 @@
-package ch.zhaw.zurimpact.dao;
+package com.zhaw.backend.model.dao;
 
-import ch.zhaw.zurimpact.config.DockerAvailableCondition;
-import ch.zhaw.zurimpact.config.TestDatabaseConfig;
+import com.zhaw.backend.config.DockerAvailableCondition;
+import com.zhaw.backend.config.TestDatabaseConfig;
 
-import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -27,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Integration tests for {@link com.zhaw.backend.model.dao.UserDao}.
+ * Integration tests for {@link UserDao}.
  * <p>
  * These tests run against a real PostgreSQL database started by Testcontainers.
  * Flyway migrations are applied automatically by {@link TestDatabaseConfig}.
