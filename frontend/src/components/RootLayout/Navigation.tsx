@@ -4,15 +4,19 @@ import {Mountain, Award, Menu, Moon, Sun} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from 'next-themes';
 import {Sheet, SheetContent, SheetTrigger} from '../ui/sheet';
+import {useAppSelector} from '../../store/store';
 
 export const Navigation = () => {
   const location = useLocation();
   const {t} = useTranslation();
   const {theme, setTheme} = useTheme();
+  const {currentUser} = useAppSelector((s) => s.user);
+  const points = currentUser?.points;
 
   const navLinks = [
     {to: ROUTES.dashboard, label: t('rootLayout.dashboard')},
     {to: ROUTES.track, label: t('rootLayout.track')},
+    {to: ROUTES.rewards, label: t('rootLayout.rewards')},
   ];
 
   /**
@@ -67,10 +71,10 @@ export const Navigation = () => {
             {renderThemeButton()}
             {renderLanguageButton()}
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-full">
+              <div className="flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-600/20 rounded-full">
                 <Award className="h-4 w-4 text-green-600" />
                 <span className="font-medium text-green-700">
-                  {123} {t('points') /*TODO Get actual points from auth state*/}
+                  {`${points} ${t('points')}` /*TODO Get actual points from auth state*/}
                 </span>
               </div>
               {/**
