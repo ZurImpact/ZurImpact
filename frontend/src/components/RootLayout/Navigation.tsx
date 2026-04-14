@@ -3,12 +3,14 @@ import {ROUTES} from '../../routes';
 import {Mountain, Award, Menu, Moon, Sun} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from 'next-themes';
+import {useAppSelector} from '../../store/store';
 import {Sheet, SheetContent, SheetTrigger} from '../ui/sheet';
 
 export const Navigation = () => {
   const location = useLocation();
   const {t} = useTranslation();
   const {theme, setTheme} = useTheme();
+  const user = useAppSelector((state) => state.user.user);
 
   const navLinks = [
     {to: ROUTES.dashboard, label: t('rootLayout.dashboard')},
@@ -70,7 +72,7 @@ export const Navigation = () => {
               <div className="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-full">
                 <Award className="h-4 w-4 text-green-600" />
                 <span className="font-medium text-green-700">
-                  {123} {t('points') /*TODO Get actual points from auth state*/}
+                  {user ? user.points : '--'} {t('points')}
                 </span>
               </div>
               {/**

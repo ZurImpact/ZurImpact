@@ -21,6 +21,8 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+const mockUser = {id: 1, username: 'zurUser', email: 'zur@example.com', points: 250};
+
 const mockActions: ActionDto[] = [
   {id: 1, displayName: 'Clean Park', description: 'Help clean', points: 50, tags: ['SOCIAL']},
   {id: 2, displayName: 'Plant Tree', description: 'Plant a tree', points: 100, tags: ['FOOD']},
@@ -36,6 +38,10 @@ const mockUserActions = [
   },
 ];
 
+const userLoadedState = {
+  user: {user: mockUser, loading: false, error: null},
+};
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -47,6 +53,7 @@ describe('ActionDashboard', () => {
       <BrowserRouter>
         <ActionDashboard />
       </BrowserRouter>,
+      {preloadedState: userLoadedState},
     );
 
     expect(screen.getByText('actionDashboard.header')).toBeInTheDocument();
@@ -54,12 +61,12 @@ describe('ActionDashboard', () => {
   });
 
   it('shows loading state while fetching', () => {
-    // Never resolve — keeps the component in loading state
     mockGet.mockReturnValue(new Promise(() => {}));
     renderWithProviders(
       <BrowserRouter>
         <ActionDashboard />
       </BrowserRouter>,
+      {preloadedState: userLoadedState},
     );
 
     expect(screen.getByText('actionDashboard.loading')).toBeInTheDocument();
@@ -71,6 +78,7 @@ describe('ActionDashboard', () => {
       <BrowserRouter>
         <ActionDashboard />
       </BrowserRouter>,
+      {preloadedState: userLoadedState},
     );
 
     await waitFor(() => {
@@ -87,10 +95,29 @@ describe('ActionDashboard', () => {
       <BrowserRouter>
         <ActionDashboard />
       </BrowserRouter>,
+      {preloadedState: userLoadedState},
     );
 
     expect(await screen.findByText('Clean Park')).toBeInTheDocument();
     expect(screen.getByText('Plant Tree')).toBeInTheDocument();
+  });
+
+  it('fetches user actions with user ID from store, not hardcoded', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/actions') return Promise.resolve({data: mockActions});
+      if (url.includes('getUserActions')) return Promise.resolve({data: mockUserActions});
+      return Promise.resolve({data: []});
+    });
+    renderWithProviders(
+      <BrowserRouter>
+        <ActionDashboard />
+      </BrowserRouter>,
+      {preloadedState: userLoadedState},
+    );
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith('/userActionHistory/getUserActions?userId=1');
+    });
   });
 
   it('renders user action history with points', async () => {
@@ -103,6 +130,7 @@ describe('ActionDashboard', () => {
       <BrowserRouter>
         <ActionDashboard />
       </BrowserRouter>,
+      {preloadedState: userLoadedState},
     );
 
     await waitFor(() => {
@@ -116,6 +144,7 @@ describe('ActionDashboard', () => {
       <BrowserRouter>
         <ActionDashboard />
       </BrowserRouter>,
+      {preloadedState: userLoadedState},
     );
 
     expect(await screen.findByText('Network error')).toBeInTheDocument();
@@ -127,8 +156,25 @@ describe('ActionDashboard', () => {
       <BrowserRouter>
         <ActionDashboard />
       </BrowserRouter>,
+      {preloadedState: userLoadedState},
     );
 
     expect(screen.getByText('actionDashboard.historyTitle')).toBeInTheDocument();
+  });
+
+  it('dispatches fetchUser when no user is in store', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/users/1') return Promise.resolve({data: mockUser});
+      return Promise.resolve({data: []});
+    });
+    renderWithProviders(
+      <BrowserRouter>
+        <ActionDashboard />
+      </BrowserRouter>,
+    );
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith('/users/1');
+    });
   });
 });

@@ -14,6 +14,11 @@ export const preloadedStateForTests: DeepPartial<RootState> = {
     loading: false,
     error: null,
   },
+  user: {
+    user: null,
+    loading: false,
+    error: null,
+  },
 };
 
 export const renderWithProviders = (

@@ -10,6 +10,7 @@ app.use(express.json());
 const BASE_URL = '/backend_war_exploded/api';
 const mockActions = loadJSON('get_actions.json');
 const mockUserActions = loadJSON('get_useractions.json');
+const mockUser = loadJSON('get_user.json');
 
 // GET all actions (with optional filters)
 app.get(BASE_URL + '/actions', (req, res) => {
@@ -83,6 +84,15 @@ app.delete(BASE_URL + '/actions/:id', (req, res) => {
     res.json(deleted[0]);
   } else {
     res.status(404).json({error: 'Action not found'});
+  }
+});
+
+// GET user by ID
+app.get(BASE_URL + '/users/:id', (req, res) => {
+  if (parseInt(req.params.id) === mockUser.id) {
+    res.json(mockUser);
+  } else {
+    res.status(404).json({error: 'User not found'});
   }
 });
 

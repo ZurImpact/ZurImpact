@@ -3,6 +3,8 @@ import {Card} from '../ui/card';
 import {Award} from 'lucide-react';
 import {useAppSelector, useAppDispatch} from '../../store/store';
 import {fetchActions, fetchUserActions} from '../../store/slices/ActionSlice';
+import {fetchUser} from '../../store/slices/UserSlice';
+import {CURRENT_USER_ID} from '../../constants/user';
 import {useTranslation} from 'react-i18next';
 import {ActionCard} from './ActionCard/ActionCard';
 
@@ -11,17 +13,27 @@ export function ActionDashboard() {
   const {t} = useTranslation();
 
   const {actions, loading, error, userActions} = useAppSelector((state) => state.actions);
+  const user = useAppSelector((state) => state.user.user);
 
   const handleActionClick = (actionId: number) => {
     // TODO Implement action click behavior (e.g., open details, start action, etc.)
     alert(`Action clicked: ${actionId}`);
   };
 
-  // Fetch actions on component mount
+  // Fetch actions and user on component mount
   useEffect(() => {
     dispatch(fetchActions({}));
-    dispatch(fetchUserActions(123)); // TODO Use actual user ID from auth state
-  }, [dispatch]);
+    if (!user) {
+      dispatch(fetchUser(CURRENT_USER_ID));
+    }
+  }, [dispatch, user]);
+
+  // Fetch user actions once user is loaded
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(fetchUserActions(user.id));
+    }
+  }, [dispatch, user?.id]);
 
   return (
     <div className="container mx-auto px-4 py-8">
