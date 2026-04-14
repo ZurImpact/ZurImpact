@@ -33,7 +33,9 @@ public class UserDao {
         u.setUsername(rs.getString("username"));
         u.setEmail(rs.getString("email"));
         u.setPasswordHash(rs.getString("password_hash"));
+        u.setAddress(rs.getLong("address_id"));
         u.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+        u.setPoints(rs.getInt("points"));
         return u;
     };
 
@@ -78,13 +80,14 @@ public class UserDao {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO users (username, email, password_hash, created_at) "
-                            + "VALUES (?, ?, ?, ?)",
+                    "INSERT INTO users (username, email, address_id, password_hash, created_at) "
+                            + "VALUES (?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPasswordHash());
-            ps.setTimestamp(4, Timestamp.valueOf(user.getCreatedAt()));
+            ps.setLong(3, user.getAddress());
+            ps.setString(4, user.getPasswordHash());
+            ps.setTimestamp(5, Timestamp.valueOf(user.getCreatedAt()));
             return ps;
         }, keyHolder);
 
@@ -100,8 +103,8 @@ public class UserDao {
 
     private User update(User user) {
         jdbc.update(
-                "UPDATE users SET username = ?, email = ?, password_hash = ? WHERE id = ?",
-                user.getUsername(), user.getEmail(), user.getPasswordHash(), user.getId());
+                "UPDATE users SET username = ?, email = ?, address_id = ?, password_hash = ?, points = ? WHERE id = ?",
+                user.getUsername(), user.getEmail(), user.getAddress(), user.getPasswordHash(), user.getPoints(), user.getId());
         return user;
     }
 }
