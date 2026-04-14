@@ -3,4 +3,5 @@ export const ROUTES = {
   root: '/',
   dashboard: '/dashboard',
   track: '/track',
+  rewards: '/rewards',
 };

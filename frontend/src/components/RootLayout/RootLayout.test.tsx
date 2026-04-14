@@ -17,7 +17,7 @@ vi.mock('../../utility/i18n', () => ({
   default: {changeLanguage: vi.fn(), language: 'en'},
 }));
 
-const renderWithRouter = (initialRoute = '/') => {
+const renderWithRouter = (initialRoute = '/', options?: Record<string, unknown>) => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[initialRoute]}>
       <Routes>
@@ -26,6 +26,7 @@ const renderWithRouter = (initialRoute = '/') => {
         </Route>
       </Routes>
     </MemoryRouter>,
+    options,
   );
 };
 
@@ -51,7 +52,16 @@ describe('RootLayout', () => {
  */
 
   it('renders points display', () => {
-    renderWithRouter();
+    renderWithRouter('/', {
+      preloadedState: {
+        user: {
+          currentUser: {id: 1, points: 123, name: 'Test User', email: 'test@test.com'},
+          isAuthenticated: true,
+          loading: false,
+          error: null,
+        },
+      },
+    });
 
     // "123 points" is combined in a single span
     expect(screen.getByText(/123/)).toBeInTheDocument();
