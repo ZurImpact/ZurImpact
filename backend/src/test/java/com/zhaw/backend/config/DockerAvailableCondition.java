@@ -1,4 +1,4 @@
-package ch.zhaw.zurimpact.config;
+package com.zhaw.backend.config;
 
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;

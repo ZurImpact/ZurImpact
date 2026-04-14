@@ -1,4 +1,4 @@
-package ch.zhaw.zurimpact.config;
+package com.zhaw.backend.config;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.flywaydb.core.Flyway;
@@ -18,7 +18,7 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 /**
- * Test-only Spring configuration that replaces {@link PersistenceConfig}.
+ * Test-only Spring configuration that replaces {@link com.zhaw.backend.config.PersistenceConfig}.
  * <p>
  * Starts a Testcontainers PostgreSQL 16 container and wires up the same
  * bean stack (DataSource → Flyway → JPA → JdbcTemplate) so that integration
@@ -76,7 +76,7 @@ public class TestDatabaseConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
         emf.setDataSource(dataSource);
-        emf.setPackagesToScan("ch.zhaw.zurimpact.model");
+        emf.setPackagesToScan("com.zhaw.backend");
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setShowSql(true);

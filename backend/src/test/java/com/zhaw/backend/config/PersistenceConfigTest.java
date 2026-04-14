@@ -1,4 +1,4 @@
-package ch.zhaw.zurimpact.config;
+package com.zhaw.backend.config;
 
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.DisplayName;
