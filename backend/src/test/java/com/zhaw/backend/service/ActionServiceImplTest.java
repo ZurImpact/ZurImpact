@@ -36,9 +36,12 @@ class ActionServiceImplTest {
 
     private ActionServiceImpl actionService;
 
+    @Mock
+    private UserService userService;
+
     @BeforeEach
     void setUp() {
-        actionService = new ActionServiceImpl(actionDao, subTaskService);
+        actionService = new ActionServiceImpl(actionDao, subTaskService, userService);
     }
 
     private Action buildAction(Long id, boolean hasSubtasks) {
@@ -230,16 +233,20 @@ class ActionServiceImplTest {
             }
 
             @Test
-            @DisplayName("completeActionForUser with non-subtask delegates to DAO")
-            void completeActionForUserWithNonSubtaskDelegatesToDao() {
+            @DisplayName("completeActionForUser with non-subtask delegates to DAO and adds points")
+            void completeActionForUserWithNonSubtaskDelegatesToDao() throws Exception {
                 when(subTaskService.getSubTasksCompletionStatesForUser(7L, 8L)).thenReturn(null);
                 when(actionDao.completeAction(7L, 8L, false, null)).thenReturn(true);
+                when(actionDao.getPointsForAction(8L)).thenReturn(25);
+                when(userService.addPointsToUser(7L, 25)).thenReturn(true);
 
                 boolean result = actionService.completeActionForUser(7L, 8L);
 
                 assertTrue(result);
                 verify(subTaskService).getSubTasksCompletionStatesForUser(7L, 8L);
                 verify(actionDao).completeAction(7L, 8L, false, null);
+                verify(actionDao).getPointsForAction(8L);
+                verify(userService).addPointsToUser(7L, 25);
             }
 
             @Test
@@ -259,21 +266,25 @@ class ActionServiceImplTest {
         class CompleteActionForUserTests {
 
             @Test
-            @DisplayName("completes action when there are no sub-action completion states")
-            void completesActionWhenNoSubActionStatesExist() {
+            @DisplayName("completes action and adds points when there are no sub-action completion states")
+            void completesActionWhenNoSubActionStatesExist() throws Exception {
                 when(subTaskService.getSubTasksCompletionStatesForUser(1L, 2L)).thenReturn(null);
                 when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(true);
+                when(actionDao.getPointsForAction(2L)).thenReturn(15);
+                when(userService.addPointsToUser(1L, 15)).thenReturn(true);
 
                 boolean result = actionService.completeActionForUser(1L, 2L);
 
                 assertTrue(result);
                 verify(subTaskService).getSubTasksCompletionStatesForUser(1L, 2L);
                 verify(actionDao).completeAction(1L, 2L, false, null);
+                verify(actionDao).getPointsForAction(2L);
+                verify(userService).addPointsToUser(1L, 15);
             }
 
             @Test
             @DisplayName("returns false and does not call DAO when any sub-action is not completed")
-            void returnsFalseWhenACompletionStateIsNotCompleted() {
+            void returnsFalseWhenACompletionStateIsNotCompleted() throws Exception {
                 when(subTaskService.getSubTasksCompletionStatesForUser(1L, 2L))
                         .thenReturn(Map.of(1L, CompletionState.IN_PROGRESS));
 
@@ -282,18 +293,37 @@ class ActionServiceImplTest {
                 assertFalse(result);
                 verify(subTaskService).getSubTasksCompletionStatesForUser(1L, 2L);
                 verify(actionDao, never()).completeAction(anyLong(), anyLong(), any(), any());
+                verify(actionDao, never()).getPointsForAction(anyLong());
+                verify(userService, never()).addPointsToUser(anyLong(), anyInt());
             }
 
             @Test
-            @DisplayName("returns false when DAO fails to complete action")
-            void returnsFalseWhenDaoFailsToCompleteAction() {
+            @DisplayName("throws when DAO fails to complete action")
+            void throwsWhenDaoFailsToCompleteAction() throws Exception {
                 when(subTaskService.getSubTasksCompletionStatesForUser(1L, 2L)).thenReturn(Map.of());
                 when(actionDao.completeAction(1L, 2L, false, null)).thenReturn(false);
 
-                boolean result = actionService.completeActionForUser(1L, 2L);
+                Exception ex = assertThrows(Exception.class, () -> actionService.completeActionForUser(1L, 2L));
 
-                assertFalse(result);
+                assertEquals("Failed to complete action for user", ex.getMessage());
                 verify(actionDao).completeAction(1L, 2L, false, null);
+                verify(actionDao, never()).getPointsForAction(anyLong());
+                verify(userService, never()).addPointsToUser(anyLong(), anyInt());
+            }
+
+            @Test
+            @DisplayName("throws when adding points fails")
+            void throwsWhenAddPointsFails() throws Exception {
+                when(subTaskService.getSubTasksCompletionStatesForUser(3L, 4L)).thenReturn(Map.of());
+                when(actionDao.completeAction(3L, 4L, false, null)).thenReturn(true);
+                when(actionDao.getPointsForAction(4L)).thenReturn(20);
+                when(userService.addPointsToUser(3L, 20)).thenReturn(false);
+
+                Exception ex = assertThrows(Exception.class, () -> actionService.completeActionForUser(3L, 4L));
+
+                assertEquals("Failed to add points to user after completing action", ex.getMessage());
+                verify(actionDao).getPointsForAction(4L);
+                verify(userService).addPointsToUser(3L, 20);
             }
         }
     }

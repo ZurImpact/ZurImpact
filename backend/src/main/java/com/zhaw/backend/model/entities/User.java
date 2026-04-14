@@ -41,6 +41,9 @@ public class User {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "points", nullable = false)
+    private Integer points;
+
     // No-args constructor required by JPA
     // Do not use this constructor directly in your code; use the @Builder instead for creating instances.
     public User() {

@@ -38,7 +38,16 @@
     "geolocationError": "Geolocation is not supported by your browser",
     "locationError": "Error getting location",
     "checkpoint": "Checkpoint",
-    "checkpointReached": "Checkpoint {{checkpoint}} reached: {{name}}!"
+    "checkpointReached": "Checkpoint {{checkpoint}} reached: {{name}}!",
+    "actionCompleted": "Action completed! You've earned points!",
+    "actionStarted": "Action started! Complete all checkpoints to earn points.",
+    "startError": "Failed to start action. Please try again.",
+    "startAction": "Start Action",
+    "startDialogTitle": "Start this action?",
+    "startDialogDescription": "Once you start, you can begin completing checkpoints. Make sure you're ready to complete all of them!",
+    "cancel": "Cancel",
+    "starting": "Starting...",
+    "confirmStart": "Yes, I'm ready to start"
   },
   "rewardsPage": {
     "header": "Rewards",

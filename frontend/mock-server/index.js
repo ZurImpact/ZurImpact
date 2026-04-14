@@ -114,6 +114,12 @@ app.post(BASE_URL + '/actions/cancelAction', (req, res) => {
   res.status(200).json({message: 'Action cancelled (mock)'});
 });
 
+// POST completeSubTask
+app.post(BASE_URL + '/subTasks/completeSubTask', (req, res) => {
+  console.log('completeSubTask called with:', req.body);
+  res.status(200).json({message: 'SubTask completed (mock)'});
+});
+
 // GET all rewards
 app.get(BASE_URL + '/rewards', (req, res) => {
   res.json(mockRewards);

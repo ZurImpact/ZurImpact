@@ -29,6 +29,7 @@ public class ActionServiceImpl implements ActionService {
 
     private final ActionDao actionDao;
     private final SubTaskService subTaskService;
+    private final UserService userService;
 
     /**
      * Gets all Actions in DB available with filtering options for text, points, tags and validUntil
@@ -94,9 +95,20 @@ public class ActionServiceImpl implements ActionService {
      * @return true if the action was successfully completed, false if not (e.g. if the mapping does not exist or is already completed)
      */
     @Override
-    public boolean completeActionForUser(Long userId, Long actionId) {
+    @Transactional(rollbackFor = Exception.class)
+    public boolean completeActionForUser(Long userId, Long actionId) throws Exception {
         if(ActionValidator.validateActionCompletion(subTaskService.getSubTasksCompletionStatesForUser(userId,actionId)) ){
-            return actionDao.completeAction(userId, actionId, false, null);
+            boolean successCompletion = actionDao.completeAction(userId, actionId, false, null);
+            if(successCompletion){
+                boolean success = userService.addPointsToUser(userId, actionDao.getPointsForAction(actionId));
+                if (success){
+                    return true;
+                } else {
+                    throw new Exception("Failed to add points to user after completing action");
+                }
+            } else {
+                throw new Exception("Failed to complete action for user");
+            }
         }
         return false;
     }
