@@ -1,0 +1,38 @@
+[
+  {
+    "id": "1",
+    "title": "Free Coffee at Café Central",
+    "description": "Enjoy a complimentary coffee at one of Zürich's finest cafés",
+    "points": 50,
+    "category": "Food & Drink",
+    "icon": "Coffee",
+    "available": 45
+  },
+  {
+    "id": "2",
+    "title": "10% Off at Bio Market",
+    "description": "Discount on organic and sustainable products",
+    "points": 75,
+    "category": "Shopping",
+    "icon": "ShoppingBag",
+    "available": 120
+  },
+  {
+    "id": "3",
+    "title": "Free Museum Entry",
+    "description": "Complimentary entrance to Kunsthaus Zürich",
+    "points": 100,
+    "category": "Culture",
+    "icon": "Ticket",
+    "available": 30
+  },
+  {
+    "id": "4",
+    "title": "Restaurant Voucher - 20 CHF",
+    "description": "Use at participating sustainable restaurants",
+    "points": 150,
+    "category": "Food & Drink",
+    "icon": "Utensils",
+    "available": 67
+  }
+]
