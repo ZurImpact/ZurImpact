@@ -20,8 +20,8 @@ public final class SubTaskMapper {
         if (entity instanceof GpsActionTask gpsActionTask) {
             GpsActionTaskDto dto = new GpsActionTaskDto();
             mapCommonFields(gpsActionTask, dto);
-            dto.setGpsX(gpsActionTask.getGpsX());
-            dto.setGpsY(gpsActionTask.getGpsY());
+            dto.setLatitude(gpsActionTask.getLatitude());
+            dto.setLongitude(gpsActionTask.getLongitude());
             return dto;
         }
 
@@ -38,8 +38,8 @@ public final class SubTaskMapper {
         if (dto instanceof GpsActionTaskDto gpsDto) {
             GpsActionTask entity = new GpsActionTask();
             mapCommonFields(gpsDto, entity);
-            entity.setGpsX(gpsDto.getGpsX());
-            entity.setGpsY(gpsDto.getGpsY());
+            entity.setLatitude(gpsDto.getLatitude());
+            entity.setLongitude(gpsDto.getLongitude());
             return entity;
         }
 

@@ -255,4 +255,40 @@ class UserDaoIntegrationTest {
         assertNotNull(count);
         assertEquals(1, count, "The 'users' table must exist after Flyway migration");
     }
+
+    // ── POINTS ──────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("insert sets default points to 0")
+    void insert_setsDefaultPoints() {
+        User user = createSampleUser("points_user", "points_user@example.com");
+
+        User saved = userDao.save(user);
+
+        assertEquals(0, saved.getPoints(), "Points should default to 0 on insert");
+    }
+
+    @Test
+    @DisplayName("insert preserves explicit points")
+    void insert_preservesExplicitPoints() {
+        User user = createSampleUser("points_custom", "points_custom@example.com");
+        user.setPoints(42);
+
+        User saved = userDao.save(user);
+
+        assertEquals(42, saved.getPoints(), "Points should be preserved when explicitly set");
+    }
+
+    @Test
+    @DisplayName("update persists points changes")
+    void update_persistsPointsChanges() {
+        User saved = userDao.save(createSampleUser("points_update", "points_update@example.com"));
+
+        saved.setPoints(7);
+        userDao.save(saved);
+
+        Optional<User> updated = userDao.findById(saved.getId());
+        assertTrue(updated.isPresent());
+        assertEquals(7, updated.get().getPoints(), "Points should update on save");
+    }
 }

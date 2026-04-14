@@ -10,7 +10,6 @@ import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
 import com.zhaw.backend.validator.SubTaskValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.EnumMap;
@@ -25,7 +24,7 @@ public class SubTaskServiceImpl implements SubTaskService {
     private final SubTaskDao subTaskDao;
 
     private final Map<ActionType, Function<Long, List<SubTaskDto>>> handlersForEntities = initHandlers();
-    private final float gpsAccuracyThreshold = 10.0f; // Example threshold for GPS accuracy
+    private final double gpsAccuracyThreshold = 10.0; // Threshold in meters for GPS accuracy
 
     private Map<ActionType, Function<Long, List<SubTaskDto>>> initHandlers() {
         Map<ActionType, Function<Long, List<SubTaskDto>>> handlers = new EnumMap<>(ActionType.class);
@@ -57,13 +56,13 @@ public class SubTaskServiceImpl implements SubTaskService {
     public boolean completeSubTaskForUser(SubTaskCompletionRequestDto requestDto) throws Exception {
         return switch (requestDto.getActionType()) {
             case GPS -> completeGpsSubTaskForUser(requestDto.getUserId(), requestDto.getActionId(), requestDto.getSubTaskId(),
-                    (Float) requestDto.getAdditionalData().get("gpsX"), (Float) requestDto.getAdditionalData().get("gpsY"));
+                    (Double) requestDto.getAdditionalData().get("latitude"), (Double) requestDto.getAdditionalData().get("longitude"));
             default -> throw new Exception("Unsupported SubTask Type: " + requestDto.getActionType());
         };
     }
 
-    private boolean completeGpsSubTaskForUser(Long userId, Long actionId, Long subtaskId, Float gpsx, Float gpsy) throws Exception {
-        if (gpsx == null || gpsy == null) {
+    private boolean completeGpsSubTaskForUser(Long userId, Long actionId, Long subtaskId, Double latitude, Double longitude) throws Exception {
+        if (latitude == null || longitude == null) {
             throw new Exception("GPS coordinates must not be null");
         }
         GpsActionTask gpsActionTaskEntity;
@@ -76,7 +75,7 @@ public class SubTaskServiceImpl implements SubTaskService {
         if (gpsActionTask == null) {
             throw new Exception("GPS SubTask not found for ID: " + subtaskId);
         }
-        if(SubTaskValidator.validateGpsSubTask(gpsx, gpsy, gpsActionTask.getGpsX(), gpsActionTask.getGpsY(), gpsAccuracyThreshold)){
+        if(SubTaskValidator.validateGpsSubTask(latitude, longitude, gpsActionTask.getLatitude(), gpsActionTask.getLongitude(), gpsAccuracyThreshold)){
             return subTaskDao.completeSubTaskForUser(userId, actionId, true, subtaskId.toString());
         }
         return false;
