@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/api/settings/**")).authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasRole("ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/api/user/**")).hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/api/auth/dev-login", HttpMethod.POST.name())).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authCookieFilter, UsernamePasswordAuthenticationFilter.class);
