@@ -24,7 +24,6 @@ public class SubTaskServiceImpl implements SubTaskService {
     private final SubTaskDao subTaskDao;
 
     private final Map<ActionType, Function<Long, List<SubTaskDto>>> handlersForEntities = initHandlers();
-    private final double gpsAccuracyThreshold = 10.0; // Threshold in meters for GPS accuracy
 
     private Map<ActionType, Function<Long, List<SubTaskDto>>> initHandlers() {
         Map<ActionType, Function<Long, List<SubTaskDto>>> handlers = new EnumMap<>(ActionType.class);

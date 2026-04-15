@@ -1,5 +1,8 @@
 package com.zhaw.backend.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum DistanceThresholdLevel {
     EASY(20.0),
     MEDIUM(12.5),
@@ -8,9 +11,5 @@ public enum DistanceThresholdLevel {
     private final double offsett;
     DistanceThresholdLevel(double offsett) {
         this.offsett = offsett;
-    }
-
-    public double getOffsett(){
-        return offsett;
     }
 }
