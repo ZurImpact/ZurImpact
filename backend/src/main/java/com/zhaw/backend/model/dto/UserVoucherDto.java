@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class UserVoucherDto {
 
-    private String redemptionCode;
+    private String code;
     private Long voucherId;
     private String displayName;
     private Integer pointsDeducted;
-    private LocalDateTime redeemedAt;
+    private LocalDateTime assignedAt;
 }

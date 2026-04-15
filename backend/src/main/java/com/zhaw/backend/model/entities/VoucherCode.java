@@ -6,27 +6,27 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_voucher")
+@Table(name = "voucher_code")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserVoucher {
+public class VoucherCode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
     @Column(name = "voucher_id", nullable = false)
     private Long voucherId;
 
-    @Column(name = "redemption_code", nullable = false, unique = true, length = 36)
-    private String redemptionCode;
+    @Column(nullable = false, unique = true)
+    private String code;
 
-    @Column(name = "redeemed_at", nullable = false)
-    private LocalDateTime redeemedAt;
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "assigned_at")
+    private LocalDateTime assignedAt;
 }

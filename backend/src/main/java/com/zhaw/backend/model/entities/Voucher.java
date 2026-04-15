@@ -19,10 +19,10 @@ public class Voucher {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String description;
 
-    @Column(name = "display_name", nullable = false, length = 255)
+    @Column(name = "display_name", nullable = false)
     private String displayName;
 
     @Column(nullable = false)
@@ -36,7 +36,6 @@ public class Voucher {
 
     @Column(name = "created_on", nullable = false, updatable = false)
     private LocalDateTime createdOn;
-
 
     @PrePersist
     protected void onCreate() {
