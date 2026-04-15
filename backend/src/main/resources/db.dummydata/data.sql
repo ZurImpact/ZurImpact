@@ -41,7 +41,7 @@ INSERT INTO action (description, display_name, points, tags, type, has_subtasks,
                                                                                                               ('Use public transport for a full day',              'Green Commute Day',    75, 'TRAVEL',         'TICKET', false, NOW() + INTERVAL '60 days',  NOW()),
                                                                                                               ('Cycle to work instead of driving',                 'Cycle to Work',       100, 'CYCLING,HEALTH', 'GPS',    true,  NOW() + INTERVAL '120 days', NOW());
 
--- 6. GPS_ACTION_TASKS (action_id references action.id)
+-- 7. GPS_ACTION_TASKS (action_id references action.id)
 INSERT INTO gps_action_tasks (description, display_name, action_id, latitude, longitude) VALUES
                                                                                              ('Check in at Bürkliplatz',    'Waypoint 1 – Bürkliplatz',    1, 47.3665, 8.5417),
                                                                                              ('Check in at Zürichhorn',     'Waypoint 2 – Zürichhorn',     1, 47.3528, 8.5556),
@@ -49,7 +49,7 @@ INSERT INTO gps_action_tasks (description, display_name, action_id, latitude, lo
                                                                                              ('Start at HB Zürich',         'Start – Hauptbahnhof',        4, 47.3782, 8.5403),
                                                                                              ('Arrive at ZHAW Winterthur',  'End – ZHAW',                  4, 47.4985, 8.7271);
 
--- 7. USER_ACTION_MAPPING (run AFTER V8 migration fixes the FK)
+-- 8. USER_ACTION_MAPPING (run AFTER V8 migration fixes the FK)
 INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subtask_id) VALUES
                                                                                                                  (1, 1, 'IN_PROGRESS', NOW(), false, NULL),
                                                                                                                  (1, 2, 'COMPLETED',   NOW(), false, NULL),
