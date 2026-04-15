@@ -1,12 +1,11 @@
 package com.zhaw.backend.controller;
 
 import com.zhaw.backend.model.dto.VoucherDto;
+import com.zhaw.backend.model.dto.UserVoucherDto;
 import com.zhaw.backend.service.VoucherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,11 +21,24 @@ public class VoucherController {
         try {
             List<VoucherDto> vouchers = voucherService.getAllVouchers();
             return ResponseEntity.ok(vouchers);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
     }
 
+    @PostMapping("/{voucherId}/redeem")
+    public ResponseEntity<?> redeemVoucher(
+            @PathVariable Long voucherId,
+            @RequestParam Long userId) {
+        try {
+            UserVoucherDto result = voucherService.redeemVoucher(userId, voucherId);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            String message = e.getMessage();
+            if ("Voucher not found".equals(message)) {
+                return ResponseEntity.status(404).body(message);
+            }
+            return ResponseEntity.badRequest().body(message);
+        }
+    }
 }
