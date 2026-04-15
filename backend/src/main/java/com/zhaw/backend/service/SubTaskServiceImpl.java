@@ -75,7 +75,7 @@ public class SubTaskServiceImpl implements SubTaskService {
         if (gpsActionTask == null) {
             throw new Exception("GPS SubTask not found for ID: " + subtaskId);
         }
-        if(SubTaskValidator.validateGpsSubTask(latitude, longitude, gpsActionTask.getLatitude(), gpsActionTask.getLongitude(), gpsAccuracyThreshold)){
+        if(SubTaskValidator.validateGpsSubTask(latitude, longitude, gpsActionTask.getLatitude(), gpsActionTask.getLongitude(), gpsActionTask.getDistanceThresholdLevel().getOffsett())){
             return subTaskDao.completeSubTaskForUser(userId, actionId, true, subtaskId.toString());
         }
         return false;
