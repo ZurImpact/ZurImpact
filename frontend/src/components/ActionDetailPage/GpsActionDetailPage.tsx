@@ -137,7 +137,7 @@ export function GpsActionDetailPage() {
   const hasCalledCompleteAction = useRef(false);
 
   const handleStartAction = async () => {
-    const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
+    const userId = localStorage.getItem('userId') || '123'; //remove 1 once auth is fully implemented!!
 
     if (!userId || !id) {
       alert(`Missing userId or id. userId: ${userId}, id: ${id}`);
