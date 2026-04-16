@@ -2,6 +2,7 @@
   "appName": "ZürImpact",
   "rootLayout": {
     "dashboard": "Dashboard",
+    "login": "Anmelden",
     "logout": "Abmelden",
     "track": "Karte",
     "rewards": "Belohnungen"
@@ -11,7 +12,8 @@
     "subheader": "Logge deine nachhaltigen Aktivitäten und sammle Punkte",
     "historyTitle": "Deine Aktivitätshistorie",
     "loading": "Aktivitäten werden geladen...",
-    "noActions": "Du hast noch keine Aktivitäten abgeschlossen. Starte noch heute deinen nachhaltigen Weg!"
+    "noActions": "Du hast noch keine Aktivitäten abgeschlossen. Starte noch heute deinen nachhaltigen Weg!",
+    "loginPrompt": "Bitte melde dich zuerst an."
   },
   "actionDetail": {
     "header": "Zeichne deine Route auf",
