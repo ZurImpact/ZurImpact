@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +39,14 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     public List<VoucherDto> getAllVouchers() {
         List<Voucher> voucherList = voucherDao.getAll();
-        return VoucherMapper.toDtoList(voucherList);
+        Map<Long, Integer> availableCounts = voucherCodeDao.countAvailableGrouped();
+        return voucherList.stream()
+                .map(v -> {
+                    VoucherDto dto = VoucherMapper.toDto(v);
+                    dto.setAvailableCount(availableCounts.getOrDefault(v.getId(), 0));
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

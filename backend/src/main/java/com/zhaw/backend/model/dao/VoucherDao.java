@@ -51,7 +51,7 @@ public class VoucherDao {
 
     public List<Voucher> getAll() {
         return jdbc.query(
-                "SELECT id, description, display_name, points, company_id, valid_until, created_on FROM voucher",
+                "SELECT id, description, display_name, points, company_id, valid_until, created_on FROM voucher WHERE valid_until > NOW()",
                 ROW_MAPPER);
     }
 

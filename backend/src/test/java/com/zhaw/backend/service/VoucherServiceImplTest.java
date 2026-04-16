@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,10 +57,10 @@ class VoucherServiceImplTest {
                 .build();
     }
 
-    private VoucherCode buildCode(Long id, Long voucherId, String code) {
+    private VoucherCode buildCode(Long id, String code) {
         return VoucherCode.builder()
                 .id(id)
-                .voucherId(voucherId)
+                .voucherId(1L)
                 .code(code)
                 .build();
     }
@@ -99,16 +100,30 @@ class VoucherServiceImplTest {
     class GetAllVouchers {
 
         @Test
-        @DisplayName("returns mapped list of all vouchers")
-        void returnsMappedList() {
+        @DisplayName("returns mapped list with available counts")
+        void returnsMappedListWithCounts() {
             Voucher v1 = buildVoucher(1L, 100, LocalDateTime.now().plusDays(30));
             Voucher v2 = buildVoucher(2L, 50, LocalDateTime.now().plusDays(10));
             when(voucherDao.getAll()).thenReturn(List.of(v1, v2));
+            when(voucherCodeDao.countAvailableGrouped()).thenReturn(Map.of(1L, 3, 2L, 0));
 
             List<VoucherDto> result = voucherService.getAllVouchers();
 
             assertEquals(2, result.size());
-            verify(voucherDao).getAll();
+            assertEquals(3, result.get(0).getAvailableCount());
+            assertEquals(0, result.get(1).getAvailableCount());
+        }
+
+        @Test
+        @DisplayName("defaults to 0 when voucher has no available codes in count map")
+        void defaultsToZeroWhenNotInCountMap() {
+            Voucher v1 = buildVoucher(1L, 100, LocalDateTime.now().plusDays(30));
+            when(voucherDao.getAll()).thenReturn(List.of(v1));
+            when(voucherCodeDao.countAvailableGrouped()).thenReturn(Map.of());
+
+            List<VoucherDto> result = voucherService.getAllVouchers();
+
+            assertEquals(0, result.getFirst().getAvailableCount());
         }
     }
 
@@ -122,7 +137,7 @@ class VoucherServiceImplTest {
         @DisplayName("happy path — assigns code and returns correct DTO")
         void happyPath_assignsCodeAndReturnsDto() throws Exception {
             Voucher voucher = buildVoucher(1L, 100, LocalDateTime.now().plusDays(30));
-            VoucherCode code = buildCode(10L, 1L, "GREENRIDE-ABC1");
+            VoucherCode code = buildCode(10L, "GREENRIDE-ABC1");
 
             when(voucherDao.findById(1L)).thenReturn(Optional.of(voucher));
             when(voucherCodeDao.findAndAssign(eq(1L), eq(5L), any(LocalDateTime.class))).thenReturn(Optional.of(code));
@@ -142,7 +157,7 @@ class VoucherServiceImplTest {
         @DisplayName("assigns code to the correct user and voucher")
         void assignsToCorrectUserAndVoucher() throws Exception {
             Voucher voucher = buildVoucher(1L, 50, LocalDateTime.now().plusDays(30));
-            VoucherCode code = buildCode(42L, 1L, "ECOEATS-XYZ1");
+            VoucherCode code = buildCode(42L, "ECOEATS-XYZ1");
 
             when(voucherDao.findById(1L)).thenReturn(Optional.of(voucher));
             when(voucherCodeDao.findAndAssign(eq(1L), eq(7L), any(LocalDateTime.class))).thenReturn(Optional.of(code));
@@ -194,7 +209,7 @@ class VoucherServiceImplTest {
         @DisplayName("throws when user has insufficient points")
         void throwsWhenInsufficientPoints() {
             Voucher voucher = buildVoucher(1L, 100, LocalDateTime.now().plusDays(30));
-            VoucherCode code = buildCode(10L, 1L, "GREENRIDE-ABC1");
+            VoucherCode code = buildCode(10L, "GREENRIDE-ABC1");
 
             when(voucherDao.findById(1L)).thenReturn(Optional.of(voucher));
             when(voucherCodeDao.findAndAssign(eq(1L), eq(5L), any(LocalDateTime.class))).thenReturn(Optional.of(code));
@@ -208,7 +223,7 @@ class VoucherServiceImplTest {
         @DisplayName("rolls back code assignment when point deduction fails")
         void rollsBackAssignmentWhenDeductionFails() {
             Voucher voucher = buildVoucher(1L, 200, LocalDateTime.now().plusDays(30));
-            VoucherCode code = buildCode(3L, 1L, "VELO-FREE-001");
+            VoucherCode code = buildCode(3L, "VELO-FREE-001");
 
             when(voucherDao.findById(1L)).thenReturn(Optional.of(voucher));
             when(voucherCodeDao.findAndAssign(eq(1L), eq(5L), any(LocalDateTime.class))).thenReturn(Optional.of(code));

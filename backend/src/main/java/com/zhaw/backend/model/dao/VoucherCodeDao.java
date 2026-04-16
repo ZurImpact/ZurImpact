@@ -3,12 +3,15 @@ package com.zhaw.backend.model.dao;
 import com.zhaw.backend.model.entities.VoucherCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -27,6 +30,14 @@ public class VoucherCodeDao {
         vc.setAssignedAt(assignedAt != null ? assignedAt.toLocalDateTime() : null);
         return vc;
     };
+
+    public Map<Long, Integer> countAvailableGrouped() {
+        Map<Long, Integer> counts = new HashMap<>();
+        jdbc.query(
+                "SELECT voucher_id, COUNT(*) AS available_count FROM voucher_code WHERE user_id IS NULL GROUP BY voucher_id",
+                (RowCallbackHandler) rs -> counts.put(rs.getLong("voucher_id"), rs.getInt("available_count")));
+        return counts;
+    }
 
     public Optional<VoucherCode> findAndAssign(Long voucherId, Long userId, LocalDateTime assignedAt) {
         List<VoucherCode> results = jdbc.query(
