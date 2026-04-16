@@ -74,11 +74,11 @@ export const Navigation = () => {
     void handleLogin();
   };
 
-  const renderAuthButton = () => (
+  const renderAuthButton = (className = '') => (
     <Button
       variant="outline"
       size="sm"
-      className="flex items-center gap-2"
+      className={`flex items-center gap-2 ${className}`.trim()}
       onClick={handleAuthAction}
       disabled={!isAuthenticated && (loading || isAuthenticating)}
     >
@@ -141,6 +141,13 @@ export const Navigation = () => {
                       {link.label}
                     </Link>
                   ))}
+                  <div className="mt-4 flex flex-col gap-3 pr-8">
+                    <div className="flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-600/20 rounded-full w-fit">
+                      <Award className="h-4 w-4 text-green-600" />
+                      <span className="font-medium text-green-700">{`${points} ${t('points')}`}</span>
+                    </div>
+                    {renderAuthButton('w-full justify-center')}
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
