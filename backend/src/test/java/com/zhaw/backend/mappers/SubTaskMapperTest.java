@@ -7,6 +7,7 @@ import com.zhaw.backend.model.entities.GpsActionTask;
 import com.zhaw.backend.model.entities.SubTask;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -138,5 +139,40 @@ class SubTaskMapperTest {
         assertTrue(SubTaskMapper.GpsActionTaskToEntityList(null).isEmpty());
         assertTrue(SubTaskMapper.GpsActionTaskToEntityList(List.of()).isEmpty());
     }
-}
 
+    @Test
+    void gpsActionTaskToDto_withNullDistanceThreshold_mapsNullThreshold() {
+        GpsActionTask entity = new GpsActionTask();
+        entity.setDistanceThresholdLevel(null);
+
+        SubTaskDto dto = SubTaskMapper.GpsActionTaskToDto(entity);
+
+        assertInstanceOf(GpsActionTaskDto.class, dto);
+        assertNull(((GpsActionTaskDto) dto).getDistanceThresholdLevel());
+    }
+
+    @Test
+    void gpsActionTaskToEntity_throwsWhenDistanceThresholdMissingOnGpsDto() {
+        GpsActionTaskDto dto = new GpsActionTaskDto();
+        dto.setDistanceThresholdLevel(null);
+
+        assertThrows(NullPointerException.class, () -> SubTaskMapper.GpsActionTaskToEntity(dto));
+    }
+
+    @Test
+    void gpsActionTaskToDtoList_filtersNullElements() {
+        List<SubTaskDto> dtos = SubTaskMapper.GpsActionTaskToDtoList(Arrays.asList(new GpsActionTask(), null));
+
+        assertEquals(1, dtos.size());
+    }
+
+    @Test
+    void gpsActionTaskToEntityList_filtersNullElements() {
+        GpsActionTaskDto gpsDto = new GpsActionTaskDto();
+        gpsDto.setDistanceThresholdLevel(DistanceThresholdLevel.EASY);
+
+        List<SubTask> entities = SubTaskMapper.GpsActionTaskToEntityList(Arrays.asList(gpsDto, null));
+
+        assertEquals(1, entities.size());
+    }
+}
