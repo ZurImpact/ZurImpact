@@ -14,12 +14,12 @@ public final class UserActionHistoryMapper {
                 .displayName(entity.getDisplayName())
                 .points(entity.getPoints())
                 .tags(entity.getTags())
-                .validUntil(entity.getValidUntil())
-                .actionCreatedOn(entity.getActionCreatedOn())
+                .validUntil(entity.getValidUntil().toString())
+                .actionCreatedOn(entity.getActionCreatedOn().toString())
                 .completionState(entity.getCompletionState())
                 .isSubtask(entity.getIsSubtask())
                 .subtaskId(entity.getSubtaskId())
-                .mappingCreatedOn(entity.getMappingCreatedOn())
+                .mappingCreatedOn(entity.getMappingCreatedOn().toString())
                 .build();
     }
 
