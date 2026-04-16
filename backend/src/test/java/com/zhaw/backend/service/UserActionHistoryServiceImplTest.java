@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,7 +39,13 @@ public class UserActionHistoryServiceImplTest {
         @Test
         @DisplayName("getUserActions delegates to DAO")
         void getUserActionsDelegatesToDao() {
-            List<UserActionHistory> history = Collections.singletonList(UserActionHistory.builder().actionId(1L).build());
+            List<UserActionHistory> history =
+                    Collections.singletonList(UserActionHistory.builder()
+                            .actionId(1L)
+                            .validUntil(LocalDateTime.now())
+                            .actionCreatedOn(LocalDateTime.now())
+                            .mappingCreatedOn(LocalDateTime.now())
+                            .build());
             when(userActionHistoryDao.findUserActionHistory(5L, true)).thenReturn(history);
 
             var result = userActionHistoryService.getUserActions(5L, true);
