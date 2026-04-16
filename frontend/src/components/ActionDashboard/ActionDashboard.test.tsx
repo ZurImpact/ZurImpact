@@ -14,13 +14,6 @@ vi.mock('../../api/apiClient', () => ({
   },
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: {changeLanguage: vi.fn()},
-  }),
-}));
-
 const mockActions: ActionDto[] = [
   {id: 1, displayName: 'Clean Park', description: 'Help clean', points: 50, tags: ['SOCIAL']},
   {id: 2, displayName: 'Plant Tree', description: 'Plant a tree', points: 100, tags: ['FOOD']},

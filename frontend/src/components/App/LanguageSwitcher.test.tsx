@@ -1,16 +1,8 @@
-import {describe, it, expect, vi} from 'vitest';
+import {describe, it, expect} from 'vitest';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {LanguageSwitcher} from './LanguageSwitcher';
-
-const mockChangeLanguage = vi.fn();
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: {changeLanguage: mockChangeLanguage},
-  }),
-}));
+import {mockI18nChangeLanguage} from '../../test/setup';
 
 describe('LanguageSwitcher', () => {
   it('renders the language label', () => {
@@ -31,7 +23,7 @@ describe('LanguageSwitcher', () => {
     render(<LanguageSwitcher />);
 
     await user.click(screen.getByText('EN'));
-    expect(mockChangeLanguage).toHaveBeenCalledWith('en');
+    expect(mockI18nChangeLanguage).toHaveBeenCalledWith('en');
   });
 
   it('calls changeLanguage with "de" when DE button is clicked', async () => {
@@ -39,6 +31,6 @@ describe('LanguageSwitcher', () => {
     render(<LanguageSwitcher />);
 
     await user.click(screen.getByText('DE'));
-    expect(mockChangeLanguage).toHaveBeenCalledWith('de');
+    expect(mockI18nChangeLanguage).toHaveBeenCalledWith('de');
   });
 });
