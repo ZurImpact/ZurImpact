@@ -93,17 +93,16 @@
 
 ### 3.2 Technical Context
 
-[![](https://mermaid.ink/img/pako:eNp1U9uO2jAQ_RXLT60ELOQCSx4qJRCyN1raIFXapKpMMhuiDXZkO9ulwL93QnYpUGo_ZDzn-Mwl4w1NRArUoZlk5ZLMvZgTXKpaNI5RkQPXUUwbg3hS_FIgY_qjIdZr4kffgCWaTKTgGnj6hqHVGGeajzfud1SsP-SWP0mmtKwSXUk4kb2_DqP7agGSgwaFmVRKgzwiHASR-dMtS4WiYygLsYaUCF67TwTr5fnRHXthxGPJM-ZH3NntGWPsRR9mQulMQvj14eMReqjnf4X5r5ggZwXm8W6SEORLnoA67ZgbTXIJC6aAuJVeHkHBNAqEyAogU1aqs_zCIAoxeCDzlPgrlheXOz3xSbv9aXszn8_Cq7vwy-ct1t1AXgPNR7MrrG6L1Z7491e2mN8lbzC95A2D49DYc9LuIDplnGWg_kb-Fxl7tEVXILGQFCdwU_NiqpewwkFw0EyZfI5pzHfIY5UW4Zon1MFhgRaVosqW1HlihcJTVaZMwzhn-CNW75SS8UchDsdM1mHeLkhsGciRqLimjr3nUmdDX6nTNky7MzQN3N2h0TW7g0GLrqnTM4zOwDb7ttWzh_1rY2jsWvT3Xr_bGVpG37AG1gAZPcs0WhTSXAs5bR7X_o3t_gBE7wIy?type=png)](https://mermaid.live/edit#pako:eNp1U9uO2jAQ_RXLT60ELOQCSx4qJRCyN1raIFXapKpMMhuiDXZkO9ulwL93QnYpUGo_ZDzn-Mwl4w1NRArUoZlk5ZLMvZgTXKpaNI5RkQPXUUwbg3hS_FIgY_qjIdZr4kffgCWaTKTgGnj6hqHVGGeajzfud1SsP-SWP0mmtKwSXUk4kb2_DqP7agGSgwaFmVRKgzwiHASR-dMtS4WiYygLsYaUCF67TwTr5fnRHXthxGPJM-ZH3NntGWPsRR9mQulMQvj14eMReqjnf4X5r5ggZwXm8W6SEORLnoA67ZgbTXIJC6aAuJVeHkHBNAqEyAogU1aqs_zCIAoxeCDzlPgrlheXOz3xSbv9aXszn8_Cq7vwy-ct1t1AXgPNR7MrrG6L1Z7491e2mN8lbzC95A2D49DYc9LuIDplnGWg_kb-Fxl7tEVXILGQFCdwU_NiqpewwkFw0EyZfI5pzHfIY5UW4Zon1MFhgRaVosqW1HlihcJTVaZMwzhn-CNW75SS8UchDsdM1mHeLkhsGciRqLimjr3nUmdDX6nTNky7MzQN3N2h0TW7g0GLrqnTM4zOwDb7ttWzh_1rY2jsWvT3Xr_bGVpG37AG1gAZPcs0WhTSXAs5bR7X_o3t_gBE7wIy)
+[![](https://mermaid.ink/img/pako:eNplUtuO2jAQ_RXLT7sSZAm5QR4qES7aC7R0g1Rpk6oyyQARiR3ZzrYU-PdOyC6F3XmxPXPOmRnP7GkiUqA-XUtWbsgiiDlBU9WycQzzDLiOYtpcSCDFbwUypj8bYG2TcfQMLNFkIgXXwNOL2BTYKgcdvZ1kxkpFptlSMrl7gyEh5h_SvtwPfmDS-iAPfCWZ0rJKdCXhKvNTL4yeqiVIDhoUFlspDfICcBZE5K9BWSoUHUGZix2kRPDafSVYWzBG0CN7ZSRgyRarI4P5Qxzzm4wnuUEGld4MhdhmMMlyzHb7SWAURDdzofRaQvh9Skz39gJw6vZD25Mxabe_HO4Xi3l49xh--3rAIq5Cz4gGqUiB33d4_9QGETSIxXB-h9kOmP1dFpsjbQNjM8bZGtR_1c-RmkVbuAVZSv0VyxW0aAGyYPWb7mtaTPUGChyAj9eUyW1MY35EUsn4ixAF9XFGSJOiWm_OIlWZMg2jjOEcirOXVVqEO56cOaf-hqLimvrdbvckSv09_UN90_QMu-N6lmlZna7ds60W3SHKMlzL7dn9XqfveJbjOMcW_XuqwzTMjmv1Lbdv9zzP7dpOi0KaaSFnzbKfdv74D4v_5zk?type=png)](https://mermaid.live/edit#pako:eNplUtuO2jAQ_RXLT7sSZAm5QR4qES7aC7R0g1Rpk6oyyQARiR3ZzrYU-PdOyC6F3XmxPXPOmRnP7GkiUqA-XUtWbsgiiDlBU9WycQzzDLiOYtpcSCDFbwUypj8bYG2TcfQMLNFkIgXXwNOL2BTYKgcdvZ1kxkpFptlSMrl7gyEh5h_SvtwPfmDS-iAPfCWZ0rJKdCXhKvNTL4yeqiVIDhoUFlspDfICcBZE5K9BWSoUHUGZix2kRPDafSVYWzBG0CN7ZSRgyRarI4P5Qxzzm4wnuUEGld4MhdhmMMlyzHb7SWAURDdzofRaQvh9Skz39gJw6vZD25Mxabe_HO4Xi3l49xh--3rAIq5Cz4gGqUiB33d4_9QGETSIxXB-h9kOmP1dFpsjbQNjM8bZGtR_1c-RmkVbuAVZSv0VyxW0aAGyYPWb7mtaTPUGChyAj9eUyW1MY35EUsn4ixAF9XFGSJOiWm_OIlWZMg2jjOEcirOXVVqEO56cOaf-hqLimvrdbvckSv09_UN90_QMu-N6lmlZna7ds60W3SHKMlzL7dn9XqfveJbjOMcW_XuqwzTMjmv1Lbdv9zzP7dpOi0KaaSFnzbKfdv74D4v_5zk)
 
 **External Interfaces:**
 
-| System                       | Interface Type          | Protocol        | Purpose                                 |
-| ---------------------------- | ----------------------- | --------------- | --------------------------------------- |
-| **ZHAW Kubernetes Cluster**  | Container orchestration | kubectl/Rancher | Hosting, scaling, deployment management |
-| **Firebase Authentication**  | SDK/REST API            | HTTPS           | User authentication, session management |
-| **Google Maps API**          | REST API                | HTTPS           | Geolocation, place search, mapping      |
-| **PostgreSQL**               | Database driver         | TCP/SSL         | Persistent data storage                 |
-| **Email Service (SendGrid)** | REST API                | HTTPS           | Transactional emails, notifications     |
+| System                      | Interface Type          | Protocol        | Purpose                                 |
+| --------------------------- | ----------------------- | --------------- | --------------------------------------- |
+| **ZHAW Kubernetes Cluster** | Container orchestration | kubectl/Rancher | Hosting, scaling, deployment management |
+| **Custom Session Auth**     | Cookie/HTTP filter      | HTTPS           | User authentication, session management |
+| **Leaflet / React-Leaflet** | JavaScript library      | —               | Geolocation display, map rendering      |
+| **PostgreSQL**              | Database driver         | TCP/SSL         | Persistent data storage                 |
 
 **Data Formats:**
 
@@ -122,9 +121,8 @@
 - **i18next** - Internationalization framework
 
 **Backend:**
-- **Java 24** - Team familiarity
-- **PostgreSQL 18** - Team familiarity
-- **Redis** (optional) - Session caching, rate limiting
+- **Java 21** - Team familiarity
+- **PostgreSQL 16** - Team familiarity
 
 **Infrastructure:**
 - **ZHAW Kubernetes cluster** - Container orchestration and hosting
@@ -139,57 +137,58 @@
 
 ### 4.2 Top-Level Decomposition
 
-[![](https://mermaid.ink/img/pako:eNqFlF1v2jAUhv9K5CsqUQYJNJCLSSFha6ZCWT52MTIhL_EgamMjx2nHEP99_goqNGy-yTnHT47zvnZ8ABnJEXDAhsLd1oinKTb4qOqfqvCJEswQzlcpaELjAe4RTcEPhYqRBKsQwYwZ0dJ9Uz51SYL1nOT1M6p4nyQwdHLWQww3ie_XvJlbs62GLgkvDh4XkYQyVhBctXNLN4wXs1CCS0gZRvQK6frzYCH75WWB3zNcsUpOwYVFU5g9KYd0pAwyOl_gC_wQ7WiBN8aUEHZzptddctNmUSwC4zNk6BXu27yLEH0pMumcDls2QG5CNAvX0TdvlVR8dc222icpZd8VzgtnfhBLzqMoL9gVTtssQW1zC3ly7kyYT0pYYC5LBf9S5T_OlSqFtosSkBbVimlNAtOaWrFGkuAaSe_A_x4KHzIopPFHizB_uuosScU2FEVfH27ezHiudz9bdUL-fZXhwWyLmtmLlfhfdHv7URwelYtTJArNcVHVJpNTSoWa0J7L8rSFld8BuqBElIM5vyAOgkoB26ISpcDhYQ7pUwpSfOQcrBmJ9jgDDqM16gJK6s0WOL_gc8WzepfzA-4XkJtTnqo7iL8TUjavbKhYR89RLhdRj9SYAcfsSxg4B_AbONao3-ubtm2ag8HItMaDLtjzqtWbWPZoMLLMiX03GU-Gxy74I9v3e2N7OOHDtm1rYN6Nh10g9p_Qubr75BV4_Av_1Xnc?type=png)](https://mermaid.live/edit#pako:eNqFlF1v2jAUhv9K5CsqUQYJNJCLSSFha6ZCWT52MTIhL_EgamMjx2nHEP99_goqNGy-yTnHT47zvnZ8ABnJEXDAhsLd1oinKTb4qOqfqvCJEswQzlcpaELjAe4RTcEPhYqRBKsQwYwZ0dJ9Uz51SYL1nOT1M6p4nyQwdHLWQww3ie_XvJlbs62GLgkvDh4XkYQyVhBctXNLN4wXs1CCS0gZRvQK6frzYCH75WWB3zNcsUpOwYVFU5g9KYd0pAwyOl_gC_wQ7WiBN8aUEHZzptddctNmUSwC4zNk6BXu27yLEH0pMumcDls2QG5CNAvX0TdvlVR8dc222icpZd8VzgtnfhBLzqMoL9gVTtssQW1zC3ly7kyYT0pYYC5LBf9S5T_OlSqFtosSkBbVimlNAtOaWrFGkuAaSe_A_x4KHzIopPFHizB_uuosScU2FEVfH27ezHiudz9bdUL-fZXhwWyLmtmLlfhfdHv7URwelYtTJArNcVHVJpNTSoWa0J7L8rSFld8BuqBElIM5vyAOgkoB26ISpcDhYQ7pUwpSfOQcrBmJ9jgDDqM16gJK6s0WOL_gc8WzepfzA-4XkJtTnqo7iL8TUjavbKhYR89RLhdRj9SYAcfsSxg4B_AbONao3-ubtm2ag8HItMaDLtjzqtWbWPZoMLLMiX03GU-Gxy74I9v3e2N7OOHDtm1rYN6Nh10g9p_Qubr75BV4_Av_1Xnc)
+[![](https://mermaid.ink/img/pako:eNp9lFGPojAQgP8K6dNuonuCgsLDJShe5G5dPQsmd7IxXegpcWlNKZv1jP_9SovkXHH74nT4Os58KRxBTBMMHLBhaL_VgmFENLHy4kUlvjFKOCbJKgLnUHtEB8wi8KzQcoX-aoFRzDU4d_9L11VCfz2lSfGKc1En9LVqc1GjXG4YTNaimFvwbQV9JEaBP3uCEop5SknezC1n4WgyXkhwSYt4i9kN0vWm_pOsl2QpuWbExGojgw96hijeKTtVpORod9_RG_oC9ywlG226HN1fjOrOha8xDMqgSRfE7C2NpawqbHAuvcPxYg2Xo1WYiz-t2EZjklLGbnAwHAYu_CFBWLwEKN_dICu3kqzc3iAnPgxmi191i6qBSZpzyg4NZ2rXFzo8mqGUCBkq-MyFN5sqFwptVlFClYpG7DxfyZ3nuwI_vRYe4qjsV_w0dOsNV3dzmvMNw_Dno6Zb989XpcRL0m5_LS-I2otAJs5XQ2XPO_lItageVKZkegha4u1OE-D8Qa85boEMM_FU7MGxpCPAtzjDEXBEmCC2i0BETuLQHpHflGbA4awQxxgtNtu6SLFPEMdeisTEWZ1FBafwQOL6jBgJsxEtCAeObcqawDmCd-DoHfOhZw463U6337MM0xi0wAE4bb1vP5j9jtEzbdMy9a5unVrgr-xDf-j2bN20erbRsWxjYIiCOEnFZZqqj5j8lp3-AeH5bRk?type=png)](https://mermaid.live/edit#pako:eNp9lFGPojAQgP8K6dNuonuCgsLDJShe5G5dPQsmd7IxXegpcWlNKZv1jP_9SovkXHH74nT4Os58KRxBTBMMHLBhaL_VgmFENLHy4kUlvjFKOCbJKgLnUHtEB8wi8KzQcoX-aoFRzDU4d_9L11VCfz2lSfGKc1En9LVqc1GjXG4YTNaimFvwbQV9JEaBP3uCEop5SknezC1n4WgyXkhwSYt4i9kN0vWm_pOsl2QpuWbExGojgw96hijeKTtVpORod9_RG_oC9ywlG226HN1fjOrOha8xDMqgSRfE7C2NpawqbHAuvcPxYg2Xo1WYiz-t2EZjklLGbnAwHAYu_CFBWLwEKN_dICu3kqzc3iAnPgxmi191i6qBSZpzyg4NZ2rXFzo8mqGUCBkq-MyFN5sqFwptVlFClYpG7DxfyZ3nuwI_vRYe4qjsV_w0dOsNV3dzmvMNw_Dno6Zb989XpcRL0m5_LS-I2otAJs5XQ2XPO_lItageVKZkegha4u1OE-D8Qa85boEMM_FU7MGxpCPAtzjDEXBEmCC2i0BETuLQHpHflGbA4awQxxgtNtu6SLFPEMdeisTEWZ1FBafwQOL6jBgJsxEtCAeObcqawDmCd-DoHfOhZw463U6337MM0xi0wAE4bb1vP5j9jtEzbdMy9a5unVrgr-xDf-j2bN20erbRsWxjYIiCOEnFZZqqj5j8lp3-AeH5bRk)
 
 **Module Responsibilities:**
 
-| Module              | Responsibility                             | Key Components                                       |
-| ------------------- | ------------------------------------------ | ---------------------------------------------------- |
-| **User Service**    | Authentication, profile management         | User entity, Auth controller, Profile API            |
-| **Action Service**  | Action definition, completion tracking     | Action entity, Verification logic, GPS/QR validation |
-| **Credit Service**  | Credit calculation, transaction management | Transaction entity, Balance calculation, Audit trail |
-| **Partner Service** | Partner/offer management, redemption       | Partner entity, Offer entity, Redemption logic       |
+| Module                         | Responsibility                               | Key Components                                           |
+| ------------------------------ | -------------------------------------------- | -------------------------------------------------------- |
+| **User Service**               | Authentication, profile management           | User entity, LoginController, AuthCookieFilter           |
+| **Action Service**             | Action definition, filtering, completion     | Action entity, ActionController, GPS/QR validation       |
+| **SubTask Service**            | Sub-task tracking within actions             | SubTask entity, SubTaskController, SubTaskValidator      |
+| **Voucher Service**            | Voucher and partner offer management         | Voucher entity, VoucherController, VoucherCode entity    |
+| **UserActionHistory Service**  | User progress and action history tracking    | UserActionHistory entity, UserActionHistoryController    |
 
 ### 4.3 Key Architectural Decision Records
 
 **ADR-001: Monolithic Architecture**
 - **Decision:** Start with modular monolith, not microservices
 - **Rationale:**
-    - Simpler for 9-person student team
-    - Faster development and debugging
-    - Single deployment reduces DevOps complexity
-    - Clear module boundaries allow future extraction
+  - Simpler for 9-person student team
+  - Faster development and debugging
+  - Single deployment reduces DevOps complexity
+  - Clear module boundaries allow future extraction
 - **Consequences:**
-    - All services share same deployment lifecycle
-    - Requires disciplined module boundaries
-    - Easier initial development, harder to scale horizontally
+  - All services share same deployment lifecycle
+  - Requires disciplined module boundaries
+  - Easier initial development, harder to scale horizontally
 
 **ADR-002: PostgreSQL as Primary Database**
 - **Decision:** Use PostgreSQL for all persistent data
 - **Rationale:**
-    - Team familiarity
-    - ACID (Atomicity, Consistency, Isolation, Durability) guarantees critical for credit transactions
-    - Supports geospatial queries (PostGIS) for GPS features
+  - Team familiarity
+  - ACID (Atomicity, Consistency, Isolation, Durability) guarantees critical for credit transactions
+  - Supports geospatial queries (PostGIS) for GPS features
 - **Consequences:**
-    - Need careful indexing strategy
-    - Single point of failure without replication (acceptable for MVP)
+  - Need careful indexing strategy
+  - Single point of failure without replication (acceptable for MVP)
 
 **ADR-003: Serverless Frontend Deployment**
 - **Decision:** React SPA hosted separately from backend (static hosting)
 - **Rationale:**
-    - Simplifies backend to pure API
-    - Independent scaling of frontend/backend
+  - Simplifies backend to pure API
+  - Independent scaling of frontend/backend
 - **Consequences:**
-    - Requires CORS configuration
-    - Two deployment pipelines
-    - Better separation of concerns
+  - Requires CORS configuration
+  - Two deployment pipelines
+  - Better separation of concerns
 
 ### 4.4 Quality Goal Achievement Strategy
 
 | Quality Goal        | Strategy                      | Implementation                                                                       |
 | ------------------- | ----------------------------- | ------------------------------------------------------------------------------------ |
-| **Security**        | Defense in depth              | JWT tokens, HTTPS only, input validation, SQL injection prevention, OWASP guidelines |
-| **Performance**     | Caching and optimization      | Redis for sessions, DB query optimization, lazy loading in UI, CDN for assets        |
+| **Security**        | Defense in depth              | Cookie-based session auth, HTTPS only, input validation, SQL injection prevention, OWASP guidelines |
+| **Performance**     | Caching and optimization      | DB query optimization, lazy loading in UI, CDN for assets                            |
 | **Usability**       | User-centered design          | Mobile-first responsive design, user testing sessions, intuitive navigation          |
 | **Reliability**     | Error handling and monitoring | Try-catch blocks, graceful degradation, health checks, logging and monitoring        |
 | **Maintainability** | Clean code practices          | Modular architecture, code reviews, comprehensive documentation, automated testing   |
@@ -199,17 +198,16 @@
 **Development Process:**
 - **Methodology:** Kanban Agile - Caretaker model with 2-week sprints
 - **Team Organization:**
-    - 3 backend developers (Java/Spring)
-    - 2 frontend developers (React/TypeScript)
-    - 2 full-stack developers (bridge between layers)
-    - 2 DevOps/infrastructure focus (K8s deployment)
+  - 3 backend developers (Java/Spring)
+  - 2 frontend developers (React/TypeScript)
+  - 2 full-stack developers (bridge between layers)
+  - 2 DevOps/infrastructure focus (K8s deployment)
 - **Code Review:** All PRs require 2 approvals before merge
 - **Testing Strategy:** Unit tests (70% coverage), integration tests, E2E tests for critical paths
 
 **Third-Party Delegation:**
-- **Authentication:** Delegated to Firebase Auth (reduces security complexity)
-- **Email:** Delegated to SendGrid (avoid managing mail servers)
-- **Maps/Geolocation:** Delegated to Google Maps API (accurate, maintained)
+- **Authentication:** Custom cookie-based session management via `AuthCookieFilter`
+- **Maps/Geolocation:** Leaflet / React-Leaflet (open-source, no API key required)
 - **Infrastructure:** Delegated to ZHAW K8s (predetermined constraint)
 
 **Knowledge Management:**
