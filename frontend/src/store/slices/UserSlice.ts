@@ -27,7 +27,7 @@ export const fetchCurrentUser = createAsyncThunk('user/fetchCurrentUser', async 
   try {
     await apiClient.get('/auth/whoami');
     // TODOD implement actual user fetching
-    const result = {name: 'Test User', email: 'test@example.com', points: 100, id: 1} as UserDto;
+    const result = {name: 'Test User', email: 'test@example.com', points: 100, id: 123} as UserDto;
     return result as UserDto;
   } catch (error: unknown) {
     if (error && typeof error === 'object' && 'response' in error) {
