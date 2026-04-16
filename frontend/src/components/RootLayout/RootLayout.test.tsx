@@ -1,8 +1,17 @@
-import {describe, it, expect, vi} from 'vitest';
+import {describe, it, expect, vi, beforeEach} from 'vitest';
 import {screen} from '@testing-library/react';
 import {MemoryRouter, Route, Routes} from 'react-router';
 import {renderWithProviders} from '../../test/test.utils';
 import {RootLayout} from './RootLayout';
+
+const mockApiGet = vi.hoisted(() => vi.fn());
+
+vi.mock('../../api/apiClient', () => ({
+  default: {
+    get: (...args: unknown[]) => mockApiGet(...args),
+    post: vi.fn(),
+  },
+}));
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -31,16 +40,23 @@ const renderWithRouter = (initialRoute = '/', options?: Record<string, unknown>)
 };
 
 describe('RootLayout', () => {
-  it('renders the app name translation key', () => {
-    renderWithRouter();
-
-    expect(screen.getByText('appName')).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockApiGet.mockResolvedValue({
+      data: {id: 1, name: 'Test User', email: 'test@test.com', points: 123},
+    });
   });
 
-  it('renders the dashboard navigation link', () => {
+  it('renders the app name translation key', async () => {
     renderWithRouter();
 
-    expect(screen.getByText('rootLayout.dashboard')).toBeInTheDocument();
+    expect(await screen.findByText('appName')).toBeInTheDocument();
+  });
+
+  it('renders the dashboard navigation link', async () => {
+    renderWithRouter();
+
+    expect(await screen.findByText('rootLayout.dashboard')).toBeInTheDocument();
   });
 
   /**
@@ -51,7 +67,7 @@ describe('RootLayout', () => {
   });
  */
 
-  it('renders points display', () => {
+  it('renders points display', async () => {
     renderWithRouter('/', {
       preloadedState: {
         user: {
@@ -64,20 +80,20 @@ describe('RootLayout', () => {
     });
 
     // "123 points" is combined in a single span
-    expect(screen.getByText(/123/)).toBeInTheDocument();
-    expect(screen.getByText(/points/)).toBeInTheDocument();
+    expect(await screen.findByText(/123/)).toBeInTheDocument();
+    expect(await screen.findByText(/points/)).toBeInTheDocument();
   });
 
-  it('renders the child route via Outlet', () => {
+  it('renders the child route via Outlet', async () => {
     renderWithRouter('/dashboard');
 
-    expect(screen.getByText('Dashboard Page')).toBeInTheDocument();
+    expect(await screen.findByText('Dashboard Page')).toBeInTheDocument();
   });
 
-  it('highlights dashboard link when on dashboard route', () => {
+  it('highlights dashboard link when on dashboard route', async () => {
     renderWithRouter('/dashboard');
 
-    const dashboardLink = screen.getByText('rootLayout.dashboard');
+    const dashboardLink = await screen.findByText('rootLayout.dashboard');
     expect(dashboardLink).toHaveClass('text-green-600');
   });
 });

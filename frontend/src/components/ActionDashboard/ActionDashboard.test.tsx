@@ -41,7 +41,7 @@ beforeEach(() => {
 });
 
 describe('ActionDashboard', () => {
-  it('renders the header and subheader translation keys', () => {
+  it('renders the header and subheader translation keys', async () => {
     mockGet.mockResolvedValue({data: []});
     renderWithProviders(
       <BrowserRouter>
@@ -49,8 +49,8 @@ describe('ActionDashboard', () => {
       </BrowserRouter>,
     );
 
-    expect(screen.getByText('actionDashboard.header')).toBeInTheDocument();
-    expect(screen.getByText('actionDashboard.subheader')).toBeInTheDocument();
+    expect(await screen.findByText('actionDashboard.header')).toBeInTheDocument();
+    expect(await screen.findByText('actionDashboard.subheader')).toBeInTheDocument();
   });
 
   it('shows loading state while fetching', () => {
@@ -121,7 +121,7 @@ describe('ActionDashboard', () => {
     expect(await screen.findByText('Network error')).toBeInTheDocument();
   });
 
-  it('renders activity history section title', () => {
+  it('renders activity history section title', async () => {
     mockGet.mockResolvedValue({data: []});
     renderWithProviders(
       <BrowserRouter>
@@ -129,6 +129,6 @@ describe('ActionDashboard', () => {
       </BrowserRouter>,
     );
 
-    expect(screen.getByText('actionDashboard.historyTitle')).toBeInTheDocument();
+    expect(await screen.findByText('actionDashboard.historyTitle')).toBeInTheDocument();
   });
 });
