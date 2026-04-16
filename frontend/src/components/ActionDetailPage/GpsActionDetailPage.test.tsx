@@ -236,6 +236,16 @@ describe('GpsActionDetailPage', () => {
     await user.click(await screen.findByRole('button', {name: 'gpsActionDetail.startAction'}));
     await user.click(screen.getByRole('button', {name: 'gpsActionDetail.confirmStart'}));
 
+    await waitFor(() => {
+      expect(mockPost).toHaveBeenCalledWith('/actions/startAction', null, {
+        params: {userId: 5, actionId: 1},
+      });
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByRole('button', {name: 'gpsActionDetail.startAction'})).not.toBeInTheDocument();
+    });
+
     await act(async () => {
       watchSuccessCallback?.({
         coords: {latitude: 47.3769, longitude: 8.5417} as GeolocationCoordinates,
