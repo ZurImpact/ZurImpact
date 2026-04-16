@@ -50,16 +50,14 @@ public class VoucherServiceImpl implements VoucherService {
             throw new Exception("Voucher has expired");
         }
 
-        VoucherCode voucherCode = voucherCodeDao.findAvailableByVoucherId(voucherId)
+        LocalDateTime assignedAt = LocalDateTime.now();
+        VoucherCode voucherCode = voucherCodeDao.findAndAssign(voucherId, userId, assignedAt)
                 .orElseThrow(() -> new Exception("No codes available"));
 
         boolean deducted = userService.deductPointsFromUser(userId, voucher.getPoints());
         if (!deducted) {
             throw new Exception("Insufficient points");
         }
-
-        LocalDateTime assignedAt = LocalDateTime.now();
-        voucherCodeDao.assignToUser(voucherCode.getId(), userId, assignedAt);
 
         return UserVoucherDto.builder()
                 .code(voucherCode.getCode())

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -126,7 +125,7 @@ class VoucherServiceImplTest {
             VoucherCode code = buildCode(10L, 1L, "GREENRIDE-ABC1");
 
             when(voucherDao.findById(1L)).thenReturn(Optional.of(voucher));
-            when(voucherCodeDao.findAvailableByVoucherId(1L)).thenReturn(Optional.of(code));
+            when(voucherCodeDao.findAndAssign(eq(1L), eq(5L), any(LocalDateTime.class))).thenReturn(Optional.of(code));
             when(userService.deductPointsFromUser(5L, 100)).thenReturn(true);
 
             UserVoucherDto result = voucherService.redeemVoucher(5L, 1L);
@@ -140,20 +139,19 @@ class VoucherServiceImplTest {
         }
 
         @Test
-        @DisplayName("assigns code to the correct code ID")
-        void assignsToCorrectCodeId() throws Exception {
+        @DisplayName("assigns code to the correct user and voucher")
+        void assignsToCorrectUserAndVoucher() throws Exception {
             Voucher voucher = buildVoucher(1L, 50, LocalDateTime.now().plusDays(30));
             VoucherCode code = buildCode(42L, 1L, "ECOEATS-XYZ1");
 
             when(voucherDao.findById(1L)).thenReturn(Optional.of(voucher));
-            when(voucherCodeDao.findAvailableByVoucherId(1L)).thenReturn(Optional.of(code));
+            when(voucherCodeDao.findAndAssign(eq(1L), eq(7L), any(LocalDateTime.class))).thenReturn(Optional.of(code));
             when(userService.deductPointsFromUser(anyLong(), anyInt())).thenReturn(true);
 
-            voucherService.redeemVoucher(7L, 1L);
+            UserVoucherDto result = voucherService.redeemVoucher(7L, 1L);
 
-            ArgumentCaptor<Long> codeIdCaptor = ArgumentCaptor.forClass(Long.class);
-            verify(voucherCodeDao).assignToUser(codeIdCaptor.capture(), eq(7L), any(LocalDateTime.class));
-            assertEquals(42L, codeIdCaptor.getValue());
+            verify(voucherCodeDao).findAndAssign(eq(1L), eq(7L), any(LocalDateTime.class));
+            assertEquals("ECOEATS-XYZ1", result.getCode());
         }
 
         @Test
@@ -184,7 +182,7 @@ class VoucherServiceImplTest {
         void throwsWhenNoCodesAvailable() {
             Voucher voucher = buildVoucher(1L, 100, LocalDateTime.now().plusDays(30));
             when(voucherDao.findById(1L)).thenReturn(Optional.of(voucher));
-            when(voucherCodeDao.findAvailableByVoucherId(1L)).thenReturn(Optional.empty());
+            when(voucherCodeDao.findAndAssign(eq(1L), eq(5L), any(LocalDateTime.class))).thenReturn(Optional.empty());
 
             Exception ex = assertThrows(Exception.class, () -> voucherService.redeemVoucher(5L, 1L));
             assertEquals("No codes available", ex.getMessage());
@@ -199,28 +197,28 @@ class VoucherServiceImplTest {
             VoucherCode code = buildCode(10L, 1L, "GREENRIDE-ABC1");
 
             when(voucherDao.findById(1L)).thenReturn(Optional.of(voucher));
-            when(voucherCodeDao.findAvailableByVoucherId(1L)).thenReturn(Optional.of(code));
+            when(voucherCodeDao.findAndAssign(eq(1L), eq(5L), any(LocalDateTime.class))).thenReturn(Optional.of(code));
             when(userService.deductPointsFromUser(5L, 100)).thenReturn(false);
 
             Exception ex = assertThrows(Exception.class, () -> voucherService.redeemVoucher(5L, 1L));
             assertEquals("Insufficient points", ex.getMessage());
-
-            verify(voucherCodeDao, never()).assignToUser(anyLong(), anyLong(), any());
         }
 
         @Test
-        @DisplayName("does not assign code when point deduction fails")
-        void doesNotAssignCodeWhenDeductionFails() {
+        @DisplayName("rolls back code assignment when point deduction fails")
+        void rollsBackAssignmentWhenDeductionFails() {
             Voucher voucher = buildVoucher(1L, 200, LocalDateTime.now().plusDays(30));
             VoucherCode code = buildCode(3L, 1L, "VELO-FREE-001");
 
             when(voucherDao.findById(1L)).thenReturn(Optional.of(voucher));
-            when(voucherCodeDao.findAvailableByVoucherId(1L)).thenReturn(Optional.of(code));
+            when(voucherCodeDao.findAndAssign(eq(1L), eq(5L), any(LocalDateTime.class))).thenReturn(Optional.of(code));
             when(userService.deductPointsFromUser(5L, 200)).thenReturn(false);
 
             assertThrows(Exception.class, () -> voucherService.redeemVoucher(5L, 1L));
 
-            verify(voucherCodeDao, never()).assignToUser(anyLong(), anyLong(), any());
+            // findAndAssign was called (code was claimed in DB), but the @Transactional
+            // on the service method rolls back the UPDATE when the exception propagates
+            verify(voucherCodeDao).findAndAssign(eq(1L), eq(5L), any(LocalDateTime.class));
         }
     }
 }
