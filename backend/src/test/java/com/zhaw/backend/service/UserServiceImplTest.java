@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -200,6 +201,40 @@ class UserServiceImplTest {
 
             verify(userDao, times(1)).deleteById(1L);
             verifyNoMoreInteractions(userDao);
+        }
+    }
+
+    // ── addPointsToUser ──────────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("addPointsToUser")
+    class AddPointsToUser {
+
+        @Test
+        @DisplayName("adds points and saves user when user exists")
+        void addsPointsAndSavesUser_whenUserExists() {
+            sampleUser.setPoints(10);
+            when(userDao.findById(1L)).thenReturn(Optional.of(sampleUser));
+            when(userDao.save(sampleUser)).thenReturn(sampleUser);
+
+            boolean result = userService.addPointsToUser(1L, 5);
+
+            assertTrue(result);
+            assertEquals(15, sampleUser.getPoints());
+            verify(userDao).findById(1L);
+            verify(userDao).save(sampleUser);
+        }
+
+        @Test
+        @DisplayName("returns false and does not save when user does not exist")
+        void returnsFalseAndDoesNotSave_whenUserMissing() {
+            when(userDao.findById(404L)).thenReturn(Optional.empty());
+
+            boolean result = userService.addPointsToUser(404L, 5);
+
+            assertTrue(!result);
+            verify(userDao).findById(404L);
+            verify(userDao, never()).save(any(User.class));
         }
     }
 }
