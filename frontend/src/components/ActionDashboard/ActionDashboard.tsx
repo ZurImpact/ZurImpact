@@ -25,7 +25,7 @@ export function ActionDashboard() {
     }
 
     dispatch(fetchActions({}));
-    dispatch(fetchUserActions(currentUser?.id ?? 1));
+    dispatch(fetchUserActions(123));
   }, [dispatch, isAuthenticated, currentUser?.id]);
 
   if (!isAuthenticated) {
