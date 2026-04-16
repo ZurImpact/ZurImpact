@@ -124,7 +124,9 @@ export const startAction = createAsyncThunk(
   'action/startAction',
   async ({userId, actionId}: {userId: number; actionId: number}, {rejectWithValue}) => {
     try {
-      const response = await apiClient.post(`/actions/startAction`, {userId, actionId});
+      const response = await apiClient.post('/actions/startAction', null, {
+        params: {userId, actionId},
+      });
       return response.data;
     } catch (error: unknown) {
       if (error instanceof Error) {

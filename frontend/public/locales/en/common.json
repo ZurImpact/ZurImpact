@@ -2,6 +2,7 @@
   "appName": "ZurImpact",
   "rootLayout": {
     "dashboard": "Dashboard",
+    "login": "Login",
     "logout": "Logout",
     "track": "Map",
     "rewards": "Rewards"
@@ -11,7 +12,8 @@
     "subheader": "Log your sustainable activities and earn points",
     "historyTitle": "Your Activity History",
     "loading": "Loading actions...",
-    "noActions": "You haven't completed any actions yet. Start making an impact today!"
+    "noActions": "You haven't completed any actions yet. Start making an impact today!",
+    "loginPrompt": "Please login first."
   },
   "actionDetail": {
     "header": "Track Your Route",

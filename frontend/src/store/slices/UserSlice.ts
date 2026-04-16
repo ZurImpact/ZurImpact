@@ -25,8 +25,10 @@ const initialState: UserState = {
 
 export const fetchCurrentUser = createAsyncThunk('user/fetchCurrentUser', async (_, {rejectWithValue}) => {
   try {
-    const response = await apiClient.get('/users/current');
-    return response.data as UserDto;
+    await apiClient.get('/auth/whoami');
+    // TODOD implement actual user fetching
+    const result = {name: 'Test User', email: 'test@example.com', points: 100, id: 1} as UserDto;
+    return result as UserDto;
   } catch (error: unknown) {
     if (error && typeof error === 'object' && 'response' in error) {
       const axiosError = error as {
