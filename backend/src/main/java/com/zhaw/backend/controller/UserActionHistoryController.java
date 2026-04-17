@@ -36,7 +36,7 @@ public class UserActionHistoryController {
     @Operation(summary = "Get user action history", description = "Returns all actions a user has interacted with.", tags = "User Progress")
     public ResponseEntity<List<UserActionHistoryDto>> getUserActions(
             @RequestParam(name = "userId") Long userId,
-            @RequestParam(name = "active", required = false) Boolean active,
+            @RequestParam(name = "active", required = false, defaultValue = "false") Boolean active,
             Authentication authentication) {
         try {
             if (!isAuthorizedUser(authentication, userId)) {
