@@ -2,10 +2,10 @@ package com.zhaw.backend.model.dao;
 
 import com.zhaw.backend.config.DockerAvailableCondition;
 import com.zhaw.backend.config.TestDatabaseConfig;
+import com.zhaw.backend.config.TestDataHelper;
 
 import com.zhaw.backend.model.entities.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(DockerAvailableCondition.class)
 @SpringJUnitConfig(TestDatabaseConfig.class)
 @Transactional
-@Disabled("address_id NOT NULL constraint – UserDao does not handle address_id yet")
 @DisplayName("UserDao – Integration Tests (Testcontainers PostgreSQL)")
 class UserDaoIntegrationTest {
 
@@ -46,10 +45,12 @@ class UserDaoIntegrationTest {
     private JdbcTemplate jdbcTemplate;
 
     private UserDao userDao;
+    private Long sharedAddressId;
 
     @BeforeEach
     void setUp() {
         userDao = new UserDao(jdbcTemplate);
+        sharedAddressId = TestDataHelper.insertAddress(jdbcTemplate);
     }
 
     // ── Helper ──────────────────────────────────────────────────────────
@@ -59,6 +60,7 @@ class UserDaoIntegrationTest {
         user.setUsername(username);
         user.setEmail(email);
         user.setPasswordHash("hashed_pw");
+        user.setAddress(TestDataHelper.insertAddress(jdbcTemplate));
         return user;
     }
 
@@ -213,6 +215,7 @@ class UserDaoIntegrationTest {
         User phantom = createSampleUser("phantom", "phantom@example.com");
         phantom.setId(99999L);
         phantom.setCreatedAt(LocalDateTime.now());
+        phantom.setAddress(sharedAddressId);
 
         // jdbc.update() returns 0, but the DAO still returns the user object.
         User returned = userDao.save(phantom);
