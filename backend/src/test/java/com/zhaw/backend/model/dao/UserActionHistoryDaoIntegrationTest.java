@@ -65,7 +65,7 @@ class UserActionHistoryDaoIntegrationTest {
             Long actionId2 = TestDataHelper.insertAction(jdbcTemplate);
             insertMapping(userId, actionId2, CompletionState.COMPLETED);
 
-            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, false);
+            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, true);
 
             assertEquals(2, result.size());
         }
@@ -118,7 +118,7 @@ class UserActionHistoryDaoIntegrationTest {
                     userId, actionId2, CompletionState.COMPLETED.name(),
                     Timestamp.valueOf(LocalDateTime.now()), false);
 
-            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, false);
+            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, true);
 
             assertEquals(2, result.size());
             // First result should be the most recent (COMPLETED)
