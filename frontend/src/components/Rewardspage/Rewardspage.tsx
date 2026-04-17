@@ -1,13 +1,13 @@
 import {useEffect, useState} from 'react';
-import {Card} from './ui/card';
-import {Button} from './ui/button';
-import {Badge} from './ui/badge';
+import {Card} from '../ui/card';
+import {Button} from '../ui/button';
+import {Badge} from '../ui/badge';
 import {Gift, Coffee, Utensils, ShoppingBag, Ticket, Lock, User} from 'lucide-react';
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from './ui/dialog';
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '../ui/dialog';
 import {toast} from 'sonner';
-import {useAppDispatch, useAppSelector} from '../store/store';
-import {fetchRewards, redeemVoucher, resetRedemptionStatus} from '../store/slices/RewardSlice';
-import {fetchCurrentUser} from '../store/slices/UserSlice';
+import {useAppDispatch, useAppSelector} from '../../store/store';
+import {fetchRewards, redeemVoucher, resetRedemptionStatus} from '../../store/slices/RewardSlice';
+import {fetchCurrentUser} from '../../store/slices/UserSlice';
 import {useTranslation} from 'react-i18next';
 
 const ICON_MAP: Record<string, React.ComponentType<{className?: string}>> = {

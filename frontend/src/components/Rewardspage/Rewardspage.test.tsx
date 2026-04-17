@@ -2,13 +2,13 @@ import {describe, it, expect, vi, beforeEach} from 'vitest';
 import {screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {RewardsPage} from './Rewardspage';
-import {renderWithProviders} from '../test/test.utils';
-import type {DeepPartial, RootState} from '../store/store';
-import {mockToastSuccess, mockToastError} from '../test/setup';
+import {renderWithProviders} from '../../test/test.utils';
+import type {DeepPartial, RootState} from '../../store/store';
+import {mockToastSuccess, mockToastError} from '../../test/setup';
 const mockGet = vi.fn();
 const mockPost = vi.fn();
 
-vi.mock('../api/apiClient', () => ({
+vi.mock('../../api/apiClient', () => ({
   default: {
     get: (...args: unknown[]) => mockGet(...args),
     post: (...args: unknown[]) => mockPost(...args),
