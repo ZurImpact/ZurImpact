@@ -65,7 +65,7 @@ class UserActionHistoryDaoIntegrationTest {
             Long actionId2 = TestDataHelper.insertAction(jdbcTemplate);
             insertMapping(userId, actionId2, CompletionState.COMPLETED);
 
-            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, true);
+            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, false);
 
             assertEquals(2, result.size());
         }
