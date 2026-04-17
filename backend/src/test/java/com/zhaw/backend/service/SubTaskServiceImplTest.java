@@ -1,7 +1,10 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.ActionType;
+import com.zhaw.backend.enums.CompletionState;
+import com.zhaw.backend.enums.DistanceThresholdLevel;
 import com.zhaw.backend.model.dao.SubTaskDao;
+import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubTaskCompletionRequestDto;
 import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
@@ -18,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubTaskServiceImpl - Unit Tests")
@@ -303,6 +306,95 @@ class SubTaskServiceImplTest {
             Exception exception = assertThrows(Exception.class, () ->
                 subTaskService.completeSubTaskForUser(requestDto));
             assertTrue(exception.getMessage().contains("Unsupported SubTask Type"));
+        }
+
+        @Test
+        @DisplayName("Should throw wrapped exception when findGpsSubTaskById throws")
+        void shouldThrowWrappedExceptionWhenDaoThrows() {
+            Map<String, Object> additionalData = new HashMap<>();
+            additionalData.put("latitude", 10.0);
+            additionalData.put("longitude", 20.0);
+
+            SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
+                    .userId(1L).actionId(1L).subTaskId(10L)
+                    .actionType(ActionType.GPS)
+                    .additionalData(additionalData)
+                    .build();
+
+            when(subTaskDao.findGpsSubTaskById(10L)).thenThrow(new RuntimeException("DB error"));
+
+            Exception ex = assertThrows(Exception.class, () ->
+                    subTaskService.completeSubTaskForUser(requestDto));
+            assertTrue(ex.getMessage().contains("Error retrieving GPS SubTask"));
+        }
+    }
+
+    @Nested
+    @DisplayName("getSubTasks – PHOTO and TICKET")
+    class GetSubTasksPhotoTicket {
+
+        @Test
+        @DisplayName("returns empty list for PHOTO type")
+        void returnsEmptyForPhoto() throws Exception {
+            List<SubTaskDto> result = subTaskService.getSubTasks(1L, ActionType.PHOTO);
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        @DisplayName("returns empty list for TICKET type")
+        void returnsEmptyForTicket() throws Exception {
+            List<SubTaskDto> result = subTaskService.getSubTasks(1L, ActionType.TICKET);
+            assertTrue(result.isEmpty());
+        }
+    }
+
+    @Nested
+    @DisplayName("delegation methods")
+    class DelegationMethods {
+
+        @Test
+        @DisplayName("createSubTask delegates to subTaskDao.createGpsSubTask")
+        void createSubTaskDelegatesToDao() {
+            GpsActionTaskDto dto = new GpsActionTaskDto();
+            dto.setLatitude(47.0);
+            dto.setLongitude(8.0);
+            dto.setDistanceThresholdLevel(DistanceThresholdLevel.EASY);
+
+            subTaskService.createSubTask(1L, dto);
+
+            verify(subTaskDao).createGpsSubTask(1L, dto);
+        }
+
+        @Test
+        @DisplayName("updateSubTask delegates to subTaskDao.updateGpsSubTask")
+        void updateSubTaskDelegatesToDao() {
+            GpsActionTaskDto dto = new GpsActionTaskDto();
+            dto.setDistanceThresholdLevel(DistanceThresholdLevel.MEDIUM);
+            when(subTaskDao.updateGpsSubTask(5L, dto)).thenReturn(true);
+
+            assertTrue(subTaskService.updateSubTask(5L, dto));
+            verify(subTaskDao).updateGpsSubTask(5L, dto);
+        }
+
+        @Test
+        @DisplayName("deleteSubTask delegates to subTaskDao.deleteSubTask")
+        void deleteSubTaskDelegatesToDao() {
+            when(subTaskDao.deleteSubTask(7L)).thenReturn(true);
+
+            assertTrue(subTaskService.deleteSubTask(7L));
+            verify(subTaskDao).deleteSubTask(7L);
+        }
+
+        @Test
+        @DisplayName("getSubTasksCompletionStatesForUser delegates to subTaskDao")
+        void getSubTasksCompletionStatesForUserDelegatesToDao() {
+            Map<Long, CompletionState> expected = Map.of(1L, CompletionState.COMPLETED);
+            when(subTaskDao.findSubTaskCompletionStates(3L, 4L)).thenReturn(expected);
+
+            Map<Long, CompletionState> result = subTaskService.getSubTasksCompletionStatesForUser(3L, 4L);
+
+            assertEquals(expected, result);
+            verify(subTaskDao).findSubTaskCompletionStates(3L, 4L);
         }
     }
 }

@@ -16,7 +16,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -69,6 +71,24 @@ class VoucherServiceImplTest {
             assertNotNull(result);
             assertTrue(result.isEmpty());
             verify(voucherDao).getAll();
+        }
+    }
+
+    @Nested
+    @DisplayName("stub methods")
+    class StubMethods {
+
+        @Test
+        @DisplayName("createVoucher returns false (stub)")
+        void createVoucherReturnsFalse() {
+            VoucherDto dto = new VoucherDto();
+            assertFalse(voucherService.createVoucher(dto));
+        }
+
+        @Test
+        @DisplayName("getVoucherById returns null (stub)")
+        void getVoucherByIdReturnsNull() {
+            assertNull(voucherService.getVoucherById(1L));
         }
     }
 }
