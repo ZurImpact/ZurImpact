@@ -61,11 +61,11 @@ class UserActionHistoryDaoIntegrationTest {
         @Test
         @DisplayName("returns all mappings when active is null")
         void returnsAllWhenActiveNull() {
-            insertMapping(userId, actionId, CompletionState.IN_PROGRESS);
+            insertMapping(userId, actionId, CompletionState.COMPLETED);
             Long actionId2 = TestDataHelper.insertAction(jdbcTemplate);
             insertMapping(userId, actionId2, CompletionState.COMPLETED);
 
-            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, null);
+            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, false);
 
             assertEquals(2, result.size());
         }
@@ -99,7 +99,7 @@ class UserActionHistoryDaoIntegrationTest {
         @Test
         @DisplayName("returns empty list when user has no action history")
         void returnsEmptyForUserWithNoHistory() {
-            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, null);
+            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, false);
 
             assertTrue(result.isEmpty());
         }
@@ -111,14 +111,14 @@ class UserActionHistoryDaoIntegrationTest {
 
             jdbcTemplate.update(
                     "INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask) VALUES (?,?,?,?,?)",
-                    userId, actionId, CompletionState.IN_PROGRESS.name(),
+                    userId, actionId, CompletionState.COMPLETED.name(),
                     Timestamp.valueOf(LocalDateTime.now().minusHours(2)), false);
             jdbcTemplate.update(
                     "INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask) VALUES (?,?,?,?,?)",
                     userId, actionId2, CompletionState.COMPLETED.name(),
                     Timestamp.valueOf(LocalDateTime.now()), false);
 
-            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, null);
+            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, false);
 
             assertEquals(2, result.size());
             // First result should be the most recent (COMPLETED)
