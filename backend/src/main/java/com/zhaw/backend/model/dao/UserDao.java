@@ -33,6 +33,8 @@ public class UserDao {
         u.setUsername(rs.getString("username"));
         u.setEmail(rs.getString("email"));
         u.setPasswordHash(rs.getString("password_hash"));
+        u.setAddress(rs.getLong("address_id"));
+        u.setPoints(rs.getInt("points"));
         u.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         return u;
     };
@@ -74,17 +76,22 @@ public class UserDao {
         if (user.getCreatedAt() == null) {
             user.setCreatedAt(LocalDateTime.now());
         }
+        if (user.getPoints() == null) {
+            user.setPoints(0);
+        }
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO users (username, email, password_hash, created_at) "
-                            + "VALUES (?, ?, ?, ?)",
+                    "INSERT INTO users (username, email, address_id, password_hash, created_at, points) "
+                            + "VALUES (?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPasswordHash());
-            ps.setTimestamp(4, Timestamp.valueOf(user.getCreatedAt()));
+            ps.setLong(3, user.getAddress() != null ? user.getAddress() : 0L);
+            ps.setString(4, user.getPasswordHash());
+            ps.setTimestamp(5, Timestamp.valueOf(user.getCreatedAt()));
+            ps.setInt(6, user.getPoints() != null ? user.getPoints() : 0);
             return ps;
         }, keyHolder);
 
@@ -100,8 +107,11 @@ public class UserDao {
 
     private User update(User user) {
         jdbc.update(
-                "UPDATE users SET username = ?, email = ?, password_hash = ? WHERE id = ?",
-                user.getUsername(), user.getEmail(), user.getPasswordHash(), user.getId());
+                "UPDATE users SET username = ?, email = ?, password_hash = ?, address_id = ?, points = ? WHERE id = ?",
+                user.getUsername(), user.getEmail(), user.getPasswordHash(),
+                user.getAddress() != null ? user.getAddress() : 0L,
+                user.getPoints() != null ? user.getPoints() : 0,
+                user.getId());
         return user;
     }
 }

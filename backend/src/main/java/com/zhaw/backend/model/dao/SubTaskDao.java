@@ -96,7 +96,8 @@ public class SubTaskDao {
     public boolean updateGpsSubTask(Long id, GpsActionTaskDto dto) {
         int rows = jdbc.update(
                 "UPDATE gps_action_tasks SET description = ?, display_name = ?, latitude = ?, longitude = ?, distance_threshold_level = ? WHERE id = ?",
-                dto.getDescription(), dto.getDisplayName(), dto.getLatitude(), dto.getLongitude(), dto.getDistanceThresholdLevel(), id);
+                dto.getDescription(), dto.getDisplayName(), dto.getLatitude(), dto.getLongitude(),
+                dto.getDistanceThresholdLevel() != null ? dto.getDistanceThresholdLevel().name() : null, id);
         return rows > 0;
     }
 
