@@ -31,7 +31,7 @@ applies business logic without relying on a real database.
 - `UserServiceImpl.saveUser()` – insert (id=null) & update (id set)
 - `UserServiceImpl.deleteUserById()` – delegation check
 
-**Test class:** `src/test/java/ch/zhaw/zurimpact/service/UserServiceImplTest.java`
+**Test class:** `src/test/java/com/zhaw/backend/service/UserServiceImplTest.java`
 
 ---
 
@@ -44,9 +44,9 @@ applies business logic without relying on a real database.
 - Uses [Testcontainers](https://testcontainers.com/) to start an ephemeral
   PostgreSQL 16 Docker container before the test class runs.
 - A Spring `@Configuration` class (`TestDatabaseConfig`) wires up:
-  - `HikariDataSource` → container
-  - `Flyway` → runs all migrations from `src/main/resources/db/migration/`
-  - `JdbcTemplate`, `EntityManagerFactory`, `TransactionManager`
+    - `HikariDataSource` → container
+    - `Flyway` → runs all migrations from `src/main/resources/db/migration/`
+    - `JdbcTemplate`, `EntityManagerFactory`, `TransactionManager`
 - Each test method is `@Transactional` and is **rolled back** after execution,
   keeping the database clean between tests.
 - An `@ExtendWith(DockerAvailableCondition.class)` annotation ensures that
@@ -66,8 +66,8 @@ applies business logic without relying on a real database.
 - Flyway verification – `users` table exists after migration
 
 **Test classes:**
-- `src/test/java/ch/zhaw/zurimpact/dao/UserDaoIntegrationTest.java`
-- `src/test/java/ch/zhaw/zurimpact/config/PersistenceConfigTest.java`
+- `src/test/java/com/zhaw/backend/model/dao/UserDaoIntegrationTest.java`
+- `src/test/java/com/zhaw/backend/config/PersistenceConfigTest.java`
 
 ---
 
@@ -83,7 +83,7 @@ applies business logic without relying on a real database.
 ### Prerequisites
 
 - **Java 21** and **Maven** for all tests
-- **Docker Desktop** (running) for Tier 3 integration tests only
+- **Docker Desktop** (running) for Tier 2 integration tests only
 
 ---
 
@@ -139,13 +139,39 @@ When adding new functionality, follow this pattern:
 ## 6. Test File Overview
 
 ```
-src/test/java/ch/zhaw/zurimpact/
+src/test/java/com/zhaw/backend/
 ├── config/
-│   ├── DockerAvailableCondition.java   ← JUnit 5 condition (skip if no Docker)
-│   ├── PersistenceConfigTest.java      ← Context smoke test
-│   └── TestDatabaseConfig.java         ← Testcontainers Spring config
-├── dao/
-│   └── UserDaoIntegrationTest.java     ← SQL + constraint integration tests
-└── service/
-    └── UserServiceImplTest.java        ← Service unit tests (Mockito)
+│   ├── DockerAvailableCondition.java         ← JUnit 5 condition (skip if no Docker)
+│   ├── PersistenceConfigTest.java            ← Context smoke test
+│   └── TestDatabaseConfig.java               ← Testcontainers Spring config
+├── controller/
+│   ├── ActionControllerTest.java
+│   ├── LoginControllerTest.java
+│   ├── SettingsControllerTest.java
+│   ├── SubTaskControllerTest.java
+│   ├── UserActionHistoryControllerTest.java
+│   └── VoucherControllerTest.java
+├── mappers/
+│   ├── ActionFilterMapperTest.java
+│   ├── ActionMapperTest.java
+│   ├── CompanyMapperTest.java
+│   ├── SubTaskMapperTest.java
+│   ├── UserActionHistoryMapperTest.java
+│   └── VoucherMapperTest.java
+├── model/dao/
+│   └── UserDaoIntegrationTest.java           ← SQL + constraint integration tests
+├── security/
+│   ├── AuthCookieFilterTest.java
+│   ├── AuthServiceTest.java
+│   ├── SecurityConfigTest.java
+│   └── SessionServiceTest.java
+├── service/
+│   ├── ActionServiceImplTest.java
+│   ├── SubTaskServiceImplTest.java
+│   ├── UserActionHistoryServiceImplTest.java
+│   ├── UserServiceImplTest.java              ← Service unit tests (Mockito)
+│   └── VoucherServiceImplTest.java
+└── validator/
+    ├── ActionValidatorTest.java
+    └── SubTaskValidatorTest.java
 ```
