@@ -65,7 +65,7 @@ class UserActionHistoryDaoIntegrationTest {
             Long actionId2 = TestDataHelper.insertAction(jdbcTemplate);
             insertMapping(userId, actionId2, CompletionState.COMPLETED);
 
-            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, null);
+            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, false);
 
             assertEquals(2, result.size());
         }
@@ -99,7 +99,7 @@ class UserActionHistoryDaoIntegrationTest {
         @Test
         @DisplayName("returns empty list when user has no action history")
         void returnsEmptyForUserWithNoHistory() {
-            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, null);
+            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, false);
 
             assertTrue(result.isEmpty());
         }
@@ -118,7 +118,7 @@ class UserActionHistoryDaoIntegrationTest {
                     userId, actionId2, CompletionState.COMPLETED.name(),
                     Timestamp.valueOf(LocalDateTime.now()), false);
 
-            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, null);
+            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, false);
 
             assertEquals(2, result.size());
             // First result should be the most recent (COMPLETED)
