@@ -16,4 +16,7 @@ public class GpsActionTask extends SubTask {
 
     @Column(name = "longitude", nullable = false)
     private Double longitude;
+
+    @Column(name = "distance_threshold_level", nullable = false)
+    private String distanceThresholdLevel;
 }

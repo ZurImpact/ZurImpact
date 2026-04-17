@@ -54,9 +54,10 @@ public class UserActionHistoryDao {
         List<Object> params = new ArrayList<>();
         params.add(userId);
 
-        if (active != null) {
-            sql.append(" AND uam.completion_state = ?");
-            params.add(active ? CompletionState.IN_PROGRESS.name() : CompletionState.COMPLETED.name());
+        if (active) {
+            sql.append(" AND uam.completion_state = 'IN_PROGRESS'");
+        }else{
+            sql.append(" AND uam.completion_state = 'COMPLETED'");
         }
 
         sql.append(" ORDER BY uam.created_on DESC");

@@ -120,4 +120,42 @@ class ActionMapperTest {
         assertEquals(1, entities.size());
         assertEquals(1L, entities.getFirst().getId());
     }
+
+    @Test
+    void toDto_withNullOrBlankTags_mapsToEmptyTagList() {
+        Action nullTags = Action.builder().id(1L).type("GPS").tags(null).build();
+        Action blankTags = Action.builder().id(2L).type("GPS").tags("   ").build();
+
+        ActionDto dtoNullTags = ActionMapper.toDto(nullTags);
+        ActionDto dtoBlankTags = ActionMapper.toDto(blankTags);
+
+        assertNotNull(dtoNullTags);
+        assertTrue(dtoNullTags.getTags().isEmpty());
+        assertNotNull(dtoBlankTags);
+        assertTrue(dtoBlankTags.getTags().isEmpty());
+    }
+
+    @Test
+    void toEntity_withNullOrEmptyTags_mapsToEmptyTagString() {
+        ActionDto nullTags = ActionDto.builder().id(1L).type(ActionType.GPS).tags(null).build();
+        ActionDto emptyTags = ActionDto.builder().id(2L).type(ActionType.GPS).tags(List.of()).build();
+
+        Action entityNullTags = ActionMapper.toEntity(nullTags);
+        Action entityEmptyTags = ActionMapper.toEntity(emptyTags);
+
+        assertEquals("", entityNullTags.getTags());
+        assertEquals("", entityEmptyTags.getTags());
+    }
+
+    @Test
+    void toDtoList_nullOrEmpty_returnsEmptyList() {
+        assertTrue(ActionMapper.toDtoList(null).isEmpty());
+        assertTrue(ActionMapper.toDtoList(List.of()).isEmpty());
+    }
+
+    @Test
+    void toEntityList_nullOrEmpty_returnsEmptyList() {
+        assertTrue(ActionMapper.toEntityList(null).isEmpty());
+        assertTrue(ActionMapper.toEntityList(List.of()).isEmpty());
+    }
 }

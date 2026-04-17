@@ -43,14 +43,16 @@
       "description": "Recycling station Hauptbahnhof",
       "displayName": "HB Station",
       "latitude": 47.3769,
-      "longitude": 8.5417
+      "longitude": 8.5417,
+      "distanceThresholdLevel": "MEDIUM"
     },
     {
       "type": "GPS",
       "description": "Recycling station Oerlikon",
       "displayName": "Oerlikon Station",
       "latitude": 47.4108,
-      "longitude": 8.5448
+      "longitude": 8.5448,
+      "distanceThresholdLevel": "HARD"
     }
   ]
 }

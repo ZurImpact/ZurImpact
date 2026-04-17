@@ -243,6 +243,17 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>
+                <configuration>
+                    <excludes>
+                        <!-- Spring framework wiring classes — not meaningfully unit-testable -->
+                        <exclude>com/zhaw/backend/config/PersistenceConfig.class</exclude>
+                        <exclude>com/zhaw/backend/config/AppConfig.class</exclude>
+                        <exclude>com/zhaw/backend/config/WebAppInitializer.class</exclude>
+                        <exclude>com/zhaw/backend/config/OpenApiConfig.class</exclude>
+                        <exclude>com/zhaw/backend/config/SecurityInitializer.class</exclude>
+                        <exclude>com/zhaw/backend/config/RootConfig.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

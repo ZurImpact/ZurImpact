@@ -3,6 +3,7 @@ import {BrowserRouter, Route, Routes, Navigate} from 'react-router';
 import {RootLayout} from '../RootLayout/RootLayout';
 import {GpsActionDetailPage} from '../ActionDetailPage/GpsActionDetailPage';
 import {MapTrackingPage} from '../MapTrackingPage';
+import {RewardsPage} from '../Rewardspage';
 
 import {ROUTES} from '../../routes';
 import {ThemeProvider} from 'next-themes';
@@ -16,6 +17,7 @@ function App() {
             <Route index element={<Navigate to={ROUTES.dashboard} replace />} />
             <Route path={ROUTES.dashboard} element={<ActionDashboard />} />
             <Route path={ROUTES.track} element={<MapTrackingPage />} />
+            <Route path={ROUTES.rewards} element={<RewardsPage />} />
             <Route path={'/actions/:id'} element={<GpsActionDetailPage />} />
           </Route>
         </Routes>

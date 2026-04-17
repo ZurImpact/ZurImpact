@@ -1,18 +1,28 @@
 import {Link, useLocation} from 'react-router';
 import {ROUTES} from '../../routes';
-import {Mountain, Award, Menu, Moon, Sun} from 'lucide-react';
+import {Mountain, Award, Menu, Moon, Sun, LogOut, LogIn} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from 'next-themes';
+import {useState} from 'react';
 import {Sheet, SheetContent, SheetTrigger} from '../ui/sheet';
+import {Button} from '../ui/button';
+import apiClient from '../../api/apiClient';
+import {logout, fetchCurrentUser} from '../../store/slices/UserSlice';
+import {useAppDispatch, useAppSelector} from '../../store/store';
 
 export const Navigation = () => {
   const location = useLocation();
   const {t} = useTranslation();
   const {theme, setTheme} = useTheme();
+  const dispatch = useAppDispatch();
+  const {currentUser, isAuthenticated, loading} = useAppSelector((s) => s.user);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const points = currentUser?.points ?? 0;
 
   const navLinks = [
     {to: ROUTES.dashboard, label: t('rootLayout.dashboard')},
     {to: ROUTES.track, label: t('rootLayout.track')},
+    {to: ROUTES.rewards, label: t('rootLayout.rewards')},
   ];
 
   /**
@@ -44,6 +54,39 @@ export const Navigation = () => {
       {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
     </button>
   );
+
+  const handleLogin = async () => {
+    setIsAuthenticating(true);
+    try {
+      await apiClient.post('/auth/dev-login', {username: 'alice'});
+      await dispatch(fetchCurrentUser());
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  const handleAuthAction = () => {
+    if (isAuthenticated) {
+      dispatch(logout());
+      return;
+    }
+
+    void handleLogin();
+  };
+
+  const renderAuthButton = (className = '') => (
+    <Button
+      variant="outline"
+      size="sm"
+      className={`flex items-center gap-2 ${className}`.trim()}
+      onClick={handleAuthAction}
+      disabled={!isAuthenticated && (loading || isAuthenticating)}
+    >
+      {isAuthenticated ? <LogOut className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
+      {isAuthenticated ? t('rootLayout.logout') : t('rootLayout.login')}
+    </Button>
+  );
+
   return (
     <nav className="bg-background border-b sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4">
@@ -67,18 +110,13 @@ export const Navigation = () => {
             {renderThemeButton()}
             {renderLanguageButton()}
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-full">
+              <div className="flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-600/20 rounded-full">
                 <Award className="h-4 w-4 text-green-600" />
                 <span className="font-medium text-green-700">
-                  {123} {t('points') /*TODO Get actual points from auth state*/}
+                  {`${points} ${t('points')}` /*TODO Get actual points from auth state*/}
                 </span>
               </div>
-              {/**
-               * <Button variant="outline" size="sm" className="flex items-center gap-2">
-                <LogOut className="h-4 w-4" />
-                {t('rootLayout.logout')}
-              </Button>
-               */}
+              {renderAuthButton()}
             </div>
           </div>
           <div className="flex md:hidden items-center gap-4">
@@ -103,6 +141,13 @@ export const Navigation = () => {
                       {link.label}
                     </Link>
                   ))}
+                  <div className="mt-4 flex flex-col gap-3 pr-8">
+                    <div className="flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-600/20 rounded-full w-fit">
+                      <Award className="h-4 w-4 text-green-600" />
+                      <span className="font-medium text-green-700">{`${points} ${t('points')}`}</span>
+                    </div>
+                    {renderAuthButton('w-full justify-center')}
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>

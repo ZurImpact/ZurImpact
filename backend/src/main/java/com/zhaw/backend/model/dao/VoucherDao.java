@@ -96,7 +96,10 @@ public class VoucherDao {
             return ps;
         }, keyHolder);
 
-        if (keyHolder.getKey() != null) {
+        java.util.Map<String, Object> keys = keyHolder.getKeys();
+        if (keys != null && keys.containsKey("id")) {
+            voucher.setId(((Number) keys.get("id")).longValue());
+        } else if (keyHolder.getKey() != null) {
             voucher.setId(keyHolder.getKey().longValue());
         }
 

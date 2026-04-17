@@ -1,7 +1,10 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.ActionType;
+import com.zhaw.backend.enums.CompletionState;
+import com.zhaw.backend.enums.DistanceThresholdLevel;
 import com.zhaw.backend.model.dao.SubTaskDao;
+import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubTaskCompletionRequestDto;
 import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
@@ -18,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubTaskServiceImpl - Unit Tests")
@@ -50,6 +53,7 @@ class SubTaskServiceImplTest {
             gpsTask.setActionId(actionId);
             gpsTask.setLatitude(10.0);
             gpsTask.setLongitude(20.0);
+            gpsTask.setDistanceThresholdLevel("MEDIUM");
             List<GpsActionTask> gpsTasks = List.of(gpsTask);
             when(subTaskDao.findGpsSubTask(actionId)).thenReturn(gpsTasks);
 
@@ -85,18 +89,20 @@ class SubTaskServiceImplTest {
     class CompleteSubTaskForUserTests {
 
         @Test
-        @DisplayName("Should complete GPS subtask successfully when coordinates match")
-        void shouldCompleteGpsSubTaskSuccessfully() throws Exception {
+        @DisplayName("Should complete GPS subtask successfully when coordinates are inside easy threshold")
+        void shouldCompleteEasyGpsSubTaskSuccessfully() throws Exception {
             // Given
             Long userId = 1L;
             Long actionId = 1L;
             Long subtaskId = 10L;
-            Double gpsx = 10.0;
+            Double gpsx = 10.000144;
             Double gpsy = 20.0;
+            String distanceThresholdLevel = "EASY";
 
             Map<String, Object> additionalData = new HashMap<>();
             additionalData.put("latitude", gpsx);
             additionalData.put("longitude", gpsy);
+            additionalData.put("distanceThresholdLevel", distanceThresholdLevel);
 
             SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
                     .userId(userId)
@@ -110,6 +116,84 @@ class SubTaskServiceImplTest {
             gpsTask.setId(10L);
             gpsTask.setLatitude(10.0);
             gpsTask.setLongitude(20.0);
+            gpsTask.setDistanceThresholdLevel(distanceThresholdLevel);
+            when(subTaskDao.findGpsSubTaskById(10L)).thenReturn(gpsTask);
+            when(subTaskDao.completeSubTaskForUser(userId, actionId, true, subtaskId.toString())).thenReturn(true);
+
+            // When
+            boolean result = subTaskService.completeSubTaskForUser(requestDto);
+
+            // Then
+            assertTrue(result);
+        }
+        @Test
+        @DisplayName("Should complete GPS subtask successfully when coordinates are inside medium threshold")
+        void shouldCompleteMediumGpsSubTaskSuccessfully() throws Exception {
+            // Given
+            Long userId = 1L;
+            Long actionId = 1L;
+            Long subtaskId = 10L;
+            Double gpsx = 10.000081;
+            Double gpsy = 20.0;
+            String distanceThresholdLevel = "MEDIUM";
+
+            Map<String, Object> additionalData = new HashMap<>();
+            additionalData.put("latitude", gpsx);
+            additionalData.put("longitude", gpsy);
+            additionalData.put("distanceThresholdLevel", distanceThresholdLevel);
+
+            SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
+                    .userId(userId)
+                    .actionId(actionId)
+                    .subTaskId(subtaskId)
+                    .actionType(ActionType.GPS)
+                    .additionalData(additionalData)
+                    .build();
+
+            GpsActionTask gpsTask = new GpsActionTask();
+            gpsTask.setId(10L);
+            gpsTask.setLatitude(10.0);
+            gpsTask.setLongitude(20.0);
+            gpsTask.setDistanceThresholdLevel(distanceThresholdLevel);
+            when(subTaskDao.findGpsSubTaskById(10L)).thenReturn(gpsTask);
+            when(subTaskDao.completeSubTaskForUser(userId, actionId, true, subtaskId.toString())).thenReturn(true);
+
+            // When
+            boolean result = subTaskService.completeSubTaskForUser(requestDto);
+
+            // Then
+            assertTrue(result);
+        }
+
+        @Test
+        @DisplayName("Should complete GPS subtask successfully when coordinates are inside hard threshold")
+        void shouldCompleteHardGpsSubTaskSuccessfully() throws Exception {
+            // Given
+            Long userId = 1L;
+            Long actionId = 1L;
+            Long subtaskId = 10L;
+            Double gpsx = 10.000036;
+            Double gpsy = 20.0;
+            String distanceThresholdLevel = "HARD";
+
+            Map<String, Object> additionalData = new HashMap<>();
+            additionalData.put("latitude", gpsx);
+            additionalData.put("longitude", gpsy);
+            additionalData.put("distanceThresholdLevel", distanceThresholdLevel);
+
+            SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
+                    .userId(userId)
+                    .actionId(actionId)
+                    .subTaskId(subtaskId)
+                    .actionType(ActionType.GPS)
+                    .additionalData(additionalData)
+                    .build();
+
+            GpsActionTask gpsTask = new GpsActionTask();
+            gpsTask.setId(10L);
+            gpsTask.setLatitude(10.0);
+            gpsTask.setLongitude(20.0);
+            gpsTask.setDistanceThresholdLevel(distanceThresholdLevel);
             when(subTaskDao.findGpsSubTaskById(10L)).thenReturn(gpsTask);
             when(subTaskDao.completeSubTaskForUser(userId, actionId, true, subtaskId.toString())).thenReturn(true);
 
@@ -129,10 +213,12 @@ class SubTaskServiceImplTest {
             Long subtaskId = 10L;
             Double gpsx = 25.0; // ~1668 km from target at lat 10.0, well outside 10m threshold
             Double gpsy = 20.0;
+            String distanceThreshold = "HARD";
 
             Map<String, Object> additionalData = new HashMap<>();
             additionalData.put("latitude", gpsx);
             additionalData.put("longitude", gpsy);
+            additionalData.put("distanceThresholdLevel", distanceThreshold);
 
             SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
                     .userId(userId)
@@ -146,6 +232,7 @@ class SubTaskServiceImplTest {
             gpsTask.setId(10L);
             gpsTask.setLatitude(10.0);
             gpsTask.setLongitude(20.0);
+            gpsTask.setDistanceThresholdLevel(distanceThreshold);
             when(subTaskDao.findGpsSubTaskById(10L)).thenReturn(gpsTask);
 
             // When
@@ -184,6 +271,7 @@ class SubTaskServiceImplTest {
             Map<String, Object> additionalData = new HashMap<>();
             additionalData.put("latitude", 10.0);
             additionalData.put("longitude", 20.0);
+            additionalData.put("distanceThresholdLevel", "MEDIUM");
 
             SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
                     .userId(1L)
@@ -218,6 +306,95 @@ class SubTaskServiceImplTest {
             Exception exception = assertThrows(Exception.class, () ->
                 subTaskService.completeSubTaskForUser(requestDto));
             assertTrue(exception.getMessage().contains("Unsupported SubTask Type"));
+        }
+
+        @Test
+        @DisplayName("Should throw wrapped exception when findGpsSubTaskById throws")
+        void shouldThrowWrappedExceptionWhenDaoThrows() {
+            Map<String, Object> additionalData = new HashMap<>();
+            additionalData.put("latitude", 10.0);
+            additionalData.put("longitude", 20.0);
+
+            SubTaskCompletionRequestDto requestDto = SubTaskCompletionRequestDto.builder()
+                    .userId(1L).actionId(1L).subTaskId(10L)
+                    .actionType(ActionType.GPS)
+                    .additionalData(additionalData)
+                    .build();
+
+            when(subTaskDao.findGpsSubTaskById(10L)).thenThrow(new RuntimeException("DB error"));
+
+            Exception ex = assertThrows(Exception.class, () ->
+                    subTaskService.completeSubTaskForUser(requestDto));
+            assertTrue(ex.getMessage().contains("Error retrieving GPS SubTask"));
+        }
+    }
+
+    @Nested
+    @DisplayName("getSubTasks – PHOTO and TICKET")
+    class GetSubTasksPhotoTicket {
+
+        @Test
+        @DisplayName("returns empty list for PHOTO type")
+        void returnsEmptyForPhoto() throws Exception {
+            List<SubTaskDto> result = subTaskService.getSubTasks(1L, ActionType.PHOTO);
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        @DisplayName("returns empty list for TICKET type")
+        void returnsEmptyForTicket() throws Exception {
+            List<SubTaskDto> result = subTaskService.getSubTasks(1L, ActionType.TICKET);
+            assertTrue(result.isEmpty());
+        }
+    }
+
+    @Nested
+    @DisplayName("delegation methods")
+    class DelegationMethods {
+
+        @Test
+        @DisplayName("createSubTask delegates to subTaskDao.createGpsSubTask")
+        void createSubTaskDelegatesToDao() {
+            GpsActionTaskDto dto = new GpsActionTaskDto();
+            dto.setLatitude(47.0);
+            dto.setLongitude(8.0);
+            dto.setDistanceThresholdLevel(DistanceThresholdLevel.EASY);
+
+            subTaskService.createSubTask(1L, dto);
+
+            verify(subTaskDao).createGpsSubTask(1L, dto);
+        }
+
+        @Test
+        @DisplayName("updateSubTask delegates to subTaskDao.updateGpsSubTask")
+        void updateSubTaskDelegatesToDao() {
+            GpsActionTaskDto dto = new GpsActionTaskDto();
+            dto.setDistanceThresholdLevel(DistanceThresholdLevel.MEDIUM);
+            when(subTaskDao.updateGpsSubTask(5L, dto)).thenReturn(true);
+
+            assertTrue(subTaskService.updateSubTask(5L, dto));
+            verify(subTaskDao).updateGpsSubTask(5L, dto);
+        }
+
+        @Test
+        @DisplayName("deleteSubTask delegates to subTaskDao.deleteSubTask")
+        void deleteSubTaskDelegatesToDao() {
+            when(subTaskDao.deleteSubTask(7L)).thenReturn(true);
+
+            assertTrue(subTaskService.deleteSubTask(7L));
+            verify(subTaskDao).deleteSubTask(7L);
+        }
+
+        @Test
+        @DisplayName("getSubTasksCompletionStatesForUser delegates to subTaskDao")
+        void getSubTasksCompletionStatesForUserDelegatesToDao() {
+            Map<Long, CompletionState> expected = Map.of(1L, CompletionState.COMPLETED);
+            when(subTaskDao.findSubTaskCompletionStates(3L, 4L)).thenReturn(expected);
+
+            Map<Long, CompletionState> result = subTaskService.getSubTasksCompletionStatesForUser(3L, 4L);
+
+            assertEquals(expected, result);
+            verify(subTaskDao).findSubTaskCompletionStates(3L, 4L);
         }
     }
 }

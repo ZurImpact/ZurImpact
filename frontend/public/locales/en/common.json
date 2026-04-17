@@ -2,15 +2,18 @@
   "appName": "ZurImpact",
   "rootLayout": {
     "dashboard": "Dashboard",
+    "login": "Login",
     "logout": "Logout",
-    "track": "Map"
+    "track": "Map",
+    "rewards": "Rewards"
   },
   "actionDashboard": {
     "header": "Activities",
     "subheader": "Log your sustainable activities and earn points",
     "historyTitle": "Your Activity History",
     "loading": "Loading actions...",
-    "noActions": "You haven't completed any actions yet. Start making an impact today!"
+    "noActions": "You haven't completed any actions yet. Start making an impact today!",
+    "loginPrompt": "Please login first."
   },
   "actionDetail": {
     "header": "Track Your Route",
@@ -47,6 +50,36 @@
     "cancel": "Cancel",
     "starting": "Starting...",
     "confirmStart": "Yes, I'm ready to start"
+  },
+  "rewardsPage": {
+    "header": "Rewards",
+    "subheader": "Redeem your points for exclusive vouchers and gifts",
+    "availablePoints": "Your Available Points",
+    "allRewards": "All Rewards",
+    "loading": "Loading rewards...",
+    "noRewards": "No rewards available",
+    "pts": "pts",
+    "available": "available",
+    "redeem": "Redeem",
+    "redeemReward": "Redeem Reward",
+    "confirmRedemption": "Are you sure you want to redeem this reward?",
+    "cost": "Cost",
+    "currentPoints": "Current Points",
+    "afterRedemption": "After Redemption",
+    "cancel": "Cancel",
+    "confirmRedemptionBtn": "Confirm Redemption",
+    "redeeming": "Redeeming...",
+    "redeemSuccess": "Reward redeemed successfully! Check your email for the voucher code.",
+    "notEnoughPoints": "Not enough points to redeem this reward!",
+    "notAuthenticated": "You must be logged in to redeem rewards.",
+    "loginRequired": "Login Required",
+    "loginPrompt": "Please log in to view and redeem your rewards.",
+    "tryAgain": "Try Again",
+    "howRewardsWork": "How Rewards Work",
+    "howRewardsPoint1": "Earn points by completing sustainable activities",
+    "howRewardsPoint2": "Redeem points for vouchers, gifts, and exclusive offers",
+    "howRewardsPoint3": "Receive voucher codes after redemption",
+    "howRewardsPoint4": "New rewards are added regularly - check back often!"
   },
   "points": "Points",
   "language": "Language"

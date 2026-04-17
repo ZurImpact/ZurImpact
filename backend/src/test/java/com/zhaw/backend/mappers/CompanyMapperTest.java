@@ -89,5 +89,16 @@ class CompanyMapperTest {
         assertEquals(1, entities.size());
         assertEquals(1L, entities.get(0).getId());
     }
-}
 
+    @Test
+    void toDtoList_nullOrEmpty_returnsEmptyList() {
+        assertTrue(CompanyMapper.toDtoList(null).isEmpty());
+        assertTrue(CompanyMapper.toDtoList(List.of()).isEmpty());
+    }
+
+    @Test
+    void toEntityList_nullOrEmpty_returnsEmptyList() {
+        assertTrue(CompanyMapper.toEntityList(null).isEmpty());
+        assertTrue(CompanyMapper.toEntityList(List.of()).isEmpty());
+    }
+}

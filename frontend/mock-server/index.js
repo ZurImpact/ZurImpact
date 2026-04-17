@@ -10,6 +10,13 @@ app.use(express.json());
 const BASE_URL = '/backend_war_exploded/api';
 const mockActions = loadJSON('get_actions.json');
 const mockUserActions = loadJSON('get_useractions.json');
+const mockRewards = loadJSON('get_rewards.json');
+const mockCurrentUser = loadJSON('get_current_user.json');
+
+let mockUserPoints = {
+  userId: mockCurrentUser.id,
+  points: mockCurrentUser.points,
+};
 
 // GET all actions (with optional filters)
 app.get(BASE_URL + '/actions', (req, res) => {
@@ -111,6 +118,67 @@ app.post(BASE_URL + '/actions/cancelAction', (req, res) => {
 app.post(BASE_URL + '/subTasks/completeSubTask', (req, res) => {
   console.log('completeSubTask called with:', req.body);
   res.status(200).json({message: 'SubTask completed (mock)'});
+});
+
+// GET all rewards
+app.get(BASE_URL + '/rewards', (req, res) => {
+  res.json(mockRewards);
+});
+
+// GET current authenticated user
+app.get(BASE_URL + '/users/current', (req, res) => {
+  const currentUserWithPoints = {
+    ...mockCurrentUser,
+    points: mockUserPoints.points,
+  };
+  res.json(currentUserWithPoints);
+});
+
+// GET user points
+app.get(BASE_URL + '/users/:userId/points', (req, res) => {
+  const userId = parseInt(req.params.userId);
+  if (mockUserPoints.userId === userId) {
+    res.json(mockUserPoints);
+  } else {
+    res.json({userId, points: 0});
+  }
+});
+
+// POST redeem voucher
+app.post(BASE_URL + '/users/redemptions', (req, res) => {
+  const {userId, voucherId} = req.query;
+
+  if (!userId || !voucherId) {
+    return res.status(400).json({error: 'userId and voucherId are required'});
+  }
+
+  const rewardIndex = mockRewards.findIndex((r) => r.id === voucherId);
+
+  if (rewardIndex === -1) {
+    return res.status(404).json({error: 'Reward not found'});
+  }
+
+  const reward = mockRewards[rewardIndex];
+
+  if (reward.available <= 0) {
+    return res.status(400).json({error: 'No more rewards available'});
+  }
+
+  if (mockUserPoints.points < reward.points) {
+    return res.status(400).json({error: 'Not enough points'});
+  }
+
+  mockUserPoints.points -= reward.points;
+  mockRewards[rewardIndex].available -= 1;
+
+  const voucherCode = `VCHR-${Date.now().toString(36).toUpperCase()}`;
+
+  res.json({
+    success: true,
+    message: 'Voucher redeemed successfully',
+    remainingPoints: mockUserPoints.points,
+    voucherCode,
+  });
 });
 
 app.listen(PORT, () => {

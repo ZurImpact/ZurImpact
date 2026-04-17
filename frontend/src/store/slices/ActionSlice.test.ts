@@ -200,7 +200,9 @@ describe('ActionSlice', () => {
       const state = store.getState().actions;
       expect(state.loading).toBe(false);
       expect(state.error).toBeNull();
-      expect(mockedPost).toHaveBeenCalledWith('/actions/startAction', {userId: 123, actionId: 1});
+      expect(mockedPost).toHaveBeenCalledWith('/actions/startAction', null, {
+        params: {userId: 123, actionId: 1},
+      });
     });
 
     it('sets error on failure', async () => {

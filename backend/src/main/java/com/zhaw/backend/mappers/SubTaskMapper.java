@@ -1,5 +1,6 @@
 package com.zhaw.backend.mappers;
 
+import com.zhaw.backend.enums.DistanceThresholdLevel;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.entities.GpsActionTask;
@@ -22,6 +23,8 @@ public final class SubTaskMapper {
             mapCommonFields(gpsActionTask, dto);
             dto.setLatitude(gpsActionTask.getLatitude());
             dto.setLongitude(gpsActionTask.getLongitude());
+            String distanceThresholdLevel = gpsActionTask.getDistanceThresholdLevel();
+            dto.setDistanceThresholdLevel(distanceThresholdLevel == null ? null : DistanceThresholdLevel.valueOf(distanceThresholdLevel));
             return dto;
         }
 
@@ -40,6 +43,7 @@ public final class SubTaskMapper {
             mapCommonFields(gpsDto, entity);
             entity.setLatitude(gpsDto.getLatitude());
             entity.setLongitude(gpsDto.getLongitude());
+            entity.setDistanceThresholdLevel(gpsDto.getDistanceThresholdLevel().name());
             return entity;
         }
 

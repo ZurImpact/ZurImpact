@@ -25,6 +25,7 @@ public class SubTaskDao {
         task.setActionId(rs.getLong("action_id"));
         task.setLatitude(rs.getDouble("latitude"));
         task.setLongitude(rs.getDouble("longitude"));
+        task.setDistanceThresholdLevel(rs.getString("distance_threshold_level"));
         return task;
     };
 
@@ -32,7 +33,7 @@ public class SubTaskDao {
 
     public List<GpsActionTask> findGpsSubTask(Long actionId) {
         return jdbc.query(
-                "SELECT id, description, display_name, action_id, latitude, longitude FROM gps_action_tasks WHERE action_id = ?",
+                "SELECT id, description, display_name, action_id, latitude, longitude, distance_threshold_level FROM gps_action_tasks WHERE action_id = ?",
                 GPS_ROW_MAPPER,
                 actionId
         );
@@ -40,7 +41,7 @@ public class SubTaskDao {
 
     public GpsActionTask findGpsSubTaskById(Long id) {
         return jdbc.queryForObject(
-                "SELECT id, description, display_name, action_id, latitude, longitude FROM gps_action_tasks WHERE id = ?",
+                "SELECT id, description, display_name, action_id, latitude, longitude, distance_threshold_level FROM gps_action_tasks WHERE id = ?",
                 GPS_ROW_MAPPER,
                 id
         );
@@ -88,14 +89,15 @@ public class SubTaskDao {
 
     public void createGpsSubTask(Long actionId, GpsActionTaskDto dto) {
         jdbc.update(
-                "INSERT INTO gps_action_tasks (description, display_name, action_id, latitude, longitude) VALUES (?, ?, ?, ?, ?)",
-                dto.getDescription(), dto.getDisplayName(), actionId, dto.getLatitude(), dto.getLongitude());
+                "INSERT INTO gps_action_tasks (description, display_name, action_id, latitude, longitude, distance_threshold_level) VALUES (?, ?, ?, ?, ?, ?)",
+                dto.getDescription(), dto.getDisplayName(), actionId, dto.getLatitude(), dto.getLongitude(), dto.getDistanceThresholdLevel().name());
     }
 
     public boolean updateGpsSubTask(Long id, GpsActionTaskDto dto) {
         int rows = jdbc.update(
-                "UPDATE gps_action_tasks SET description = ?, display_name = ?, latitude = ?, longitude = ? WHERE id = ?",
-                dto.getDescription(), dto.getDisplayName(), dto.getLatitude(), dto.getLongitude(), id);
+                "UPDATE gps_action_tasks SET description = ?, display_name = ?, latitude = ?, longitude = ?, distance_threshold_level = ? WHERE id = ?",
+                dto.getDescription(), dto.getDisplayName(), dto.getLatitude(), dto.getLongitude(),
+                dto.getDistanceThresholdLevel() != null ? dto.getDistanceThresholdLevel().name() : null, id);
         return rows > 0;
     }
 

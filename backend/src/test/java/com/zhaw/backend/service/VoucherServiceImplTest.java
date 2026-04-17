@@ -43,7 +43,7 @@ class VoucherServiceImplTest {
         voucherService = new VoucherServiceImpl(voucherDao, voucherCodeDao, userService);
     }
 
-    // ── Helpers ─────────────────────────────────────────────────────────────────
+    // ── Helpers ──────────────────────────────────────────────────────────────────
 
     private Voucher buildVoucher(Long id, int points, LocalDateTime validUntil) {
         return Voucher.builder()

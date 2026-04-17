@@ -1,6 +1,8 @@
 package com.zhaw.backend.controller;
 
+import com.zhaw.backend.enums.ActionType;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
+import com.zhaw.backend.model.dto.SubTaskCompletionRequestDto;
 import com.zhaw.backend.service.SubTaskService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,6 +27,40 @@ class SubTaskControllerTest {
 
     @InjectMocks
     private SubTaskController subTaskController;
+
+    @Nested
+    @DisplayName("completeSubTask")
+    class CompleteSubTask {
+
+        private SubTaskCompletionRequestDto buildRequest() {
+            return SubTaskCompletionRequestDto.builder()
+                    .userId(1L).actionId(2L).subTaskId(3L)
+                    .actionType(ActionType.GPS).build();
+        }
+
+        @Test
+        @DisplayName("returns 200 when subtask is completed successfully")
+        void returns200WhenCompleted() throws Exception {
+            SubTaskCompletionRequestDto dto = buildRequest();
+            when(subTaskService.completeSubTaskForUser(dto)).thenReturn(true);
+
+            ResponseEntity<Void> response = subTaskController.completeSubTask(dto);
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            verify(subTaskService).completeSubTaskForUser(dto);
+        }
+
+        @Test
+        @DisplayName("returns 500 when service throws exception")
+        void returns500OnException() throws Exception {
+            SubTaskCompletionRequestDto dto = buildRequest();
+            when(subTaskService.completeSubTaskForUser(dto)).thenThrow(new RuntimeException("gps error"));
+
+            ResponseEntity<Void> response = subTaskController.completeSubTask(dto);
+
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        }
+    }
 
     @Nested
     @DisplayName("updateSubTask")

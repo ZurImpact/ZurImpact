@@ -5,13 +5,6 @@ import {BrowserRouter} from 'react-router';
 import {ActionCard} from './ActionCard';
 import type {ActionDto} from '../../../store/slices/ActionSlice';
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: {changeLanguage: vi.fn()},
-  }),
-}));
-
 const baseAction: ActionDto = {
   id: 1,
   displayName: 'Clean Park',

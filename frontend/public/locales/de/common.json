@@ -2,15 +2,18 @@
   "appName": "ZürImpact",
   "rootLayout": {
     "dashboard": "Dashboard",
+    "login": "Anmelden",
     "logout": "Abmelden",
-    "track": "Karte"
+    "track": "Karte",
+    "rewards": "Belohnungen"
   },
   "actionDashboard": {
     "header": "Aktivitäten",
     "subheader": "Logge deine nachhaltigen Aktivitäten und sammle Punkte",
     "historyTitle": "Deine Aktivitätshistorie",
     "loading": "Aktivitäten werden geladen...",
-    "noActions": "Du hast noch keine Aktivitäten abgeschlossen. Starte noch heute deinen nachhaltigen Weg!"
+    "noActions": "Du hast noch keine Aktivitäten abgeschlossen. Starte noch heute deinen nachhaltigen Weg!",
+    "loginPrompt": "Bitte melde dich zuerst an."
   },
   "actionDetail": {
     "header": "Zeichne deine Route auf",
@@ -47,6 +50,36 @@
     "cancel": "Abbrechen",
     "starting": "Starte...",
     "confirmStart": "Ja, ich bin bereit zu starten"
+  },
+  "rewardsPage": {
+    "header": "Belohnungen",
+    "subheader": "Löse deine Punkte gegen exklusive Gutscheine und Geschenke ein",
+    "availablePoints": "Deine verfügbaren Punkte",
+    "allRewards": "Alle Belohnungen",
+    "loading": "Belohnungen werden geladen...",
+    "noRewards": "Keine Belohnungen verfügbar",
+    "pts": "Pkt",
+    "available": "verfügbar",
+    "redeem": "Einlösen",
+    "redeemReward": "Belohnung einlösen",
+    "confirmRedemption": "Möchtest du diese Belohnung wirklich einlösen?",
+    "cost": "Kosten",
+    "currentPoints": "Aktuelle Punkte",
+    "afterRedemption": "Nach Einlösung",
+    "cancel": "Abbrechen",
+    "confirmRedemptionBtn": "Einlösung bestätigen",
+    "redeeming": "Wird eingelöst...",
+    "redeemSuccess": "Belohnung erfolgreich eingelöst! Überprüfe deine E-Mail für den Gutscheincode.",
+    "notEnoughPoints": "Nicht genügend Punkte um diese Belohnung einzulösen!",
+    "notAuthenticated": "Du musst angemeldet sein um Belohnungen einzulösen.",
+    "loginRequired": "Anmeldung erforderlich",
+    "loginPrompt": "Bitte melde dich an um deine Belohnungen einzusehen und einzulösen.",
+    "tryAgain": "Erneut versuchen",
+    "howRewardsWork": "So funktionieren Belohnungen",
+    "howRewardsPoint1": "Sammle Punkte durch nachhaltige Aktivitäten",
+    "howRewardsPoint2": "Löse Punkte für Gutscheine, Geschenke und exklusive Angebote ein",
+    "howRewardsPoint3": "Erhalte nach der Einlösung den Gutscheincode",
+    "howRewardsPoint4": "Neue Belohnungen werden regelmässig hinzugefügt - schau regelmässig vorbei!"
   },
   "points": "Punkte",
   "language": "Sprache"

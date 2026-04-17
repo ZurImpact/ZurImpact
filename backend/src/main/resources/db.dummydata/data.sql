@@ -41,13 +41,13 @@ INSERT INTO action (description, display_name, points, tags, type, has_subtasks,
                                                                                                               ('Use public transport for a full day',              'Green Commute Day',    75, 'TRAVEL',         'TICKET', false, NOW() + INTERVAL '60 days',  NOW()),
                                                                                                               ('Cycle to work instead of driving',                 'Cycle to Work',       100, 'CYCLING,HEALTH', 'GPS',    true,  NOW() + INTERVAL '120 days', NOW());
 
--- 7. GPS_ACTION_TASKS (action_id references action.id)
-INSERT INTO gps_action_tasks (description, display_name, action_id, latitude, longitude) VALUES
-                                                                                             ('Check in at Bürkliplatz',    'Waypoint 1 – Bürkliplatz',    1, 47.3665, 8.5417),
-                                                                                             ('Check in at Zürichhorn',     'Waypoint 2 – Zürichhorn',     1, 47.3528, 8.5556),
-                                                                                             ('Check in at Seebad Utoquai', 'Waypoint 3 – Seebad Utoquai', 1, 47.3597, 8.5493),
-                                                                                             ('Start at HB Zürich',         'Start – Hauptbahnhof',        4, 47.3782, 8.5403),
-                                                                                             ('Arrive at ZHAW Winterthur',  'End – ZHAW',                  4, 47.4985, 8.7271);
+-- 6. GPS_ACTION_TASKS (action_id references action.id)
+INSERT INTO gps_action_tasks (description, display_name, action_id, latitude, longitude, distance_threshol_level) VALUES
+                                                                                             ('Check in at Bürkliplatz',    'Waypoint 1 – Bürkliplatz',    1, 47.3665, 8.5417, 'EASY'),
+                                                                                             ('Check in at Zürichhorn',     'Waypoint 2 – Zürichhorn',     1, 47.3528, 8.5556, 'MEDIUM'),
+                                                                                             ('Check in at Seebad Utoquai', 'Waypoint 3 – Seebad Utoquai', 1, 47.3597, 8.5493, 'HARD'),
+                                                                                             ('Start at HB Zürich',         'Start – Hauptbahnhof',        4, 47.3782, 8.5403, 'EASY'),
+                                                                                             ('Arrive at ZHAW Winterthur',  'End – ZHAW',                  4, 47.4985, 8.7271, 'EASY');
 
 -- 8. USER_ACTION_MAPPING (run AFTER V8 migration fixes the FK)
 INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subtask_id) VALUES

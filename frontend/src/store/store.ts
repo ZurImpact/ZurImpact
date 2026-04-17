@@ -2,6 +2,8 @@ import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import type {TypedUseSelectorHook} from 'react-redux';
 import {useDispatch, useSelector} from 'react-redux';
 import actionReducer from './slices/ActionSlice';
+import rewardReducer from './slices/RewardSlice';
+import userReducer from './slices/UserSlice';
 
 export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
@@ -9,6 +11,8 @@ export type DeepPartial<T> = {
 
 const rootReducer = combineReducers({
   actions: actionReducer,
+  rewards: rewardReducer,
+  user: userReducer,
 });
 
 export const setupStore = (preloadedState?: DeepPartial<RootState>) =>

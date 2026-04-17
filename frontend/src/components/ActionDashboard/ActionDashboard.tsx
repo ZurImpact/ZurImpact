@@ -10,6 +10,7 @@ export function ActionDashboard() {
   const dispatch = useAppDispatch();
   const {t} = useTranslation();
 
+  const {isAuthenticated, currentUser} = useAppSelector((state) => state.user);
   const {actions, loading, error, userActions} = useAppSelector((state) => state.actions);
 
   const handleActionClick = (actionId: number) => {
@@ -19,9 +20,23 @@ export function ActionDashboard() {
 
   // Fetch actions on component mount
   useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
     dispatch(fetchActions({}));
-    dispatch(fetchUserActions(123)); // TODO Use actual user ID from auth state
-  }, [dispatch]);
+    dispatch(fetchUserActions(123));
+  }, [dispatch, isAuthenticated, currentUser?.id]);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card className="p-6 text-center">
+          <p className="text-gray-600">{t('actionDashboard.loginPrompt')}</p>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">

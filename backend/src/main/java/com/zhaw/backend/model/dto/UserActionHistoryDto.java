@@ -20,11 +20,11 @@ public class UserActionHistoryDto {
     private String displayName;
     private Integer points;
     private String tags;
-    private LocalDateTime validUntil;
-    private LocalDateTime actionCreatedOn;
+    private String validUntil;
+    private String actionCreatedOn;
     private String completionState;
     private Boolean isSubtask;
     private String subtaskId;
-    private LocalDateTime mappingCreatedOn;
+    private String mappingCreatedOn;
 }
 

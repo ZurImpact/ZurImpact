@@ -3,6 +3,7 @@ package com.zhaw.backend.controller;
 import com.zhaw.backend.enums.Role;
 import com.zhaw.backend.security.AuthService;
 import com.zhaw.backend.security.SessionService;
+import com.zhaw.backend.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -29,6 +32,7 @@ public class LoginController {
 
     private final AuthService authService;
     private final SessionService sessionService;
+    private final UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
@@ -74,6 +78,46 @@ public class LoginController {
                 .body(Map.of("message", "Logged out"));
     }
 
+    @PostMapping("/dev-login")
+    public ResponseEntity<?> devLogin(HttpServletRequest httpRequest, @Valid @RequestBody DevLoginRequest request) {
+        if (userService.findUserByUsername(request.username()).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "User not found"));
+        }
+
+        String sessionToken = sessionService.createSession(request.username(), Set.of(Role.ROLE_USER));
+
+        ResponseCookie cookie = ResponseCookie.from(AUTH_COOKIE_NAME, sessionToken)
+                .httpOnly(true)
+                //.secure(true)
+                .secure(httpRequest.isSecure())
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(Duration.ofHours(8))
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new LoginResponse(request.username(), Set.of(Role.ROLE_USER.name())));
+    }
+
+    @GetMapping("/whoami")
+    public ResponseEntity<?> whoami(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Not authenticated"));
+        }
+
+        Set<String> roles = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+
+        return ResponseEntity.ok(Map.of(
+                "username", authentication.getName(),
+                "roles", roles
+        ));
+    }
+
     private String readAuthCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
@@ -95,5 +139,9 @@ public class LoginController {
     public record LoginResponse(
             String username,
             Set<String> roles
+    ) {}
+
+    public record DevLoginRequest(
+            @NotBlank String username
     ) {}
 }

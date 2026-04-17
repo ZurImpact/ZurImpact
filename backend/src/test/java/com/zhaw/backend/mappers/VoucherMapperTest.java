@@ -93,5 +93,16 @@ class VoucherMapperTest {
         assertEquals(1, entities.size());
         assertEquals(1L, entities.get(0).getId());
     }
-}
 
+    @Test
+    void toDtoList_nullOrEmpty_returnsEmptyList() {
+        assertTrue(VoucherMapper.toDtoList(null).isEmpty());
+        assertTrue(VoucherMapper.toDtoList(List.of()).isEmpty());
+    }
+
+    @Test
+    void toEntityList_nullOrEmpty_returnsEmptyList() {
+        assertTrue(VoucherMapper.toEntityList(null).isEmpty());
+        assertTrue(VoucherMapper.toEntityList(List.of()).isEmpty());
+    }
+}
