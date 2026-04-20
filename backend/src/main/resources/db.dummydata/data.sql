@@ -24,7 +24,17 @@ INSERT INTO voucher (description, display_name, points, company_id, valid_until,
                                                                                                  ('Free EcoEats delivery',          'EcoEats Free Delivery',   50, 2, NOW() + INTERVAL '30 days', NOW()),
                                                                                                  ('1-day free VeloZueri rental',    'Free Bike Day',           200, 3, NOW() + INTERVAL '90 days', NOW());
 
--- 5. ACTION
+-- 5. VOUCHER_CODE (individual redeemable codes per voucher template)
+INSERT INTO voucher_code (voucher_id, code) VALUES
+    (1, 'GREENRIDE-ABC1'),
+    (1, 'GREENRIDE-ABC2'),
+    (1, 'GREENRIDE-ABC3'),
+    (2, 'ECOEATS-XYZ1'),
+    (2, 'ECOEATS-XYZ2'),
+    (3, 'VELO-FREE-001'),
+    (3, 'VELO-FREE-002');
+
+-- 6. ACTION
 INSERT INTO action (description, display_name, points, tags, type, has_subtasks, valid_until, created_on) VALUES
                                                                                                               ('Visit the lake by bike and check in at waypoints', 'Lake Bike Tour',      150, 'CYCLING,SPORTS', 'GPS',    true,  NOW() + INTERVAL '90 days',  NOW()),
                                                                                                               ('Take a photo at a local farmers market',           'Farmers Market Shot',  50, 'FOOD,HEALTH',    'PHOTO',  false, NOW() + INTERVAL '30 days',  NOW()),
@@ -39,7 +49,7 @@ INSERT INTO gps_action_tasks (description, display_name, action_id, latitude, lo
                                                                                              ('Start at HB Zürich',         'Start – Hauptbahnhof',        4, 47.3782, 8.5403, 'EASY'),
                                                                                              ('Arrive at ZHAW Winterthur',  'End – ZHAW',                  4, 47.4985, 8.7271, 'EASY');
 
--- 7. USER_ACTION_MAPPING (run AFTER V8 migration fixes the FK)
+-- 8. USER_ACTION_MAPPING (run AFTER V8 migration fixes the FK)
 INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subtask_id) VALUES
                                                                                                                  (1, 1, 'IN_PROGRESS', NOW(), false, NULL),
                                                                                                                  (1, 2, 'COMPLETED',   NOW(), false, NULL),

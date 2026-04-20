@@ -19,4 +19,5 @@ public class VoucherDto {
     private Long companyId;
     private LocalDateTime validUntil;
     private LocalDateTime createdOn;
+    private Integer availableCount;
 }
