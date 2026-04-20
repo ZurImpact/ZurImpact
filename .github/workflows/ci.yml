@@ -131,7 +131,7 @@ jobs:
           projectBaseDir: frontend
           args: >
             -Dsonar.projectKey=z-rimpact-frontend
-            -Dsonar.projectName=zürimpact frontend
+            -Dsonar.projectName="zürimpact frontend"
 
       - name: Upload frontend coverage report
         if: always()
