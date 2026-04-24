@@ -60,9 +60,7 @@ public class UserActionHistoryController {
         if (username == null) {
             return null;
         }
-        return userService.findUserByUsername(username)
-                .map(user -> user.getId())
-                .orElse(null);
+        return userService.findUserByUsername(username).getId();
     }
 
 }

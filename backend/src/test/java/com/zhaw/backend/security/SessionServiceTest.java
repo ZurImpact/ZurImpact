@@ -19,12 +19,12 @@ class SessionServiceTest {
     void createSessionAndValidateReturnsRecord() {
         SessionService sessionService = new SessionService();
 
-        String token = sessionService.createSession("alice", Set.of(Role.ROLE_USER));
+        String token = sessionService.createSession("alice", Role.ROLE_USER);
         Optional<SessionService.SessionRecord> result = sessionService.validate(token);
 
         assertTrue(result.isPresent());
         assertEquals("alice", result.get().username());
-        assertTrue(result.get().roles().contains(Role.ROLE_USER));
+        assertSame(result.get().role(), Role.ROLE_USER);
     }
 
     @Test
@@ -41,7 +41,7 @@ class SessionServiceTest {
     @DisplayName("invalidate removes active session")
     void invalidateRemovesSession() {
         SessionService sessionService = new SessionService();
-        String token = sessionService.createSession("bob", Set.of(Role.ROLE_ADMIN));
+        String token = sessionService.createSession("bob", Role.ROLE_ADMIN);
 
         sessionService.invalidate(token);
 
@@ -62,7 +62,7 @@ class SessionServiceTest {
         String expiredToken = "expired-token";
         sessions.put(expiredToken, new SessionService.SessionRecord(
                 "carol",
-                Set.of(Role.ROLE_USER),
+                Role.ROLE_USER,
                 Instant.now().minusSeconds(60)));
 
         Optional<SessionService.SessionRecord> result = sessionService.validate(expiredToken);

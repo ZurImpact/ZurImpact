@@ -1,5 +1,6 @@
 package com.zhaw.backend.service;
 
+import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public interface UserService {
 
     Optional<User> findUserById(Long id);
 
-    Optional<User> findUserByUsername(String username);
+    UserDto findUserByUsername(String username);
 
     List<User> findAllUsers();
 

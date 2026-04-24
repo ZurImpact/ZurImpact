@@ -27,17 +27,16 @@ public class UserDao {
 
     // ── Row mapper ──────────────────────────────────────────────────────
 
-    private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> {
-        User u = new User();
-        u.setId(rs.getLong("id"));
-        u.setUsername(rs.getString("username"));
-        u.setEmail(rs.getString("email"));
-        u.setPasswordHash(rs.getString("password_hash"));
-        u.setAddress(rs.getLong("address_id"));
-        u.setPoints(rs.getInt("points"));
-        u.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-        return u;
-    };
+    private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> User.builder()
+            .id(rs.getLong("id"))
+            .username(rs.getString("username"))
+            .passwordHash(rs.getString("password_hash"))
+            .role(rs.getString("role"))
+            .address(rs.getLong("address_id"))
+            .email(rs.getString("email"))
+            .points(rs.getInt("points"))
+            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+            .build();
 
     // ── Queries ─────────────────────────────────────────────────────────
 

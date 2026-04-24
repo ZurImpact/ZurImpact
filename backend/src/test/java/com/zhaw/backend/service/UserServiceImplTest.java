@@ -1,6 +1,7 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.model.dao.UserDao;
+import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.testcontainers.shaded.org.apache.commons.lang3.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -16,9 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
@@ -96,10 +96,10 @@ class UserServiceImplTest {
         void returnsUser_whenFound() {
             when(userDao.findByUsername("testuser")).thenReturn(Optional.of(sampleUser));
 
-            Optional<User> result = userService.findUserByUsername("testuser");
+            UserDto result = userService.findUserByUsername("testuser");
 
-            assertTrue(result.isPresent());
-            assertEquals("test@example.com", result.get().getEmail());
+            assertNotNull(result);
+            assertEquals("test@example.com", result.getEmail());
             verify(userDao).findByUsername("testuser");
         }
 
@@ -108,9 +108,9 @@ class UserServiceImplTest {
         void returnsEmpty_whenNotFound() {
             when(userDao.findByUsername("unknown")).thenReturn(Optional.empty());
 
-            Optional<User> result = userService.findUserByUsername("unknown");
+            UserDto result = userService.findUserByUsername("unknown");
 
-            assertTrue(result.isEmpty());
+            assertNull(result);
             verify(userDao).findByUsername("unknown");
         }
     }

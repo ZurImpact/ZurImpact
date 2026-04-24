@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,10 +16,10 @@ public class SessionService {
 
     private final Map<String, SessionRecord> sessions = new ConcurrentHashMap<>();
 
-    public String createSession(String username, Set<Role> roles) {
+    public String createSession(String username, Role role) {
         String token = UUID.randomUUID().toString();
         Instant expiresAt = Instant.now().plusSeconds(SESSION_TTL_SECONDS);
-        sessions.put(token, new SessionRecord(username, roles, expiresAt));
+        sessions.put(token, new SessionRecord(username, role, expiresAt));
         return token;
     }
 
@@ -45,5 +44,5 @@ public class SessionService {
         }
     }
 
-    public record SessionRecord(String username, Set<Role> roles, Instant expiresAt) {}
+    public record SessionRecord(String username, Role role, Instant expiresAt) {}
 }

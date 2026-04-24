@@ -1,6 +1,5 @@
 package com.zhaw.backend.security;
 
-import com.zhaw.backend.enums.Role;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -37,10 +36,9 @@ public class AuthCookieFilter extends OncePerRequestFilter {
             if (sessionOpt.isPresent()) {
                 SessionService.SessionRecord session = sessionOpt.get();
 
-                List<SimpleGrantedAuthority> authorities = session.roles().stream()
-                        .map(Role::name)
-                        .map(SimpleGrantedAuthority::new)
-                        .toList();
+                List<SimpleGrantedAuthority> authorities = session.role() == null
+                        ? List.of()
+                        : List.of(new SimpleGrantedAuthority(session.role().name()));
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(session.username(), null, authorities);

@@ -57,7 +57,7 @@ class AuthCookieFilterTest {
             when(request.getCookies()).thenReturn(new Cookie[]{new Cookie("AUTH_SESSION", "token-1")});
             SessionService.SessionRecord sessionRecord = new SessionService.SessionRecord(
                     "alice",
-                    Set.of(Role.ROLE_USER),
+                    Role.ROLE_USER,
                     java.time.Instant.now().plusSeconds(60));
             when(sessionService.validate("token-1")).thenReturn(Optional.of(sessionRecord));
 

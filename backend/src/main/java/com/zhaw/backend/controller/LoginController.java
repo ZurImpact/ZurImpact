@@ -38,7 +38,7 @@ public class LoginController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             AuthService.AuthResult result = authService.authenticate(request.username(), request.password());
-            String sessionToken = sessionService.createSession(result.username(), result.roles());
+            String sessionToken = sessionService.createSession(result.username(), result.role());
 
             ResponseCookie cookie = ResponseCookie.from(AUTH_COOKIE_NAME, sessionToken)
                     .httpOnly(true)
@@ -50,11 +50,8 @@ public class LoginController {
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .body(new LoginResponse(
-                            result.username(),
-                            result.roles().stream().map(Role::name).collect(Collectors.toSet())
-                    ));
-        } catch (BadCredentialsException ex) {
+                    .body(new LoginResponse(result.username(), result.role().name()));
+        } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Invalid username or password"));
         }
@@ -79,13 +76,13 @@ public class LoginController {
     }
 
     @PostMapping("/dev-login")
-    public ResponseEntity<?> devLogin(HttpServletRequest httpRequest, @Valid @RequestBody DevLoginRequest request) {
-        if (userService.findUserByUsername(request.username()).isEmpty()) {
+    public ResponseEntity<?> devLogin(HttpServletRequest httpRequest, @Valid @RequestBody DevLoginRequest request) throws Exception {
+        if (userService.findUserByUsername(request.username()) == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "User not found"));
         }
 
-        String sessionToken = sessionService.createSession(request.username(), Set.of(Role.ROLE_USER));
+        String sessionToken = sessionService.createSession(request.username(), Role.ROLE_USER);
 
         ResponseCookie cookie = ResponseCookie.from(AUTH_COOKIE_NAME, sessionToken)
                 .httpOnly(true)
@@ -98,7 +95,7 @@ public class LoginController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new LoginResponse(request.username(), Set.of(Role.ROLE_USER.name())));
+                .body(new LoginResponse(request.username(), Role.ROLE_USER.name()));
     }
 
     @GetMapping("/whoami")
@@ -138,7 +135,7 @@ public class LoginController {
 
     public record LoginResponse(
             String username,
-            Set<String> roles
+            String role
     ) {}
 
     public record DevLoginRequest(

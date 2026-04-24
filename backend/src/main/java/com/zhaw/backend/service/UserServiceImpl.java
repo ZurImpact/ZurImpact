@@ -1,6 +1,8 @@
 package com.zhaw.backend.service;
 
+import com.zhaw.backend.mappers.UserMapper;
 import com.zhaw.backend.model.dao.UserDao;
+import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +31,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> findUserByUsername(String username) {
-        return userDao.findByUsername(username);
+    public UserDto findUserByUsername(String username) {
+        Optional<User> user = userDao.findByUsername(username);
+        return user.map(UserMapper::toDto).orElse(null);
     }
 
     @Override
