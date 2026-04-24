@@ -10,6 +10,8 @@ import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +22,9 @@ import java.time.LocalDateTime;
 @Table(name = "users")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -44,11 +49,8 @@ public class User {
     @Column(name = "points", nullable = false)
     private Integer points;
 
-    // No-args constructor required by JPA
-    // Do not use this constructor directly in your code; use the @Builder instead for creating instances.
-    public User() {
-
-    }
+    @Column(name = "role", nullable = false, length = 50)
+    private String role;
 
     /**
      * Sets createdAt in-memory before INSERT so the field is never null

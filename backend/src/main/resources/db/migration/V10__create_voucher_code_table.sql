@@ -1,6 +1,6 @@
 -- V10: Create voucher_code table to normalize individual redeemable codes
 -- out of the voucher template table.
-CREATE TABLE voucher_code (
+CREATE TABLE IF NOT EXISTS voucher_code (
     id           SERIAL       PRIMARY KEY,
     voucher_id   INTEGER      NOT NULL REFERENCES voucher(id),
     code         VARCHAR(255) NOT NULL UNIQUE,

@@ -1,7 +1,7 @@
 package com.zhaw.backend.controller;
 
 import com.zhaw.backend.enums.Role;
-import com.zhaw.backend.model.entities.User;
+import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.security.AuthService;
 import com.zhaw.backend.security.SessionService;
 import com.zhaw.backend.service.UserService;
@@ -23,12 +23,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,11 +58,11 @@ class LoginControllerTest {
             LoginController.LoginRequest loginRequest = new LoginController.LoginRequest("admin", "secret");
             AuthService.AuthResult authResult = new AuthService.AuthResult(
                     "admin",
-                    Set.of(Role.ROLE_ADMIN, Role.ROLE_USER),
+                    Role.ROLE_ADMIN,
                     "ignored-service-token");
 
             when(authService.authenticate("admin", "secret")).thenReturn(authResult);
-            when(sessionService.createSession("admin", authResult.roles())).thenReturn("session-123");
+            when(sessionService.createSession("admin", authResult.role())).thenReturn("session-123");
 
             ResponseEntity<?> response = loginController.login(loginRequest);
 
@@ -130,14 +127,14 @@ class LoginControllerTest {
 
         @Test
         @DisplayName("returns 200 and cookie for existing user")
-        void returns200ForExistingUser() {
-            User user = new User();
+        void returns200ForExistingUser() throws Exception {
+            UserDto user = new UserDto();
             user.setId(1L);
             user.setUsername("alice");
             LoginController.DevLoginRequest devLoginRequest = new LoginController.DevLoginRequest("alice");
 
-            when(userService.findUserByUsername("alice")).thenReturn(Optional.of(user));
-            when(sessionService.createSession("alice", Set.of(Role.ROLE_USER))).thenReturn("dev-session");
+            when(userService.findUserByUsername("alice")).thenReturn((user));
+            when(sessionService.createSession("alice", Role.ROLE_USER)).thenReturn("dev-session");
             when(request.isSecure()).thenReturn(true);
 
             ResponseEntity<?> response = loginController.devLogin(request, devLoginRequest);
@@ -150,9 +147,9 @@ class LoginControllerTest {
 
         @Test
         @DisplayName("returns 404 for unknown user")
-        void returns404ForUnknownUser() {
+        void returns404ForUnknownUser() throws Exception {
             LoginController.DevLoginRequest devLoginRequest = new LoginController.DevLoginRequest("ghost");
-            when(userService.findUserByUsername("ghost")).thenReturn(Optional.empty());
+            when(userService.findUserByUsername("ghost")).thenReturn(null);
 
             ResponseEntity<?> response = loginController.devLogin(request, devLoginRequest);
 

@@ -1,6 +1,7 @@
 package com.zhaw.backend.controller;
 
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
+import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
 import com.zhaw.backend.service.UserActionHistoryService;
 import com.zhaw.backend.service.UserService;
@@ -47,10 +48,10 @@ class UserActionHistoryControllerTest {
         @Test
         @DisplayName("returns 200 for authorized user")
         void returns200ForAuthorizedUser() {
-            User user = new User();
+            UserDto user = new UserDto();
             user.setId(7L);
             when(authentication.getName()).thenReturn("alice");
-            when(userService.findUserByUsername("alice")).thenReturn(Optional.of(user));
+            when(userService.findUserByUsername("alice")).thenReturn(user);
 
             UserActionHistoryDto dto = UserActionHistoryDto.builder()
                     .actionId(1L)
@@ -71,10 +72,10 @@ class UserActionHistoryControllerTest {
         @Test
         @DisplayName("returns 403 when authenticated user does not match requested userId")
         void returns403WhenUserIsNotAuthorized() {
-            User otherUser = new User();
+            UserDto otherUser = new UserDto();
             otherUser.setId(99L);
             when(authentication.getName()).thenReturn("bob");
-            when(userService.findUserByUsername("bob")).thenReturn(Optional.of(otherUser));
+            when(userService.findUserByUsername("bob")).thenReturn(otherUser);
 
             ResponseEntity<List<UserActionHistoryDto>> response = controller.getUserActions(7L, true, authentication);
 
@@ -94,10 +95,10 @@ class UserActionHistoryControllerTest {
         @Test
         @DisplayName("returns 500 when service throws exception")
         void returns500WhenServiceThrowsException() {
-            User user = new User();
+            UserDto user = new UserDto();
             user.setId(7L);
             when(authentication.getName()).thenReturn("alice");
-            when(userService.findUserByUsername("alice")).thenReturn(Optional.of(user));
+            when(userService.findUserByUsername("alice")).thenReturn(user);
             when(userActionHistoryService.getUserActions(7L, false)).thenThrow(new RuntimeException("db error"));
 
             ResponseEntity<List<UserActionHistoryDto>> response = controller.getUserActions(7L, false, authentication);
