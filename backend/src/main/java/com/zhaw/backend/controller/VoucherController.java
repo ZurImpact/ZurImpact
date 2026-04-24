@@ -5,6 +5,7 @@ import com.zhaw.backend.model.dto.UserVoucherDto;
 import com.zhaw.backend.service.VoucherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,11 +28,10 @@ public class VoucherController {
     }
 
     @PostMapping("/{voucherId}/redeem")
-    public ResponseEntity<?> redeemVoucher(
-            @PathVariable Long voucherId,
-            @RequestParam Long userId) {
+    public ResponseEntity<?> redeemVoucher(@PathVariable Long voucherId, Authentication authentication) {
         try {
-            UserVoucherDto result = voucherService.redeemVoucher(userId, voucherId);
+            System.out.println(authentication.getName());
+            UserVoucherDto result = voucherService.redeemVoucher(authentication.getName(), voucherId);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             String message = e.getMessage();

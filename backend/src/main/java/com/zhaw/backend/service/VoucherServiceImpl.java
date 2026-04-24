@@ -51,7 +51,9 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UserVoucherDto redeemVoucher(Long userId, Long voucherId) throws Exception {
+    public UserVoucherDto redeemVoucher(String username, Long voucherId) throws Exception {
+        Long userId = userService.findUserByUsername(username).getId();
+
         Voucher voucher = voucherDao.findById(voucherId)
                 .orElseThrow(() -> new Exception("Voucher not found"));
 
