@@ -2,8 +2,8 @@ import {describe, it, expect, vi, beforeEach} from 'vitest';
 import {screen, act} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MapTrackingPage} from './MapTrackingPage';
-import {renderWithProviders} from '../test/test.utils';
-import {mockToastSuccess, mockToastError} from '../test/setup';
+import {renderWithProviders} from '../../test/test.utils';
+import {mockToastSuccess, mockToastError} from '../../test/setup';
 
 const watchPositionMock = vi.fn();
 const clearWatchMock = vi.fn();

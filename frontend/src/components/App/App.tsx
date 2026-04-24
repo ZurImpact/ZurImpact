@@ -2,8 +2,8 @@ import {ActionDashboard} from '../ActionDashboard/ActionDashboard';
 import {BrowserRouter, Route, Routes, Navigate} from 'react-router';
 import {RootLayout} from '../RootLayout/RootLayout';
 import {GpsActionDetailPage} from '../ActionDetailPage/GpsActionDetailPage';
-import {MapTrackingPage} from '../MapTrackingPage';
-import {RewardsPage} from '../Rewardspage';
+import {MapTrackingPage} from '../MapTrackingPage/MapTrackingPage';
+import {RewardsPage} from '../Rewardspage/Rewardspage';
 
 import {ROUTES} from '../../routes';
 import {ThemeProvider} from 'next-themes';

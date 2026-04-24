@@ -1,13 +1,13 @@
 import {useState, useEffect, useRef} from 'react';
 // import { useNavigate } from "react-router";
-import {Card} from './ui/card';
-import {Button} from './ui/button';
-import {Badge} from './ui/badge';
+import {Card} from '../ui/card';
+import {Button} from '../ui/button';
+import {Badge} from '../ui/badge';
 import {MapContainer, TileLayer, Polyline, Marker, useMap} from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {Play, Square, MapPin, Clock, Route, Award, Bike, Footprints} from 'lucide-react';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from './ui/select';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '../ui/select';
 import {toast} from 'sonner';
 import {useTranslation} from 'react-i18next';
 
