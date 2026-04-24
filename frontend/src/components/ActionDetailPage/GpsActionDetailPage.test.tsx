@@ -379,10 +379,7 @@ describe('GpsActionDetailPage', () => {
       });
       // Give effects a tick
       await new Promise((r) => setTimeout(r, 50));
-      expect(mockPost).not.toHaveBeenCalledWith(
-        '/subTasks/completeSubTask',
-        expect.objectContaining({subTaskId: 201}),
-      );
+      expect(mockPost).not.toHaveBeenCalledWith('/subTasks/completeSubTask', expect.objectContaining({subTaskId: 201}));
     });
 
     it('HARD: check-in triggers when user is 3m away', async () => {
@@ -401,7 +398,10 @@ describe('GpsActionDetailPage', () => {
       });
       await act(async () => {
         watchSuccessCallback?.({
-          coords: {latitude: threeMetersNorth.latitude, longitude: threeMetersNorth.longitude} as GeolocationCoordinates,
+          coords: {
+            latitude: threeMetersNorth.latitude,
+            longitude: threeMetersNorth.longitude,
+          } as GeolocationCoordinates,
         } as GeolocationPosition);
       });
       await waitFor(() => {
