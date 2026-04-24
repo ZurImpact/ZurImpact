@@ -18,6 +18,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import {toast} from 'sonner';
 import {MapPin, Navigation, CheckCircle2, Circle, ArrowLeft, Award, Target, X} from 'lucide-react';
+import {thresholdToMeters, type DistanceThresholdLevel} from '../../utils/distanceThreshold';
 
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -67,13 +68,11 @@ interface Checkpoint {
   actionId: number;
   latitude?: number;
   longitude?: number;
-  altitude?: number;
+  distanceThresholdLevel: DistanceThresholdLevel;
   index: number;
   isCheckedIn: boolean;
   position: [number, number];
 }
-
-const CHECK_IN_RADIUS_METERS = 20;
 
 function RecenterMap({coords}: {coords: [number, number]}) {
   const map = useMap();
@@ -110,7 +109,7 @@ function processCheckpointsFromAction(action: ActionDto): Checkpoint[] {
       actionId: sub.actionId,
       latitude: sub.latitude,
       longitude: sub.longitude,
-      altitude: sub.altitude,
+      distanceThresholdLevel: sub.distanceThresholdLevel ?? 'MEDIUM',
       index: idx + 1,
       isCheckedIn: false,
       position: [sub.latitude, sub.longitude] as [number, number],
@@ -208,7 +207,7 @@ export function GpsActionDetailPage() {
 
           const distance = calculateDistance(latitude, longitude, cp.position[0], cp.position[1]);
 
-          if (distance <= CHECK_IN_RADIUS_METERS && hasStartedAction) {
+          if (distance <= thresholdToMeters(cp.distanceThresholdLevel) && hasStartedAction) {
             // Update local state
             setCheckedInCheckpointIds((prev) => {
               if (prev.has(cp.id)) return prev;
