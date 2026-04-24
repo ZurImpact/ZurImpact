@@ -179,7 +179,6 @@ class VoucherServiceImplTest {
         @Test
         @DisplayName("throws when voucher not found")
         void throwsWhenVoucherNotFound() {
-            when(userService.findUserByUsername("alice")).thenReturn(buildUserDto(1L, "alice"));
             when(voucherDao.findById(99L)).thenReturn(Optional.empty());
 
             Exception ex = assertThrows(Exception.class, () -> voucherService.redeemVoucher("alice", 99L));
@@ -191,7 +190,6 @@ class VoucherServiceImplTest {
         @Test
         @DisplayName("throws when voucher has expired")
         void throwsWhenExpired() {
-            when(userService.findUserByUsername("alice")).thenReturn(buildUserDto(5L, "alice"));
             Voucher expired = buildVoucher(1L, 100, LocalDateTime.now().minusDays(1));
             when(voucherDao.findById(1L)).thenReturn(Optional.of(expired));
 
@@ -212,7 +210,7 @@ class VoucherServiceImplTest {
             Exception ex = assertThrows(Exception.class, () -> voucherService.redeemVoucher("alice", 1L));
             assertEquals("No codes available", ex.getMessage());
 
-            verifyNoInteractions(userService);
+            verify(userService, never()).deductPointsFromUser(anyLong(), anyInt());
         }
 
         @Test

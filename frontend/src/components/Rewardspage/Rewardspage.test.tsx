@@ -46,7 +46,7 @@ describe('RewardsPage', () => {
 
     mockGet.mockImplementation((url: string) => {
       if (url === '/auth/whoami') return Promise.resolve({data: {id: 1}});
-      if (url === '/rewards') return Promise.resolve({data: baseRewards});
+      if (url === '/vouchers') return Promise.resolve({data: baseRewards});
       return Promise.resolve({data: {}});
     });
 
@@ -66,7 +66,7 @@ describe('RewardsPage', () => {
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith('/auth/whoami');
-      expect(mockGet).toHaveBeenCalledWith('/rewards');
+      expect(mockGet).toHaveBeenCalledWith('/vouchers');
     });
   });
 
@@ -87,7 +87,7 @@ describe('RewardsPage', () => {
       if (url === '/auth/whoami') {
         return Promise.reject({response: {status: 401, data: {error: 'not_authenticated'}}});
       }
-      if (url === '/rewards') return Promise.resolve({data: baseRewards});
+      if (url === '/vouchers') return Promise.resolve({data: baseRewards});
       return Promise.resolve({data: {}});
     });
 
@@ -178,7 +178,7 @@ describe('RewardsPage', () => {
     await user.click(screen.getByRole('button', {name: 'rewardsPage.confirmRedemptionBtn'}));
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith('/users/redemptions?userId=123&voucherId=r1');
+      expect(mockPost).toHaveBeenCalledWith('/vouchers/r1/redeem');
     });
   });
 

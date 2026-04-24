@@ -87,7 +87,7 @@ const rewardSlice = createSlice({
       })
       .addCase(fetchRewards.fulfilled, (state, action) => {
         state.loading = false;
-        state.rewards = action.payload;
+        state.rewards = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchRewards.rejected, (state, action) => {
         state.loading = false;

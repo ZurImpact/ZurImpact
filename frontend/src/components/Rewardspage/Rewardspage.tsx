@@ -36,7 +36,7 @@ export function RewardsPage() {
   const [redeemError, setRedeemError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
 
-  const {rewards, redemptionLoading, loading} = useAppSelector((s) => s.rewards);
+  const {rewards, redemptionLoading, loading, redemptionSuccess, redemptionError} = useAppSelector((s) => s.rewards);
   const {currentUser, isAuthenticated, loading: userLoading, error: userError} = useAppSelector((s) => s.user);
 
   useEffect(() => {
@@ -44,6 +44,20 @@ export function RewardsPage() {
     dispatch(fetchRewards());
   }, [dispatch]);
 
+
+  useEffect(() => {
+    if (redemptionSuccess) {
+      toast.success(t('rewardsPage.redeemSuccess'));
+      dispatch(resetRedemptionStatus());
+    }
+  }, [redemptionSuccess, dispatch, t]);
+
+  useEffect(() => {
+    if (redemptionError) {
+      toast.error(redemptionError);
+      dispatch(resetRedemptionStatus());
+    }
+  }, [redemptionError, dispatch]);
 
   const isDialogOpen = selectedReward !== null || redeemedResult !== null;
 
