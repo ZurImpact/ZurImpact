@@ -33,9 +33,10 @@ export function RewardsPage() {
   const {t} = useTranslation();
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [redeemedResult, setRedeemedResult] = useState<RedemptionResult | null>(null);
+  const [redeemError, setRedeemError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
 
-  const {rewards, redemptionLoading, redemptionError, loading} = useAppSelector((s) => s.rewards);
+  const {rewards, redemptionLoading, loading} = useAppSelector((s) => s.rewards);
   const {currentUser, isAuthenticated, loading: userLoading, error: userError} = useAppSelector((s) => s.user);
 
   useEffect(() => {
@@ -43,18 +44,13 @@ export function RewardsPage() {
     dispatch(fetchRewards());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (redemptionError) {
-      toast.error(redemptionError);
-      dispatch(resetRedemptionStatus());
-    }
-  }, [redemptionError, dispatch]);
 
   const isDialogOpen = selectedReward !== null || redeemedResult !== null;
 
   const handleDismissResult = () => {
     setRedeemedResult(null);
     setSelectedReward(null);
+    setRedeemError(null);
     dispatch(resetRedemptionStatus());
     dispatch(fetchCurrentUser());
     dispatch(fetchRewards());
@@ -71,8 +67,13 @@ export function RewardsPage() {
       return;
     }
 
-    const result = await dispatch(redeemVoucher({voucherId: reward.id})).unwrap();
-    setRedeemedResult(result);
+    setRedeemError(null);
+    try {
+      const result = await dispatch(redeemVoucher({voucherId: reward.id})).unwrap();
+      setRedeemedResult(result);
+    } catch (err) {
+      setRedeemError(typeof err === 'string' ? err : t('rewardsPage.redeemFailed'));
+    }
   };
 
   const handleRetryAuth = () => {
@@ -255,6 +256,10 @@ export function RewardsPage() {
                       </span>
                     </div>
                   </div>
+
+                  {redeemError && (
+                    <p className="text-sm text-red-600 text-center">{redeemError}</p>
+                  )}
 
                   <div className="flex gap-3">
                     <Button

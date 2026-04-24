@@ -57,10 +57,10 @@ export const redeemVoucher = createAsyncThunk(
       return response.data as RedemptionResult;
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as {
-          response?: {data?: {error?: string}};
-        };
-        return rejectWithValue(axiosError.response?.data?.error ?? 'Failed to redeem voucher');
+        const axiosError = error as {response?: {data?: unknown}};
+        const data = axiosError.response?.data;
+        const message = typeof data === 'string' ? data : 'Failed to redeem voucher';
+        return rejectWithValue(message);
       }
       if (error instanceof Error) {
         return rejectWithValue(error.message);
