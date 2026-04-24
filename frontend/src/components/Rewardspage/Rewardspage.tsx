@@ -44,7 +44,6 @@ export function RewardsPage() {
     dispatch(fetchRewards());
   }, [dispatch]);
 
-
   useEffect(() => {
     if (redemptionSuccess) {
       toast.success(t('rewardsPage.redeemSuccess'));
@@ -230,9 +229,7 @@ export function RewardsPage() {
               <div className="space-y-4 mt-4">
                 <div className="p-4 bg-green-100 dark:bg-green-500/20 rounded-lg text-center">
                   <p className="text-sm text-gray-600 mb-2">{t('rewardsPage.yourVoucherCode')}</p>
-                  <p className="text-2xl font-mono font-bold tracking-widest text-green-700">
-                    {redeemedResult.code}
-                  </p>
+                  <p className="text-2xl font-mono font-bold tracking-widest text-green-700">{redeemedResult.code}</p>
                 </div>
                 <Button className="w-full bg-green-600 hover:bg-green-700" onClick={handleDismissResult}>
                   {t('rewardsPage.close')}
@@ -271,9 +268,7 @@ export function RewardsPage() {
                     </div>
                   </div>
 
-                  {redeemError && (
-                    <p className="text-sm text-red-600 text-center">{redeemError}</p>
-                  )}
+                  {redeemError && <p className="text-sm text-red-600 text-center">{redeemError}</p>}
 
                   <div className="flex gap-3">
                     <Button
