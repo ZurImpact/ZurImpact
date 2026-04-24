@@ -1,5 +1,7 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import apiClient from '../../api/apiClient';
+import type {DistanceThresholdLevel} from '../../utils/distanceThreshold';
+export type {DistanceThresholdLevel};
 
 export interface ActionDto {
   id: number;
@@ -23,10 +25,11 @@ export interface SubActionDto {
   actionId: number;
   latitude?: number;
   longitude?: number;
-  altitude?: number;
+  type?: ActionType;
+  distanceThresholdLevel?: DistanceThresholdLevel;
 }
 
-type ActionType = 'GPS' | 'PHOTO' | 'TICKET';
+export type ActionType = 'GPS' | 'PHOTO' | 'TICKET';
 
 interface UserActionHistoryDto {
   actionId: number;

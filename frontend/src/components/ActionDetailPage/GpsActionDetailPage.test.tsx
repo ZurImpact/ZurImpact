@@ -299,4 +299,119 @@ describe('GpsActionDetailPage', () => {
 
     expect(mockToastError).toHaveBeenCalledWith('gpsActionDetail.locationError');
   });
+
+  describe('per-checkpoint distance threshold', () => {
+    const basePoint = {latitude: 47.3769, longitude: 8.5417};
+    const tenMetersNorth = {
+      latitude: basePoint.latitude + 10 / 111320,
+      longitude: basePoint.longitude,
+    };
+    const threeMetersNorth = {
+      latitude: basePoint.latitude + 3 / 111320,
+      longitude: basePoint.longitude,
+    };
+
+    const makeFixture = (level: 'EASY' | 'MEDIUM' | 'HARD') => ({
+      id: 1,
+      displayName: 'Threshold Fixture',
+      description: 'Single checkpoint',
+      points: 50,
+      subTasks: [
+        {
+          id: 201,
+          displayName: 'Only Checkpoint',
+          description: 'Only one',
+          actionId: 1,
+          latitude: basePoint.latitude,
+          longitude: basePoint.longitude,
+          distanceThresholdLevel: level,
+        },
+      ],
+    });
+
+    it('EASY: check-in triggers when user is 10m away', async () => {
+      const fixture = makeFixture('EASY');
+      mockGet.mockImplementation((url: string) =>
+        url === '/actions/1' ? Promise.resolve({data: fixture}) : Promise.resolve({data: {}}),
+      );
+      const user = userEvent.setup();
+      renderPage({actions: {...createActionState(), selectedAction: fixture}});
+      await user.click(await screen.findByRole('button', {name: 'gpsActionDetail.startAction'}));
+      await user.click(screen.getByRole('button', {name: 'gpsActionDetail.confirmStart'}));
+      await waitFor(() => {
+        expect(mockPost).toHaveBeenCalledWith('/actions/startAction', null, {
+          params: {userId: 5, actionId: 1},
+        });
+      });
+      await act(async () => {
+        watchSuccessCallback?.({
+          coords: {latitude: tenMetersNorth.latitude, longitude: tenMetersNorth.longitude} as GeolocationCoordinates,
+        } as GeolocationPosition);
+      });
+      await waitFor(() => {
+        expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
+          userId: 5,
+          actionId: 1,
+          subTaskId: 201,
+          actionType: 'GPS',
+        });
+      });
+    });
+
+    it('HARD: check-in does NOT trigger when user is 10m away', async () => {
+      const fixture = makeFixture('HARD');
+      mockGet.mockImplementation((url: string) =>
+        url === '/actions/1' ? Promise.resolve({data: fixture}) : Promise.resolve({data: {}}),
+      );
+      const user = userEvent.setup();
+      renderPage({actions: {...createActionState(), selectedAction: fixture}});
+      await user.click(await screen.findByRole('button', {name: 'gpsActionDetail.startAction'}));
+      await user.click(screen.getByRole('button', {name: 'gpsActionDetail.confirmStart'}));
+      await waitFor(() => {
+        expect(mockPost).toHaveBeenCalledWith('/actions/startAction', null, {
+          params: {userId: 5, actionId: 1},
+        });
+      });
+      await act(async () => {
+        watchSuccessCallback?.({
+          coords: {latitude: tenMetersNorth.latitude, longitude: tenMetersNorth.longitude} as GeolocationCoordinates,
+        } as GeolocationPosition);
+      });
+      // Give effects a tick
+      await new Promise((r) => setTimeout(r, 50));
+      expect(mockPost).not.toHaveBeenCalledWith(
+        '/subTasks/completeSubTask',
+        expect.objectContaining({subTaskId: 201}),
+      );
+    });
+
+    it('HARD: check-in triggers when user is 3m away', async () => {
+      const fixture = makeFixture('HARD');
+      mockGet.mockImplementation((url: string) =>
+        url === '/actions/1' ? Promise.resolve({data: fixture}) : Promise.resolve({data: {}}),
+      );
+      const user = userEvent.setup();
+      renderPage({actions: {...createActionState(), selectedAction: fixture}});
+      await user.click(await screen.findByRole('button', {name: 'gpsActionDetail.startAction'}));
+      await user.click(screen.getByRole('button', {name: 'gpsActionDetail.confirmStart'}));
+      await waitFor(() => {
+        expect(mockPost).toHaveBeenCalledWith('/actions/startAction', null, {
+          params: {userId: 5, actionId: 1},
+        });
+      });
+      await act(async () => {
+        watchSuccessCallback?.({
+          coords: {latitude: threeMetersNorth.latitude, longitude: threeMetersNorth.longitude} as GeolocationCoordinates,
+        } as GeolocationPosition);
+      });
+      await waitFor(() => {
+        expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
+          userId: 5,
+          actionId: 1,
+          subTaskId: 201,
+          actionType: 'GPS',
+        });
+      });
+    });
+  });
 });

@@ -11,28 +11,32 @@
         "displayName": "Start: Main Square",
         "actionId": 1,
         "latitude": 47.3769,
-        "longitude": 8.5417
+        "longitude": 8.5417,
+        "distanceThresholdLevel": "MEDIUM"
       },
       {
         "id": 2,
         "displayName": "Checkpoint 1: City Park",
         "actionId": 1,
         "latitude": 47.378,
-        "longitude": 8.543
+        "longitude": 8.543,
+        "distanceThresholdLevel": "MEDIUM"
       },
       {
         "id": 3,
         "displayName": "Checkpoint 2: Old Town",
         "actionId": 1,
         "latitude": 47.3792,
-        "longitude": 8.5445
+        "longitude": 8.5445,
+        "distanceThresholdLevel": "MEDIUM"
       },
       {
         "id": 4,
         "displayName": "Destination: Coffee Shop",
         "actionId": 1,
         "latitude": 47.3805,
-        "longitude": 8.546
+        "longitude": 8.546,
+        "distanceThresholdLevel": "MEDIUM"
       }
     ],
     "type": "GPS",
@@ -52,21 +56,24 @@
         "displayName": "Start: Bike Station",
         "actionId": 2,
         "latitude": 47.388715,
-        "longitude": 8.488892
+        "longitude": 8.488892,
+        "distanceThresholdLevel": "MEDIUM"
       },
       {
         "id": 6,
         "displayName": "Checkpoint 1: Lake View",
         "actionId": 2,
         "latitude": 47.378715,
-        "longitude": 8.488892
+        "longitude": 8.488892,
+        "distanceThresholdLevel": "MEDIUM"
       },
       {
         "id": 7,
         "displayName": "Destination: Restaurant",
         "actionId": 2,
         "latitude": 47.377,
-        "longitude": 8.488892
+        "longitude": 8.488892,
+        "distanceThresholdLevel": "MEDIUM"
       }
     ],
     "type": "GPS",
