@@ -2,6 +2,7 @@ package com.zhaw.backend.service;
 
 import com.zhaw.backend.model.dao.VoucherCodeDao;
 import com.zhaw.backend.model.dao.VoucherDao;
+import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.dto.UserVoucherDto;
 import com.zhaw.backend.model.dto.VoucherDto;
 import com.zhaw.backend.model.entities.Voucher;
@@ -55,6 +56,10 @@ class VoucherServiceImplTest {
                 .validUntil(validUntil)
                 .createdOn(LocalDateTime.of(2026, 1, 1, 0, 0))
                 .build();
+    }
+
+    private UserDto buildUserDto(Long id, String username) {
+        return UserDto.builder().id(id).username(username).build();
     }
 
     private VoucherCode buildCode(Long id, String code) {
@@ -139,11 +144,12 @@ class VoucherServiceImplTest {
             Voucher voucher = buildVoucher(1L, 100, LocalDateTime.now().plusDays(30));
             VoucherCode code = buildCode(10L, "GREENRIDE-ABC1");
 
+            when(userService.findUserByUsername("alice")).thenReturn(buildUserDto(5L, "alice"));
             when(voucherDao.findById(1L)).thenReturn(Optional.of(voucher));
             when(voucherCodeDao.findAndAssign(eq(1L), eq(5L), any(LocalDateTime.class))).thenReturn(Optional.of(code));
             when(userService.deductPointsFromUser(5L, 100)).thenReturn(true);
 
-            UserVoucherDto result = voucherService.redeemVoucher(5L, 1L);
+            UserVoucherDto result = voucherService.redeemVoucher("alice", 1L);
 
             assertNotNull(result);
             assertEquals("GREENRIDE-ABC1", result.getCode());
@@ -159,11 +165,12 @@ class VoucherServiceImplTest {
             Voucher voucher = buildVoucher(1L, 50, LocalDateTime.now().plusDays(30));
             VoucherCode code = buildCode(42L, "ECOEATS-XYZ1");
 
+            when(userService.findUserByUsername("bob")).thenReturn(buildUserDto(7L, "bob"));
             when(voucherDao.findById(1L)).thenReturn(Optional.of(voucher));
             when(voucherCodeDao.findAndAssign(eq(1L), eq(7L), any(LocalDateTime.class))).thenReturn(Optional.of(code));
             when(userService.deductPointsFromUser(anyLong(), anyInt())).thenReturn(true);
 
-            UserVoucherDto result = voucherService.redeemVoucher(7L, 1L);
+            UserVoucherDto result = voucherService.redeemVoucher("bob", 1L);
 
             verify(voucherCodeDao).findAndAssign(eq(1L), eq(7L), any(LocalDateTime.class));
             assertEquals("ECOEATS-XYZ1", result.getCode());
@@ -174,7 +181,7 @@ class VoucherServiceImplTest {
         void throwsWhenVoucherNotFound() {
             when(voucherDao.findById(99L)).thenReturn(Optional.empty());
 
-            Exception ex = assertThrows(Exception.class, () -> voucherService.redeemVoucher(1L, 99L));
+            Exception ex = assertThrows(Exception.class, () -> voucherService.redeemVoucher("alice", 99L));
             assertEquals("Voucher not found", ex.getMessage());
 
             verifyNoInteractions(voucherCodeDao, userService);
@@ -186,7 +193,7 @@ class VoucherServiceImplTest {
             Voucher expired = buildVoucher(1L, 100, LocalDateTime.now().minusDays(1));
             when(voucherDao.findById(1L)).thenReturn(Optional.of(expired));
 
-            Exception ex = assertThrows(Exception.class, () -> voucherService.redeemVoucher(5L, 1L));
+            Exception ex = assertThrows(Exception.class, () -> voucherService.redeemVoucher("alice", 1L));
             assertEquals("Voucher has expired", ex.getMessage());
 
             verifyNoInteractions(voucherCodeDao, userService);
@@ -195,19 +202,21 @@ class VoucherServiceImplTest {
         @Test
         @DisplayName("throws when no codes available")
         void throwsWhenNoCodesAvailable() {
+            when(userService.findUserByUsername("alice")).thenReturn(buildUserDto(5L, "alice"));
             Voucher voucher = buildVoucher(1L, 100, LocalDateTime.now().plusDays(30));
             when(voucherDao.findById(1L)).thenReturn(Optional.of(voucher));
             when(voucherCodeDao.findAndAssign(eq(1L), eq(5L), any(LocalDateTime.class))).thenReturn(Optional.empty());
 
-            Exception ex = assertThrows(Exception.class, () -> voucherService.redeemVoucher(5L, 1L));
+            Exception ex = assertThrows(Exception.class, () -> voucherService.redeemVoucher("alice", 1L));
             assertEquals("No codes available", ex.getMessage());
 
-            verifyNoInteractions(userService);
+            verify(userService, never()).deductPointsFromUser(anyLong(), anyInt());
         }
 
         @Test
         @DisplayName("throws when user has insufficient points")
         void throwsWhenInsufficientPoints() {
+            when(userService.findUserByUsername("alice")).thenReturn(buildUserDto(5L, "alice"));
             Voucher voucher = buildVoucher(1L, 100, LocalDateTime.now().plusDays(30));
             VoucherCode code = buildCode(10L, "GREENRIDE-ABC1");
 
@@ -215,13 +224,14 @@ class VoucherServiceImplTest {
             when(voucherCodeDao.findAndAssign(eq(1L), eq(5L), any(LocalDateTime.class))).thenReturn(Optional.of(code));
             when(userService.deductPointsFromUser(5L, 100)).thenReturn(false);
 
-            Exception ex = assertThrows(Exception.class, () -> voucherService.redeemVoucher(5L, 1L));
+            Exception ex = assertThrows(Exception.class, () -> voucherService.redeemVoucher("alice", 1L));
             assertEquals("Insufficient points", ex.getMessage());
         }
 
         @Test
         @DisplayName("rolls back code assignment when point deduction fails")
         void rollsBackAssignmentWhenDeductionFails() {
+            when(userService.findUserByUsername("alice")).thenReturn(buildUserDto(5L, "alice"));
             Voucher voucher = buildVoucher(1L, 200, LocalDateTime.now().plusDays(30));
             VoucherCode code = buildCode(3L, "VELO-FREE-001");
 
@@ -229,7 +239,7 @@ class VoucherServiceImplTest {
             when(voucherCodeDao.findAndAssign(eq(1L), eq(5L), any(LocalDateTime.class))).thenReturn(Optional.of(code));
             when(userService.deductPointsFromUser(5L, 200)).thenReturn(false);
 
-            assertThrows(Exception.class, () -> voucherService.redeemVoucher(5L, 1L));
+            assertThrows(Exception.class, () -> voucherService.redeemVoucher("alice", 1L));
 
             // findAndAssign was called (code was claimed in DB), but the @Transactional
             // on the service method rolls back the UPDATE when the exception propagates

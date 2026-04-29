@@ -11,8 +11,12 @@ export interface RewardDto {
   available: number;
 }
 
-interface RedemptionResult {
-  success: boolean;
+export interface RedemptionResult {
+  code: string;
+  voucherId: number;
+  displayName: string;
+  pointsDeducted: number;
+  assignedAt: string;
 }
 
 interface RewardState {
@@ -35,7 +39,7 @@ const initialState: RewardState = {
 
 export const fetchRewards = createAsyncThunk('reward/fetchRewards', async (_, {rejectWithValue}) => {
   try {
-    const response = await apiClient.get('/rewards');
+    const response = await apiClient.get('/vouchers');
     return response.data;
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -47,16 +51,16 @@ export const fetchRewards = createAsyncThunk('reward/fetchRewards', async (_, {r
 
 export const redeemVoucher = createAsyncThunk(
   'reward/redeemVoucher',
-  async ({userId, voucherId}: {userId: number; voucherId: string}, {rejectWithValue}) => {
+  async ({voucherId}: {voucherId: string}, {rejectWithValue}) => {
     try {
-      const response = await apiClient.post(`/users/redemptions?userId=${userId}&voucherId=${voucherId}`);
+      const response = await apiClient.post(`/vouchers/${voucherId}/redeem`);
       return response.data as RedemptionResult;
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as {
-          response?: {data?: {error?: string}};
-        };
-        return rejectWithValue(axiosError.response?.data?.error ?? 'Failed to redeem voucher');
+        const axiosError = error as {response?: {data?: unknown}};
+        const data = axiosError.response?.data;
+        const message = typeof data === 'string' ? data : 'Failed to redeem voucher';
+        return rejectWithValue(message);
       }
       if (error instanceof Error) {
         return rejectWithValue(error.message);
@@ -83,7 +87,7 @@ const rewardSlice = createSlice({
       })
       .addCase(fetchRewards.fulfilled, (state, action) => {
         state.loading = false;
-        state.rewards = action.payload;
+        state.rewards = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchRewards.rejected, (state, action) => {
         state.loading = false;

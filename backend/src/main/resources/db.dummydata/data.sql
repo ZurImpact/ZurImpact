@@ -32,7 +32,26 @@ INSERT INTO voucher_code (voucher_id, code) VALUES
     (2, 'ECOEATS-XYZ1'),
     (2, 'ECOEATS-XYZ2'),
     (3, 'VELO-FREE-001'),
-    (3, 'VELO-FREE-002');
+    (3, 'VELO-FREE-002'),
+    (3, 'VELO-FREE-003'),
+    (3, 'VELO-FREE-004'),
+    (3, 'VELO-FREE-005'),
+    (3, 'VELO-FREE-006'),
+    (3, 'VELO-FREE-007'),
+    (3, 'VELO-FREE-008'),
+    (3, 'VELO-FREE-009'),
+    (3, 'VELO-FREE-010'),
+    (3, 'VELO-FREE-011'),
+    (3, 'VELO-FREE-012'),
+    (3, 'VELO-FREE-013'),
+    (3, 'VELO-FREE-014'),
+    (3, 'VELO-FREE-015'),
+    (3, 'VELO-FREE-016'),
+    (3, 'VELO-FREE-017'),
+    (3, 'VELO-FREE-018'),
+    (3, 'VELO-FREE-019'),
+    (3, 'VELO-FREE-020');
+
 
 -- 6. ACTION
 INSERT INTO action (description, display_name, points, tags, type, has_subtasks, valid_until, created_on) VALUES

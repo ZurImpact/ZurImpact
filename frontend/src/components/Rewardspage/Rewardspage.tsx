@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import type {RedemptionResult} from '../../store/slices/RewardSlice';
 import {Card} from '../ui/card';
 import {Button} from '../ui/button';
 import {Badge} from '../ui/badge';
@@ -31,9 +32,11 @@ export function RewardsPage() {
   const dispatch = useAppDispatch();
   const {t} = useTranslation();
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
+  const [redeemedResult, setRedeemedResult] = useState<RedemptionResult | null>(null);
+  const [redeemError, setRedeemError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
 
-  const {rewards, redemptionLoading, redemptionSuccess, redemptionError, loading} = useAppSelector((s) => s.rewards);
+  const {rewards, redemptionLoading, loading, redemptionSuccess, redemptionError} = useAppSelector((s) => s.rewards);
   const {currentUser, isAuthenticated, loading: userLoading, error: userError} = useAppSelector((s) => s.user);
 
   useEffect(() => {
@@ -45,17 +48,28 @@ export function RewardsPage() {
     if (redemptionSuccess) {
       toast.success(t('rewardsPage.redeemSuccess'));
       dispatch(resetRedemptionStatus());
-      dispatch(fetchCurrentUser());
-      dispatch(fetchRewards()); // to sync backend with available vouchers?
-    } else if (redemptionError) {
+    }
+  }, [redemptionSuccess, dispatch, t]);
+
+  useEffect(() => {
+    if (redemptionError) {
       toast.error(redemptionError);
       dispatch(resetRedemptionStatus());
     }
-  }, [redemptionSuccess, redemptionError, dispatch, t]);
+  }, [redemptionError, dispatch]);
 
-  const isDialogOpen = selectedReward !== null && !redemptionLoading && !redemptionSuccess;
+  const isDialogOpen = selectedReward !== null || redeemedResult !== null;
 
-  const handleRedeem = (reward: Reward) => {
+  const handleDismissResult = () => {
+    setRedeemedResult(null);
+    setSelectedReward(null);
+    setRedeemError(null);
+    dispatch(resetRedemptionStatus());
+    dispatch(fetchCurrentUser());
+    dispatch(fetchRewards());
+  };
+
+  const handleRedeem = async (reward: Reward) => {
     if (!currentUser) {
       toast.error(t('rewardsPage.notAuthenticated'));
       return;
@@ -66,8 +80,13 @@ export function RewardsPage() {
       return;
     }
 
-    dispatch(redeemVoucher({userId: currentUser.id, voucherId: reward.id}));
-    setSelectedReward(null);
+    setRedeemError(null);
+    try {
+      const result = await dispatch(redeemVoucher({voucherId: reward.id})).unwrap();
+      setRedeemedResult(result);
+    } catch (err) {
+      setRedeemError(typeof err === 'string' ? err : t('rewardsPage.redeemFailed'));
+    }
   };
 
   const handleRetryAuth = () => {
@@ -201,55 +220,76 @@ export function RewardsPage() {
 
       <Dialog open={isDialogOpen}>
         <DialogContent className="bg-card">
-          <DialogHeader>
-            <DialogTitle>{t('rewardsPage.redeemReward')}</DialogTitle>
-            <DialogDescription>{t('rewardsPage.confirmRedemption')}</DialogDescription>
-          </DialogHeader>
-
-          {selectedReward && (
-            <div className="space-y-4 mt-4">
-              <div className="p-4 bg-secondary rounded-lg">
-                <h4 className="font-semibold mb-2">{selectedReward.title}</h4>
-                <p className="text-sm mb-3">{selectedReward.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">{t('rewardsPage.cost')}:</span>
-                  <span className="font-bold text-green-600">
-                    {selectedReward.points} {t('rewardsPage.pts')}
-                  </span>
+          {redeemedResult ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>{t('rewardsPage.redeemSuccess')}</DialogTitle>
+                <DialogDescription>{redeemedResult.displayName}</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 mt-4">
+                <div className="p-4 bg-green-100 dark:bg-green-500/20 rounded-lg text-center">
+                  <p className="text-sm text-gray-600 mb-2">{t('rewardsPage.yourVoucherCode')}</p>
+                  <p className="text-2xl font-mono font-bold tracking-widest text-green-700">{redeemedResult.code}</p>
                 </div>
-              </div>
-
-              <div className="p-4 bg-green-100 dark:bg-green-500/20 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm">{t('rewardsPage.currentPoints')}:</span>
-                  <span className="font-semibold">{currentUser?.points}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">{t('rewardsPage.afterRedemption')}:</span>
-                  <span className="font-semibold text-green-700">
-                    {(currentUser?.points ?? 0) - selectedReward.points}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setSelectedReward(null)}
-                  disabled={redemptionLoading}
-                >
-                  {t('rewardsPage.cancel')}
-                </Button>
-                <Button // confirm redeption button
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                  onClick={() => handleRedeem(selectedReward)}
-                  disabled={redemptionLoading}
-                >
-                  {redemptionLoading ? t('rewardsPage.redeeming') : t('rewardsPage.confirmRedemptionBtn')}
+                <Button className="w-full bg-green-600 hover:bg-green-700" onClick={handleDismissResult}>
+                  {t('rewardsPage.close')}
                 </Button>
               </div>
-            </div>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle>{t('rewardsPage.redeemReward')}</DialogTitle>
+                <DialogDescription>{t('rewardsPage.confirmRedemption')}</DialogDescription>
+              </DialogHeader>
+              {selectedReward && (
+                <div className="space-y-4 mt-4">
+                  <div className="p-4 bg-secondary rounded-lg">
+                    <h4 className="font-semibold mb-2">{selectedReward.title}</h4>
+                    <p className="text-sm mb-3">{selectedReward.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">{t('rewardsPage.cost')}:</span>
+                      <span className="font-bold text-green-600">
+                        {selectedReward.points} {t('rewardsPage.pts')}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-green-100 dark:bg-green-500/20 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm">{t('rewardsPage.currentPoints')}:</span>
+                      <span className="font-semibold">{currentUser?.points}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">{t('rewardsPage.afterRedemption')}:</span>
+                      <span className="font-semibold text-green-700">
+                        {(currentUser?.points ?? 0) - selectedReward.points}
+                      </span>
+                    </div>
+                  </div>
+
+                  {redeemError && <p className="text-sm text-red-600 text-center">{redeemError}</p>}
+
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setSelectedReward(null)}
+                      disabled={redemptionLoading}
+                    >
+                      {t('rewardsPage.cancel')}
+                    </Button>
+                    <Button
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                      onClick={() => handleRedeem(selectedReward)}
+                      disabled={redemptionLoading}
+                    >
+                      {redemptionLoading ? t('rewardsPage.redeeming') : t('rewardsPage.confirmRedemptionBtn')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </DialogContent>
       </Dialog>

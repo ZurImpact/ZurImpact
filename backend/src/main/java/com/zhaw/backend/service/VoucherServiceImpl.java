@@ -51,13 +51,15 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UserVoucherDto redeemVoucher(Long userId, Long voucherId) throws Exception {
+    public UserVoucherDto redeemVoucher(String username, Long voucherId) throws Exception {
         Voucher voucher = voucherDao.findById(voucherId)
                 .orElseThrow(() -> new Exception("Voucher not found"));
 
         if (!voucher.getValidUntil().isAfter(LocalDateTime.now())) {
             throw new Exception("Voucher has expired");
         }
+
+        Long userId = userService.findUserByUsername(username).getId();
 
         LocalDateTime assignedAt = LocalDateTime.now();
         VoucherCode voucherCode = voucherCodeDao.findAndAssign(voucherId, userId, assignedAt)
