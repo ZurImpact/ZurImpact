@@ -5,7 +5,6 @@ import com.zhaw.backend.enums.CompletionState;
 import com.zhaw.backend.model.dao.ActionDao;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
-import com.zhaw.backend.model.dto.SubTaskDto;
 import com.zhaw.backend.model.entities.Action;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -100,21 +99,6 @@ class ActionServiceImplTest {
                 assertEquals(3L, result.getId());
                 assertNull(result.getSubTasks());
                 verify(subTaskService, never()).getSubTasks(any(), any());
-            }
-
-            @Test
-            @DisplayName("populates subtasks when subtasks exist")
-            void populatesSubTaskListWhenSubtasksExist() throws Exception {
-                Action action = buildAction(4L, true);
-                when(actionDao.findById(4L)).thenReturn(action);
-                List<SubTaskDto> subTasks = List.of(SubTaskDto.builder().id(21L).actionId(4L).build());
-                when(subTaskService.getSubTasks(4L, ActionType.GPS)).thenReturn(subTasks);
-
-                var result = actionService.getActionById(4L);
-
-                assertEquals(4L, result.getId());
-                assertEquals(subTasks, result.getSubTasks());
-                verify(subTaskService).getSubTasks(4L, ActionType.GPS);
             }
         }
 

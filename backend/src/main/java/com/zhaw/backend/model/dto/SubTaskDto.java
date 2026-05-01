@@ -2,7 +2,6 @@ package com.zhaw.backend.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import jakarta.persistence.MappedSuperclass;
 import lombok.*;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
@@ -11,10 +10,8 @@ import lombok.*;
 })
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@MappedSuperclass
 public class SubTaskDto {
 
     private Long id;
