@@ -56,7 +56,7 @@ public class SecurityConfig {
                         )).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/auth/login", HttpMethod.POST.name())).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/auth/logout", HttpMethod.POST.name())).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/users/**", HttpMethod.GET.name())).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/users/**", HttpMethod.GET.name())).hasAnyRole("USER", "ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/api/action", HttpMethod.GET.name())).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/actions", HttpMethod.POST.name())).hasAnyRole("ADMIN", "PARTNER")
                         .requestMatchers(new AntPathRequestMatcher("/api/actions/**", HttpMethod.PUT.name())).hasAnyRole("ADMIN", "PARTNER")
