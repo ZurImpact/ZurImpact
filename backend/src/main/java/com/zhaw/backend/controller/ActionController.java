@@ -4,6 +4,7 @@ import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.service.ActionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +91,7 @@ public class ActionController {
      */
     @PostMapping
     @Operation(summary = "Create action", description = "Creates a new action, optionally with subtasks. Requires ADMIN or PARTNER role.", tags = "Action Management")
-    public ResponseEntity<ActionDto> createAction(@RequestBody ActionDto dto) {
+    public ResponseEntity<ActionDto> createAction(@Valid @RequestBody ActionDto dto) {
         try {
             ActionDto created = actionService.createAction(dto);
             logger.info("CREATED ACTION - id: {}", created.getId());
