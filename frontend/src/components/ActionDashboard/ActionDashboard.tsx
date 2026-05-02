@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import {Award} from 'lucide-react';
+import {Card} from '../ui/card';
 import {useAppSelector, useAppDispatch} from '../../store/store';
 import {fetchActions, fetchUserActions} from '../../store/slices/ActionSlice';
 import {useTranslation} from 'react-i18next';
@@ -33,9 +34,9 @@ export function ActionDashboard() {
   if (!isAuthenticated) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="p-6 text-center bg-card text-card-foreground rounded-xl border">
+        <Card className="p-6 text-center bg-card text-card-foreground rounded-xl border">
           <p className="text-muted-foreground">{t('actionDashboard.loginPrompt')}</p>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -65,7 +66,7 @@ export function ActionDashboard() {
       </div>
 
       {/* Activity History */}
-      <div className="p-6 bg-card text-card-foreground rounded-xl border">
+      <Card className="p-6 bg-card text-card-foreground rounded-xl border">
         <h2 className="text-2xl font-semibold mb-6">{t('actionDashboard.historyTitle')}</h2>
 
         {error && (
@@ -115,7 +116,7 @@ export function ActionDashboard() {
             })}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }
