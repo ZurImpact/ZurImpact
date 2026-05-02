@@ -19,18 +19,24 @@ public final class SubTaskMapper {
         }
 
         if (entity instanceof GpsActionTask gpsActionTask) {
-            GpsActionTaskDto dto = new GpsActionTaskDto();
-            mapCommonFields(gpsActionTask, dto);
-            dto.setLatitude(gpsActionTask.getLatitude());
-            dto.setLongitude(gpsActionTask.getLongitude());
-            String distanceThresholdLevel = gpsActionTask.getDistanceThresholdLevel();
-            dto.setDistanceThresholdLevel(distanceThresholdLevel == null ? null : DistanceThresholdLevel.valueOf(distanceThresholdLevel));
-            return dto;
+            return GpsActionTaskDto.builder()
+                    .id(gpsActionTask.getId())
+                    .description(gpsActionTask.getDescription())
+                    .displayName(gpsActionTask.getDisplayName())
+                    .actionId(gpsActionTask.getActionId())
+                    .latitude(gpsActionTask.getLatitude())
+                    .longitude(gpsActionTask.getLongitude())
+                    .distanceThresholdLevel(gpsActionTask.getDistanceThresholdLevel() == null ? null
+                            : DistanceThresholdLevel.valueOf(gpsActionTask.getDistanceThresholdLevel()))
+                    .build();
         }
 
-        SubTaskDto dto = new SubTaskDto();
-        mapCommonFields(entity, dto);
-        return dto;
+        return SubTaskDto.builder()
+                .id(entity.getId())
+                .description(entity.getDescription())
+                .displayName(entity.getDisplayName())
+                .actionId(entity.getActionId())
+                .build();
     }
 
     public static SubTask GpsActionTaskToEntity(SubTaskDto dto) {
@@ -39,17 +45,23 @@ public final class SubTaskMapper {
         }
 
         if (dto instanceof GpsActionTaskDto gpsDto) {
-            GpsActionTask entity = new GpsActionTask();
-            mapCommonFields(gpsDto, entity);
-            entity.setLatitude(gpsDto.getLatitude());
-            entity.setLongitude(gpsDto.getLongitude());
-            entity.setDistanceThresholdLevel(gpsDto.getDistanceThresholdLevel().name());
-            return entity;
+            return GpsActionTask.builder()
+                    .id(gpsDto.getId())
+                    .description(gpsDto.getDescription())
+                    .displayName(gpsDto.getDisplayName())
+                    .actionId(gpsDto.getActionId())
+                    .latitude(gpsDto.getLatitude())
+                    .longitude(gpsDto.getLongitude())
+                    .distanceThresholdLevel(gpsDto.getDistanceThresholdLevel().name())
+                    .build();
         }
 
-        SubTask entity = new SubTask();
-        mapCommonFields(dto, entity);
-        return entity;
+        return SubTask.builder()
+                .id(dto.getId())
+                .description(dto.getDescription())
+                .displayName(dto.getDisplayName())
+                .actionId(dto.getActionId())
+                .build();
     }
 
     public static List<SubTaskDto> GpsActionTaskToDtoList(List<? extends SubTask> entities) {
@@ -70,19 +82,5 @@ public final class SubTaskMapper {
                 .filter(Objects::nonNull)
                 .map(SubTaskMapper::GpsActionTaskToEntity)
                 .collect(Collectors.toList());
-    }
-
-    private static void mapCommonFields(SubTask source, SubTaskDto target) {
-        target.setId(source.getId());
-        target.setDescription(source.getDescription());
-        target.setDisplayName(source.getDisplayName());
-        target.setActionId(source.getActionId());
-    }
-
-    private static void mapCommonFields(SubTaskDto source, SubTask target) {
-        target.setId(source.getId());
-        target.setDescription(source.getDescription());
-        target.setDisplayName(source.getDisplayName());
-        target.setActionId(source.getActionId());
     }
 }
