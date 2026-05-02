@@ -34,8 +34,8 @@ describe('Badge', () => {
   });
 
   it('applies custom className', () => {
-    render(<Badge className="bg-blue-100">Custom</Badge>);
+    render(<Badge className="bg-info-container">Custom</Badge>);
 
-    expect(screen.getByText('Custom')).toHaveClass('bg-blue-100');
+    expect(screen.getByText('Custom')).toHaveClass('bg-info-container');
   });
 });

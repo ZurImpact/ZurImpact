@@ -33,11 +33,12 @@ const DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 const createCheckpointIcon = (index: number, isCheckedIn: boolean) => {
-  const color = isCheckedIn ? '#22c55e' : '#3b82f6';
+  const color = isCheckedIn ? 'var(--brand)' : 'var(--info-container)';
+  const textColor = isCheckedIn ? 'var(--brand-foreground)' : 'var(--on-info-container)';
   const svgIcon = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
       <circle cx="50" cy="50" r="45" fill="${color}" stroke="white" stroke-width="4"/>
-      <text x="50" y="65" font-size="40" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">${index}</text>
+      <text x="50" y="65" font-size="40" font-weight="bold" fill="${textColor}" text-anchor="middle" dominant-baseline="middle">${index}</text>
     </svg>
   `;
   return L.divIcon({
@@ -52,7 +53,7 @@ const createCheckpointIcon = (index: number, isCheckedIn: boolean) => {
 const userLocationIcon = L.divIcon({
   html: `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="30" fill="#ef4444" stroke="white" stroke-width="4"/>
+      <circle cx="50" cy="50" r="30" fill="var(--destructive)" stroke="white" stroke-width="4"/>
       <circle cx="50" cy="50" r="15" fill="white"/>
     </svg>
   `,
@@ -130,6 +131,10 @@ export function GpsActionDetailPage() {
 
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [checkedInCheckpointIds, setCheckedInCheckpointIds] = useState<Set<number>>(new Set());
+  const checkedInCheckpointIdsRef = useRef(checkedInCheckpointIds);
+  useEffect(() => {
+    checkedInCheckpointIdsRef.current = checkedInCheckpointIds;
+  }, [checkedInCheckpointIds]);
   const [isTrackingLocation, setIsTrackingLocation] = useState(false);
 
   const watchIdRef = useRef<number | null>(null);
@@ -203,12 +208,11 @@ export function GpsActionDetailPage() {
         setUserLocation(newLocation);
 
         initialCheckpoints.forEach((cp) => {
-          if (checkedInCheckpointIds.has(cp.id)) return;
+          if (checkedInCheckpointIdsRef.current.has(cp.id)) return;
 
           const distance = calculateDistance(latitude, longitude, cp.position[0], cp.position[1]);
 
           if (distance <= thresholdToMeters(cp.distanceThresholdLevel) && hasStartedAction) {
-            // Update local state
             setCheckedInCheckpointIds((prev) => {
               if (prev.has(cp.id)) return prev;
               const next = new Set(prev);
@@ -216,7 +220,6 @@ export function GpsActionDetailPage() {
               return next;
             });
 
-            // Sync to backend (only once per checkpoint)
             if (!completedSubtasksRef.current.has(cp.id)) {
               completedSubtasksRef.current.add(cp.id);
               const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
@@ -262,7 +265,7 @@ export function GpsActionDetailPage() {
       }
       setIsTrackingLocation(false);
     };
-  }, [t, initialCheckpoints, checkedInCheckpointIds, id, dispatch, hasStartedAction]);
+  }, [t, initialCheckpoints, id, dispatch, hasStartedAction]);
 
   const allCheckpointsCheckedIn = checkpoints.length > 0 && checkpoints.every((cp) => cp.isCheckedIn);
   const checkedInCount = checkpoints.filter((cp) => cp.isCheckedIn).length;
@@ -281,6 +284,7 @@ export function GpsActionDetailPage() {
         });
     }
   }, [allCheckpointsCheckedIn, dispatch, id, t]);
+
   const polylinePositions = checkpoints.map((cp) => cp.position);
 
   const handleBack = () => {
@@ -291,7 +295,7 @@ export function GpsActionDetailPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand"></div>
         </div>
       </div>
     );
@@ -301,7 +305,7 @@ export function GpsActionDetailPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <Card className="p-6">
-          <p className="text-red-600">{error || t('gpsActionDetail.actionNotFound')}</p>
+          <p className="text-destructive">{error || t('gpsActionDetail.actionNotFound')}</p>
           <Button onClick={handleBack} className="mt-4">
             {t('gpsActionDetail.back')}
           </Button>
@@ -314,23 +318,26 @@ export function GpsActionDetailPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
         <Button variant="ghost" onClick={handleBack} className="mb-4 pl-0">
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
           {t('gpsActionDetail.back')}
         </Button>
 
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">{selectedAction.displayName}</h1>
-            <p className="text-gray-600">{selectedAction.description}</p>
+            <p className="text-muted-foreground">{selectedAction.description}</p>
           </div>
           <div className="flex items-center gap-4">
-            <Badge variant="secondary" className="text-lg px-4 py-2 bg-green-100 text-green-700">
-              <Award className="h-4 w-4 mr-1" />
+            <Badge
+              variant="secondary"
+              className="text-lg px-4 py-2 bg-brand-container border-brand text-on-brand-container"
+            >
+              <Award className="h-4 w-4 mr-1" aria-hidden="true" />
               {selectedAction.points} {t('points')}
             </Badge>
             {!hasStartedAction && (
               <Button
-                className="h-12 text-lg px-4 bg-green-600 text-primary-foreground"
+                className="h-12 text-lg px-4 bg-brand text-brand-foreground hover:bg-brand/90"
                 onClick={() => setShowStartDialog(true)}
               >
                 {t('gpsActionDetail.startAction')}
@@ -344,24 +351,32 @@ export function GpsActionDetailPage() {
         <div
           className="fixed inset-0 z-1000 flex items-center justify-center bg-black/50"
           onClick={() => setShowStartDialog(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('gpsActionDetail.startDialogTitle')}
         >
           <div
-            className="relative bg-card rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
+            className="relative bg-card border rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setShowStartDialog(false)}
-              className="absolute top-3 right-3 p-1 hover:bg-gray-100 rounded"
+              className="absolute top-3 right-3 p-1 hover:bg-surface-container-high rounded"
+              aria-label={t('rootLayout.closeMenu')}
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5" aria-hidden="true" />
             </button>
-            <h2 className="text-xl text-green-600 font-semibold mb-2">{t('gpsActionDetail.startDialogTitle')}</h2>
-            <p className="text-gray-600 mb-6">{t('gpsActionDetail.startDialogDescription')}</p>
+            <h2 className="text-xl text-brand font-semibold mb-2">{t('gpsActionDetail.startDialogTitle')}</h2>
+            <p className="text-muted-foreground mb-6">{t('gpsActionDetail.startDialogDescription')}</p>
             <div className="flex gap-3 justify-end">
-              <Button variant="outline" onClick={() => setShowStartDialog(false)}>
+              <Button variant="outline" className="border border-brand" onClick={() => setShowStartDialog(false)}>
                 {t('gpsActionDetail.cancel')}
               </Button>
-              <Button className="bg-green-600" onClick={handleStartAction} disabled={isStartingAction}>
+              <Button
+                className="bg-brand text-brand-foreground hover:bg-brand/90"
+                onClick={handleStartAction}
+                disabled={isStartingAction}
+              >
                 {isStartingAction ? t('gpsActionDetail.starting') : t('gpsActionDetail.confirmStart')}
               </Button>
             </div>
@@ -379,7 +394,13 @@ export function GpsActionDetailPage() {
               />
 
               {polylinePositions.length > 1 && (
-                <Polyline positions={polylinePositions} color="#3b82f6" weight={4} dashArray="10, 10" opacity={0.7} />
+                <Polyline
+                  positions={polylinePositions}
+                  color="var(--brand)"
+                  weight={4}
+                  dashArray="10, 10"
+                  opacity={0.7}
+                />
               )}
 
               {checkpoints.map((checkpoint) => (
@@ -390,9 +411,18 @@ export function GpsActionDetailPage() {
                 >
                   <Popup>
                     <div className="text-center p-2">
-                      <p className="font-bold">Checkpoint {checkpoint.index}</p>
+                      <p className="font-bold">
+                        {t('gpsActionDetail.checkpoint')} {checkpoint.index}
+                      </p>
                       <p className="text-sm">{checkpoint.displayName}</p>
-                      {checkpoint.isCheckedIn && <Badge className="mt-2 bg-green-500">Checked In</Badge>}
+                      {checkpoint.isCheckedIn && (
+                        <Badge className="mt-2 bg-brand">
+                          {t('gpsActionDetail.checkpointReached', {
+                            checkpoint: checkpoint.index,
+                            name: checkpoint.displayName,
+                          })}
+                        </Badge>
+                      )}
                     </div>
                   </Popup>
                 </Marker>
@@ -413,20 +443,20 @@ export function GpsActionDetailPage() {
         <div className="space-y-6">
           <Card className="p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Target className="h-5 w-5 text-blue-600" />
+              <div className="p-2 bg-info-container rounded-lg">
+                <Target className="h-5 w-5 text-on-info-container" aria-hidden="true" />
               </div>
               <div>
                 <h3 className="font-semibold">{t('gpsActionDetail.progress')}</h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   {checkedInCount} / {checkpoints.length} {t('gpsActionDetail.checkpoints')}
                 </p>
               </div>
             </div>
 
-            <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+            <div className="w-full bg-surface-container rounded-full h-3 mb-4">
               <div
-                className="bg-green-500 h-3 rounded-full transition-all duration-500"
+                className="bg-brand h-3 rounded-full transition-all duration-500"
                 style={{
                   width: `${checkpoints.length > 0 ? (checkedInCount / checkpoints.length) * 100 : 0}%`,
                 }}
@@ -434,9 +464,9 @@ export function GpsActionDetailPage() {
             </div>
 
             {allCheckpointsCheckedIn && (
-              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center gap-2 text-green-700">
-                  <CheckCircle2 className="h-5 w-5" />
+              <div className="mt-4 p-4 bg-brand-container border border-brand rounded-lg">
+                <div className="flex items-center gap-2 text-on-brand-container">
+                  <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
                   <span className="font-semibold">{t('gpsActionDetail.allCheckpointsReached')}</span>
                 </div>
               </div>
@@ -451,25 +481,31 @@ export function GpsActionDetailPage() {
                   key={checkpoint.id}
                   className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
                     checkpoint.isCheckedIn
-                      ? 'bg-green-100 dark:bg-card/40 border border-green-200 dark:border-green-400'
-                      : 'bg-gray-50 dark:bg-card/40 border border-gray-200'
+                      ? 'bg-brand-container border border-brand'
+                      : 'bg-surface-container border border-border'
                   }`}
                 >
                   <div
                     className={`p-2 rounded-full ${
-                      checkpoint.isCheckedIn ? 'bg-green-500 text-white' : 'bg-blue-100 text-blue-600'
+                      checkpoint.isCheckedIn
+                        ? 'bg-brand text-brand-foreground'
+                        : 'bg-info-container text-on-info-container'
                     }`}
                   >
-                    {checkpoint.isCheckedIn ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
+                    {checkpoint.isCheckedIn ? (
+                      <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Circle className="h-4 w-4" aria-hidden="true" />
+                    )}
                   </div>
                   <div className="flex-1">
                     <p className="font-medium">
                       {t('gpsActionDetail.checkpoint')} {checkpoint.index}
                     </p>
-                    <p className="text-sm text-gray-500">{checkpoint.displayName}</p>
+                    <p className="text-sm text-muted-foreground">{checkpoint.displayName}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-muted-foreground">
                       {checkpoint.position[0].toFixed(4)}, {checkpoint.position[1].toFixed(4)}
                     </p>
                   </div>
@@ -477,17 +513,17 @@ export function GpsActionDetailPage() {
               ))}
 
               {checkpoints.length === 0 && (
-                <p className="text-gray-500 text-center py-4">{t('gpsActionDetail.noCheckpoints')}</p>
+                <p className="text-muted-foreground text-center py-4">{t('gpsActionDetail.noCheckpoints')}</p>
               )}
             </div>
           </Card>
 
           <Card className="p-6 bg-card">
             <div className="flex items-start gap-3">
-              <Navigation className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <Navigation className="h-5 w-5 text-brand flex-shrink-0 mt-0.5" aria-hidden="true" />
               <div className="text-sm">
-                <p className="font-semibold text-blue-700 mb-1">{t('gpsActionDetail.trackingActive')}</p>
-                <p className="text-blue-600">
+                <p className="font-semibold text-foreground mb-1">{t('gpsActionDetail.trackingActive')}</p>
+                <p className="text-muted-foreground">
                   {isTrackingLocation ? t('gpsActionDetail.trackingEnabled') : t('gpsActionDetail.trackingDisabled')}
                 </p>
               </div>
@@ -497,9 +533,9 @@ export function GpsActionDetailPage() {
           {userLocation && (
             <Card className="p-6">
               <div className="flex items-center gap-3">
-                <MapPin className="h-5 w-5 text-red-500" />
+                <MapPin className="h-5 w-5 text-destructive" aria-hidden="true" />
                 <div>
-                  <p className="text-sm text-gray-500">{t('gpsActionDetail.yourLocation')}</p>
+                  <p className="text-sm text-muted-foreground">{t('gpsActionDetail.yourLocation')}</p>
                   <p className="font-mono text-sm">
                     {userLocation[0].toFixed(6)}, {userLocation[1].toFixed(6)}
                   </p>
