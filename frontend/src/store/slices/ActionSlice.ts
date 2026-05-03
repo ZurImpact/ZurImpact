@@ -31,7 +31,7 @@ export interface SubActionDto {
 
 export type ActionType = 'GPS' | 'PHOTO' | 'TICKET';
 
-interface UserActionHistoryDto {
+export interface UserActionHistoryDto {
   actionId: number;
   description?: string;
   displayName: string;
@@ -42,6 +42,7 @@ interface UserActionHistoryDto {
   completionState?: string;
   isSubtask?: boolean;
   subtaskId?: string;
+  subactionId?: string;
   mappingCreatedOn?: string;
 }
 
@@ -107,11 +108,22 @@ export const fetchActionById = createAsyncThunk(
 );
 
 // Async thunk for fetching user's action history
+type FetchUserActionsParams = {
+  userId: number;
+  active?: boolean;
+};
+
 export const fetchUserActions = createAsyncThunk(
   'action/fetchUserActions',
-  async (userId: number, {rejectWithValue}) => {
+  async (params: FetchUserActionsParams, {rejectWithValue}) => {
     try {
-      const response = await apiClient.get(`/userActionHistory/getUserActions?userId=${userId}`);
+      const searchParams = new URLSearchParams({userId: String(params.userId)});
+
+      if (params.active !== undefined) {
+        searchParams.append('active', String(params.active));
+      }
+
+      const response = await apiClient.get(`/userActionHistory/getUserActions?${searchParams.toString()}`);
       return response.data;
     } catch (error: unknown) {
       if (error instanceof Error) {

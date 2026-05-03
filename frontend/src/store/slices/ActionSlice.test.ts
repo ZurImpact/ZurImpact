@@ -163,7 +163,7 @@ describe('ActionSlice', () => {
       const store = createTestStore();
       mockedGet.mockResolvedValueOnce({data: [mockUserAction]});
 
-      await store.dispatch(fetchUserActions(123));
+      await store.dispatch(fetchUserActions({userId: 123}));
 
       const state = store.getState().actions;
       expect(state.userActions).toEqual([mockUserAction]);
@@ -175,7 +175,7 @@ describe('ActionSlice', () => {
       const store = createTestStore();
       mockedGet.mockRejectedValueOnce(new Error('Unauthorized'));
 
-      await store.dispatch(fetchUserActions(123));
+      await store.dispatch(fetchUserActions({userId: 123}));
 
       expect(store.getState().actions.error).toBe('Unauthorized');
     });
@@ -184,9 +184,18 @@ describe('ActionSlice', () => {
       const store = createTestStore();
       mockedGet.mockRejectedValueOnce(null);
 
-      await store.dispatch(fetchUserActions(123));
+      await store.dispatch(fetchUserActions({userId: 123}));
 
       expect(store.getState().actions.error).toBe('Failed to fetch user actions');
+    });
+
+    it('passes active query param when provided', async () => {
+      const store = createTestStore();
+      mockedGet.mockResolvedValueOnce({data: [mockUserAction]});
+
+      await store.dispatch(fetchUserActions({userId: 123, active: true}));
+
+      expect(mockedGet).toHaveBeenCalledWith('/userActionHistory/getUserActions?userId=123&active=true');
     });
   });
 
