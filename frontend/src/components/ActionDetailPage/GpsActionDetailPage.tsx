@@ -331,7 +331,7 @@ export function GpsActionDetailPage() {
       }
       setIsTrackingLocation(false);
     };
-  }, [t, initialCheckpoints, checkedInCheckpointIds, actionIdFromRoute, actionIdFromRoute, dispatch, hasStartedAction]);
+  }, [t, initialCheckpoints, checkedInCheckpointIds, actionIdFromRoute, dispatch, hasStartedAction]);
 
   const allCheckpointsCheckedIn = checkpoints.length > 0 && checkpoints.every((cp) => cp.isCheckedIn);
   const checkedInCount = checkpoints.filter((cp) => cp.isCheckedIn).length;
