@@ -13,6 +13,8 @@ const mockUserActions = loadJSON('get_useractions.json');
 const mockRewards = loadJSON('get_rewards.json');
 const mockCurrentUser = loadJSON('get_current_user.json');
 
+let isMockAuthenticated = false;
+
 let mockUserPoints = {
   userId: mockCurrentUser.id,
   points: mockCurrentUser.points,
@@ -179,6 +181,28 @@ app.post(BASE_URL + '/users/redemptions', (req, res) => {
     remainingPoints: mockUserPoints.points,
     voucherCode,
   });
+});
+
+app.get(BASE_URL + '/auth/whoami', (req, res) => {
+  if (isMockAuthenticated) {
+    // Return mock user data matching the real backend's response structure
+    res.status(200).json({
+      username: mockCurrentUser.name,
+      roles: ['ROLE_USER'],
+    });
+  } else {
+    res.status(401).json({message: 'Not authenticated'});
+  }
+});
+
+app.post(BASE_URL + '/auth/dev-login', (req, res) => {
+  isMockAuthenticated = true; // Track successful login
+  res.status(200).json({message: 'Login successful (mock)', userId: 123});
+});
+
+app.post(BASE_URL + '/auth/logout', (req, res) => {
+  isMockAuthenticated = false;
+  res.status(200).json({message: 'Logged out successfully'});
 });
 
 app.listen(PORT, () => {

@@ -83,7 +83,7 @@ describe('MapTrackingPage', () => {
 
     await user.click(screen.getByRole('button', {name: /actionDetail.startTracking/}));
 
-    expect(mockToastError).toHaveBeenCalledWith('Geolocation is not supported by your browser');
+    expect(mockToastError).toHaveBeenCalledWith('actionDetail.geolocationError');
   });
 
   it('starts, tracks distance, and stops with saved activity toast', async () => {
@@ -125,6 +125,6 @@ describe('MapTrackingPage', () => {
       watchErrorCallback?.({message: 'Permission denied'} as GeolocationPositionError);
     });
 
-    expect(mockToastError).toHaveBeenCalledWith('Error tracking location: Permission denied');
+    expect(mockToastError).toHaveBeenCalledWith('actionDetail.locationErrorPermission denied');
   });
 });

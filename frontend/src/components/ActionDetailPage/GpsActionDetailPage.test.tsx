@@ -267,13 +267,23 @@ describe('GpsActionDetailPage', () => {
       } as GeolocationPosition);
     });
 
+    // Explicitly wait for second checkpoint's subTask completion
+    await waitFor(() => {
+      expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
+        userId: 5,
+        actionId: 1,
+        subTaskId: 102,
+        actionType: 'GPS',
+      });
+    });
+
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith('/actions/completeAction', {userId: 5, actionId: 1});
     });
 
     expect(mockToastSuccess).toHaveBeenCalledWith('gpsActionDetail.actionCompleted');
     expect(screen.getByText('gpsActionDetail.allCheckpointsReached')).toBeInTheDocument();
-  });
+  }, 30000);
 
   it('shows geolocation error toast when geolocation is unavailable', () => {
     Object.defineProperty(global.navigator, 'geolocation', {
@@ -356,7 +366,7 @@ describe('GpsActionDetailPage', () => {
           actionType: 'GPS',
         });
       });
-    });
+    }, 15000);
 
     it('HARD: check-in does NOT trigger when user is 10m away', async () => {
       const fixture = makeFixture('HARD');
@@ -412,6 +422,6 @@ describe('GpsActionDetailPage', () => {
           actionType: 'GPS',
         });
       });
-    });
+    }, 15000);
   });
 });

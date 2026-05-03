@@ -5,7 +5,12 @@
     "login": "Login",
     "logout": "Logout",
     "track": "Map",
-    "rewards": "Rewards"
+    "rewards": "Rewards",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "skipToContent": "Skip to main content"
   },
   "actionDashboard": {
     "header": "Activities",

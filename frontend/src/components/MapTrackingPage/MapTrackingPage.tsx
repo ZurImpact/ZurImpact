@@ -50,7 +50,7 @@ export function MapTrackingPage() {
     };
   }, [isTracking, startTime]);
 
-  // calculating distance using the haversine forumla
+  // calculating distance using the haversine formula
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Earth's radius in km
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -64,7 +64,7 @@ export function MapTrackingPage() {
 
   const handleStartTracking = () => {
     if (!navigator.geolocation) {
-      return toast.error('Geolocation is not supported by your browser');
+      return toast.error(t('actionDetail.geolocationError'));
     }
 
     setIsTracking(true);
@@ -88,7 +88,7 @@ export function MapTrackingPage() {
           return [...prevPath, newPoint];
         });
       },
-      (error) => toast.error('Error tracking location: ' + error.message),
+      (error) => toast.error(t('actionDetail.locationError') + error.message),
       {
         enableHighAccuracy: true,
         timeout: 10000,
@@ -97,7 +97,7 @@ export function MapTrackingPage() {
     );
   };
 
-  // maybe adding a method which can destinguish how fast the change of location is -> so someone cannot take the car??
+  // maybe adding a method which can distinguish how fast the change of location is -> so someone cannot take the car??
 
   const handleStopTracking = () => {
     if (watchIdRef.current !== null) {
@@ -146,14 +146,14 @@ export function MapTrackingPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-4xl font-bold text-primary mb-2">{t('actionDetail.header')}</h1>
-        <p className="text-primary">{t('actionDetail.subheader')}</p>
+        <h1 className="text-4xl font-bold text-foreground mb-2">{t('actionDetail.header')}</h1>
+        <p className="text-muted-foreground">{t('actionDetail.subheader')}</p>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Map Placeholder */}
         <div className="lg:col-span-2">
-          <Card className="overflow-hidden h-[600px] bg-primary/20 flex items-center justify-center shadow-lg">
+          <Card className="overflow-hidden h-[600px] bg-brand/20 flex items-center justify-center shadow-lg">
             <div className="h-full w-full">
               <MapContainer center={[47.3769, 8.5417]} zoom={13} style={{height: '100%', width: '100%'}}>
                 <TileLayer
@@ -162,7 +162,7 @@ export function MapTrackingPage() {
                 />
                 {path.length > 0 && (
                   <>
-                    <Polyline positions={path} color="blue" weight={5} />
+                    <Polyline positions={path} color="var(--brand)" weight={5} />
                     <Marker position={path[path.length - 1]} />
                     <RecenterMap coords={path[path.length - 1]} />
                   </>
@@ -188,13 +188,13 @@ export function MapTrackingPage() {
               <SelectContent>
                 <SelectItem value="bike">
                   <div className="flex items-center gap-2">
-                    <Bike className="h-4 w-4" />
+                    <Bike className="h-4 w-4" aria-hidden="true" />
                     Bike Ride (10 pts/km)
                   </div>
                 </SelectItem>
                 <SelectItem value="walk">
                   <div className="flex items-center gap-2">
-                    <Footprints className="h-4 w-4" />
+                    <Footprints className="h-4 w-4" aria-hidden="true" />
                     Walking (5 pts/km)
                   </div>
                 </SelectItem>
@@ -207,31 +207,31 @@ export function MapTrackingPage() {
             <h3 className="font-semibold mb-4">{t('actionDetail.statsTitle')}</h3>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Route className="h-5 w-5 text-blue-600" />
+                <div className="p-2 bg-info-container rounded-lg">
+                  <Route className="h-5 w-5 text-on-info-container" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600">{t('actionDetail.distance')}</p>
+                  <p className="text-sm text-muted-foreground">{t('actionDetail.distance')}</p>
                   <p className="text-2xl font-bold">{distance.toFixed(2)} km</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Clock className="h-5 w-5 text-green-600" />
+                <div className="p-2 bg-brand-container rounded-lg">
+                  <Clock className="h-5 w-5 text-on-brand-container" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600">{t('actionDetail.duration')}</p>
+                  <p className="text-sm text-muted-foreground">{t('actionDetail.duration')}</p>
                   <p className="text-2xl font-bold">{formatTime(elapsedTime)}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Award className="h-5 w-5 text-purple-600" />
+                <div className="p-2 bg-brand-container rounded-lg">
+                  <Award className="h-5 w-5 text-on-brand-container" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600">{t('actionDetail.points')}</p>
+                  <p className="text-sm text-muted-foreground">{t('actionDetail.points')}</p>
                   <p className="text-2xl font-bold">
                     {activityType === 'bike' ? Math.round(distance * 10) : Math.round(distance * 5)}
                   </p>
@@ -245,19 +245,19 @@ export function MapTrackingPage() {
             {!isTracking ? (
               <Button
                 onClick={handleStartTracking}
-                className="w-full bg-green-600 hover:bg-green-700 flex items-center justify-center gap-2"
+                className="w-full bg-brand hover:bg-brand/90 text-brand-foreground flex items-center justify-center gap-2"
                 size="lg"
               >
-                <Play className="h-5 w-5" />
+                <Play className="h-5 w-5" aria-hidden="true" />
                 {t('actionDetail.startTracking')}
               </Button>
             ) : (
               <Button
                 onClick={handleStopTracking}
-                className="w-full bg-red-600 hover:bg-red-700 flex items-center justify-center gap-2"
+                className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground flex items-center justify-center gap-2"
                 size="lg"
               >
-                <Square className="h-5 w-5" />
+                <Square className="h-5 w-5" aria-hidden="true" />
                 Stop & Save
               </Button>
             )}
@@ -266,10 +266,10 @@ export function MapTrackingPage() {
           {/* Info */}
           <Card className="p-6 bg-card">
             <div className="flex items-start gap-3">
-              <MapPin className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-blue-500">
+              <MapPin className="h-5 w-5 text-brand flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="text-sm text-muted-foreground">
                 <p className="font-semibold mb-1">GPS Tracking</p>
-                <p className="text-blue-500">
+                <p>
                   Your location is tracked only during active sessions. Make sure location services are enabled on your
                   device.
                 </p>
@@ -278,7 +278,10 @@ export function MapTrackingPage() {
           </Card>
 
           {isTracking && (
-            <Badge variant="secondary" className="w-full justify-center py-2 bg-green-100 text-green-700">
+            <Badge
+              variant="secondary"
+              className="w-full justify-center py-2 bg-brand-container text-on-brand-container"
+            >
               <span className="animate-pulse mr-2">●</span>
               Currently Tracking
             </Badge>

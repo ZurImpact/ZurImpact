@@ -104,7 +104,7 @@ export function RewardsPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center items-center h-64">
-          <div className="text-gray-500">{t('rewardsPage.loading')}</div>
+          <div className="text-muted-foreground">{t('rewardsPage.loading')}</div>
         </div>
       </div>
     );
@@ -114,15 +114,15 @@ export function RewardsPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">{t('rewardsPage.header')}</h1>
-          <p className="text-primary">{t('rewardsPage.subheader')}</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">{t('rewardsPage.header')}</h1>
+          <p className="text-muted-foreground">{t('rewardsPage.subheader')}</p>
         </div>
 
         <Card className="p-8 text-center max-w-md mx-auto mt-12">
-          <User className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+          <User className="h-16 w-16 mx-auto mb-4 text-muted-foreground" aria-hidden="true" />
           <h2 className="text-xl font-semibold mb-2">{t('rewardsPage.loginRequired')}</h2>
-          <p className="text-gray-600 mb-6">{t('rewardsPage.loginPrompt')}</p>
-          <Button className="bg-green-600 hover:bg-green-700" onClick={handleRetryAuth}>
+          <p className="text-muted-foreground mb-6">{t('rewardsPage.loginPrompt')}</p>
+          <Button className="bg-brand hover:bg-brand/90 text-brand-foreground" onClick={handleRetryAuth}>
             {t('rewardsPage.tryAgain')}
           </Button>
         </Card>
@@ -133,17 +133,17 @@ export function RewardsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-primary mb-2">{t('rewardsPage.header')}</h1>
-        <p className="text-primary">{t('rewardsPage.subheader')}</p>
+        <h1 className="text-4xl font-bold text-foreground mb-2">{t('rewardsPage.header')}</h1>
+        <p className="text-muted-foreground">{t('rewardsPage.subheader')}</p>
       </div>
 
-      <Card className="p-6 mb-8 bg-green-600 text-white">
+      <Card className="p-6 mb-8 bg-brand text-brand-foreground">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-green-100 mb-1">{t('rewardsPage.availablePoints')}</p>
+            <p className="text-brand-foreground/80 mb-1">{t('rewardsPage.availablePoints')}</p>
             <p className="text-4xl font-bold">{currentUser?.points}</p>
           </div>
-          <Gift className="h-16 w-16 opacity-20" />
+          <Gift className="h-16 w-16 opacity-20" aria-hidden="true" />
         </div>
       </Card>
 
@@ -153,17 +153,17 @@ export function RewardsPage() {
             key={category}
             variant={filter === category ? 'default' : 'outline'}
             onClick={() => setFilter(category)}
-            className={filter === category ? 'bg-green-600 hover:bg-green-700' : ''}
+            className={filter === category ? 'bg-brand hover:bg-brand/90 text-brand-foreground' : ''}
           >
             {category === 'all' ? t('rewardsPage.allRewards') : category}
           </Button>
         ))}
       </div>
 
-      {loading && <div className="text-center py-8 text-gray-500">{t('rewardsPage.loading')}</div>}
+      {loading && <div className="text-center py-8 text-muted-foreground">{t('rewardsPage.loading')}</div>}
 
       {!loading && filteredRewards.length === 0 && (
-        <div className="text-center py-8 text-gray-500">{t('rewardsPage.noRewards')}</div>
+        <div className="text-center py-8 text-muted-foreground">{t('rewardsPage.noRewards')}</div>
       )}
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -178,13 +178,13 @@ export function RewardsPage() {
             >
               {!canAfford && (
                 <div className="absolute top-4 right-4">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
                 </div>
               )}
 
               <div className="flex items-start gap-4 mb-4">
-                <div className="p-3 bg-green-100 dark:bg-green-500/20 rounded-lg">
-                  <Icon className="h-6 w-6 text-green-600" />
+                <div className="p-3 bg-info-container rounded-lg">
+                  <Icon className="h-6 w-6 text-on-info-container" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
                   <Badge variant="secondary" className="mb-2">
@@ -194,21 +194,21 @@ export function RewardsPage() {
                 </div>
               </div>
 
-              <p className="text-gray-600 text-sm mb-4">{reward.description}</p>
+              <p className="text-muted-foreground text-sm mb-4">{reward.description}</p>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-green-600 text-xl">
+                  <div className="font-bold text-brand text-xl">
                     {reward.points} {t('rewardsPage.pts')}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted-foreground">
                     {reward.available} {t('rewardsPage.available')}
                   </div>
                 </div>
                 <Button
                   onClick={() => setSelectedReward(reward)}
                   disabled={!canAfford || redemptionLoading}
-                  className={canAfford ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-300'}
+                  className={canAfford ? 'bg-brand hover:bg-brand/90 text-brand-foreground' : 'bg-muted'}
                 >
                   {t('rewardsPage.redeem')}
                 </Button>
@@ -227,11 +227,16 @@ export function RewardsPage() {
                 <DialogDescription>{redeemedResult.displayName}</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 mt-4">
-                <div className="p-4 bg-green-100 dark:bg-green-500/20 rounded-lg text-center">
-                  <p className="text-sm text-gray-600 mb-2">{t('rewardsPage.yourVoucherCode')}</p>
-                  <p className="text-2xl font-mono font-bold tracking-widest text-green-700">{redeemedResult.code}</p>
+                <div className="p-4 bg-brand-container rounded-lg text-center">
+                  <p className="text-sm text-on-brand-container mb-2">{t('rewardsPage.yourVoucherCode')}</p>
+                  <p className="text-2xl font-mono font-bold tracking-widest text-on-brand-container">
+                    {redeemedResult.code}
+                  </p>
                 </div>
-                <Button className="w-full bg-green-600 hover:bg-green-700" onClick={handleDismissResult}>
+                <Button
+                  className="w-full bg-brand hover:bg-brand/90 text-brand-foreground"
+                  onClick={handleDismissResult}
+                >
                   {t('rewardsPage.close')}
                 </Button>
               </div>
@@ -249,26 +254,26 @@ export function RewardsPage() {
                     <p className="text-sm mb-3">{selectedReward.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">{t('rewardsPage.cost')}:</span>
-                      <span className="font-bold text-green-600">
+                      <span className="font-bold text-brand">
                         {selectedReward.points} {t('rewardsPage.pts')}
                       </span>
                     </div>
                   </div>
 
-                  <div className="p-4 bg-green-100 dark:bg-green-500/20 rounded-lg">
+                  <div className="p-4 bg-brand-container rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm">{t('rewardsPage.currentPoints')}:</span>
-                      <span className="font-semibold">{currentUser?.points}</span>
+                      <span className="text-sm text-on-brand-container">{t('rewardsPage.currentPoints')}:</span>
+                      <span className="font-semibold text-on-brand-container">{currentUser?.points}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">{t('rewardsPage.afterRedemption')}:</span>
-                      <span className="font-semibold text-green-700">
+                      <span className="text-sm text-on-brand-container">{t('rewardsPage.afterRedemption')}:</span>
+                      <span className="font-semibold text-on-brand-container">
                         {(currentUser?.points ?? 0) - selectedReward.points}
                       </span>
                     </div>
                   </div>
 
-                  {redeemError && <p className="text-sm text-red-600 text-center">{redeemError}</p>}
+                  {redeemError && <p className="text-sm text-destructive text-center">{redeemError}</p>}
 
                   <div className="flex gap-3">
                     <Button
@@ -280,7 +285,7 @@ export function RewardsPage() {
                       {t('rewardsPage.cancel')}
                     </Button>
                     <Button
-                      className="flex-1 bg-green-600 hover:bg-green-700"
+                      className="flex-1 bg-brand hover:bg-brand/90 text-brand-foreground"
                       onClick={() => handleRedeem(selectedReward)}
                       disabled={redemptionLoading}
                     >
@@ -294,12 +299,12 @@ export function RewardsPage() {
         </DialogContent>
       </Dialog>
 
-      <Card className="p-6 mt-8 bg-green-600">
+      <Card className="p-6 mt-8 bg-brand text-brand-foreground">
         <div className="flex items-start gap-4">
-          <Gift className="h-8 w-8 text-primary-foreground flex-shrink-0 mt-1" />
+          <Gift className="h-8 w-8 text-brand-foreground flex-shrink-0 mt-1" aria-hidden="true" />
           <div>
-            <h3 className="font-semibold text-primary-foreground text-lg mb-2">{t('rewardsPage.howRewardsWork')}</h3>
-            <ul className="space-y-2 text-sm text-primary-foreground">
+            <h3 className="font-semibold text-brand-foreground text-lg mb-2">{t('rewardsPage.howRewardsWork')}</h3>
+            <ul className="space-y-2 text-sm text-brand-foreground">
               <li>• {t('rewardsPage.howRewardsPoint1')}</li>
               <li>• {t('rewardsPage.howRewardsPoint2')}</li>
               {/* <li>• {t('rewardsPage.howRewardsPoint3')}</li> */}

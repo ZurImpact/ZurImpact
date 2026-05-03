@@ -5,7 +5,12 @@
     "login": "Anmelden",
     "logout": "Abmelden",
     "track": "Karte",
-    "rewards": "Belohnungen"
+    "rewards": "Belohnungen",
+    "switchToLight": "Zu hellem Modus wechseln",
+    "switchToDark": "Zu dunklem Modus wechseln",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
+    "skipToContent": "Zum Hauptinhalt springen"
   },
   "actionDashboard": {
     "header": "Aktivitäten",

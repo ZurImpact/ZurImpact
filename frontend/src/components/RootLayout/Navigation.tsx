@@ -1,5 +1,4 @@
 import {Link, useLocation} from 'react-router';
-import {ROUTES} from '../../routes';
 import {Mountain, Award, Menu, Moon, Sun, LogOut, LogIn} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from 'next-themes';
@@ -9,6 +8,7 @@ import {Button} from '../ui/button';
 import apiClient from '../../api/apiClient';
 import {logout, fetchCurrentUser} from '../../store/slices/UserSlice';
 import {useAppDispatch, useAppSelector} from '../../store/store';
+import {ROUTES} from '../../routes';
 
 export const Navigation = () => {
   const location = useLocation();
@@ -36,22 +36,28 @@ export const Navigation = () => {
     <></>
     /**
      * <button
-      onClick={toggleLanguage}
-      className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-1"
-      title="Toggle language"
-    >
-      <Languages className="h-5 w-5" />
-      <span className="text-xs font-medium">{i18n.language.toUpperCase()}</span>
-    </button>
+     *   onClick={toggleLanguage}
+     *   className="p-2 rounded-md hover:bg-surface-container-high"
+     *   aria-label={t('rootLayout.switchLanguage')}
+     * >
+     *   <Languages className="h-5 w-5" aria-hidden="true" />
+     *   <span className="text-xs font-medium">{i18n.language.toUpperCase()}</span>
+     * </button>
      */
   );
 
   const renderThemeButton = () => (
     <button
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+      className="p-2 rounded-md hover:bg-surface-container-high"
+      aria-label={theme === 'dark' ? t('rootLayout.switchToLight') : t('rootLayout.switchToDark')}
+      aria-pressed={theme === 'dark'}
     >
-      {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      {theme === 'dark' ? (
+        <Sun className="h-5 w-5" aria-hidden="true" />
+      ) : (
+        <Moon className="h-5 w-5" aria-hidden="true" />
+      )}
     </button>
   );
 
@@ -78,11 +84,15 @@ export const Navigation = () => {
     <Button
       variant="outline"
       size="sm"
-      className={`flex items-center gap-2 ${className}`.trim()}
+      className={`flex items-center gap-2 bg-card border ${className}`.trim()}
       onClick={handleAuthAction}
       disabled={!isAuthenticated && (loading || isAuthenticating)}
     >
-      {isAuthenticated ? <LogOut className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
+      {isAuthenticated ? (
+        <LogOut className="h-4 w-4" aria-hidden="true" />
+      ) : (
+        <LogIn className="h-4 w-4" aria-hidden="true" />
+      )}
       {isAuthenticated ? t('rootLayout.logout') : t('rootLayout.login')}
     </Button>
   );
@@ -92,17 +102,18 @@ export const Navigation = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <Mountain className="h-8 w-8 text-green-600" />
-            <span className="text-2xl font-bold text-green-600">{t('appName')}</span>
+            <Mountain className="h-8 w-8 text-brand" />
+            <span className="text-2xl font-bold text-brand">{t('appName')}</span>
           </Link>
           <div className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className={`hover:text-green-600 transition-colors ${
-                  location.pathname === link.to ? 'text-green-600' : 'text-gray-300'
+                className={`hover:text-brand transition-colors ${
+                  location.pathname === link.to ? 'text-brand' : 'text-muted-foreground'
                 }`}
+                aria-current={location.pathname === link.to ? 'page' : undefined}
               >
                 {link.label}
               </Link>
@@ -110,9 +121,9 @@ export const Navigation = () => {
             {renderThemeButton()}
             {renderLanguageButton()}
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-600/20 rounded-full">
-                <Award className="h-4 w-4 text-green-600" />
-                <span className="font-medium text-green-700">
+              <div className="flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full">
+                <Award className="h-4 w-4 text-on-brand-container" aria-hidden="true" />
+                <span className="font-medium text-on-brand-container">
                   {`${points} ${t('points')}` /*TODO Get actual points from auth state*/}
                 </span>
               </div>
@@ -124,8 +135,11 @@ export const Navigation = () => {
             {renderLanguageButton()}
             <Sheet>
               <SheetTrigger asChild>
-                <button className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                  <Menu className="h-6 w-6" />
+                <button
+                  className="p-2 rounded-md hover:bg-surface-container-high"
+                  aria-label={t('rootLayout.openMenu')}
+                >
+                  <Menu className="h-6 w-6" aria-hidden="true" />
                 </button>
               </SheetTrigger>
               <SheetContent side="right">
@@ -134,17 +148,18 @@ export const Navigation = () => {
                     <Link
                       key={link.to}
                       to={link.to}
-                      className={`text-lg hover:text-green-600 transition-colors ${
-                        location.pathname === link.to ? 'text-green-600 font-semibold' : 'text-gray-300'
+                      className={`text-lg hover:text-brand transition-colors ${
+                        location.pathname === link.to ? 'text-brand font-semibold' : 'text-muted-foreground'
                       }`}
+                      aria-current={location.pathname === link.to ? 'page' : undefined}
                     >
                       {link.label}
                     </Link>
                   ))}
                   <div className="mt-4 flex flex-col gap-3 pr-8">
-                    <div className="flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-600/20 rounded-full w-fit">
-                      <Award className="h-4 w-4 text-green-600" />
-                      <span className="font-medium text-green-700">{`${points} ${t('points')}`}</span>
+                    <div className="flex items-center gap-2 px-3 py-1 bg-brand-container rounded-full w-fit">
+                      <Award className="h-4 w-4 text-on-brand-container" aria-hidden="true" />
+                      <span className="font-medium text-on-brand-container">{`${points} ${t('points')}`}</span>
                     </div>
                     {renderAuthButton('w-full justify-center')}
                   </div>

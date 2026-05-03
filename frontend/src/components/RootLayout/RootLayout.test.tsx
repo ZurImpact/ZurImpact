@@ -116,6 +116,6 @@ describe('RootLayout', () => {
     renderWithRouter('/dashboard');
 
     const dashboardLink = await screen.findByText('rootLayout.dashboard');
-    expect(dashboardLink).toHaveClass('text-green-600');
+    expect(dashboardLink).toHaveClass('text-brand');
   });
 });
