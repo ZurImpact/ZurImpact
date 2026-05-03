@@ -9,11 +9,13 @@ import {Badge} from '../ui/badge';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {
   fetchActionById,
+  fetchUserActions,
   clearSelectedAction,
   completeAction,
   startAction,
   completeSubTask,
   type ActionDto,
+  type UserActionHistoryDto,
 } from '../../store/slices/ActionSlice';
 import {useTranslation} from 'react-i18next';
 import {toast} from 'sonner';
@@ -123,9 +125,23 @@ export function GpsActionDetailPage() {
   const dispatch = useAppDispatch();
   const {t} = useTranslation();
 
+  const actionIdFromRoute = useMemo(() => {
+    if (!id) {
+      return null;
+    }
+
+    const parsedId = Number(id);
+    if (!Number.isInteger(parsedId) || parsedId <= 0) {
+      return null;
+    }
+
+    return parsedId;
+  }, [id]);
+
   const [hasStartedAction, setHasStartedAction] = useState(false);
   const [showStartDialog, setShowStartDialog] = useState(false);
   const [isStartingAction, setIsStartingAction] = useState(false);
+  const [activeUserHistoryAction, setActiveUserHistoryAction] = useState<UserActionHistoryDto | null>(null);
   const completedSubtasksRef = useRef<Set<number>>(new Set());
   const {selectedAction, loading, error} = useAppSelector((state) => state.actions);
 
@@ -141,16 +157,16 @@ export function GpsActionDetailPage() {
   const hasCalledCompleteAction = useRef(false);
 
   const handleStartAction = async () => {
-    const userId = localStorage.getItem('userId') || '123'; //remove 1 once auth is fully implemented!!
+    const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
 
-    if (!userId || !id) {
-      alert(`Missing userId or id. userId: ${userId}, id: ${id}`);
+    if (!userId || actionIdFromRoute === null) {
+      toast.error(t('gpsActionDetail.actionNotFound'));
       return;
     }
 
     setIsStartingAction(true);
     try {
-      await dispatch(startAction({userId: Number(userId), actionId: Number(id)})).unwrap();
+      await dispatch(startAction({userId: Number(userId), actionId: actionIdFromRoute})).unwrap();
       setHasStartedAction(true);
       setShowStartDialog(false);
       toast.success(t('gpsActionDetail.actionStarted'));
@@ -186,14 +202,64 @@ export function GpsActionDetailPage() {
   }, [initialCheckpoints, checkedInCheckpointIds]);
 
   useEffect(() => {
-    if (id) {
-      dispatch(fetchActionById(Number(id)));
+    let isMounted = true;
+
+    setActiveUserHistoryAction(null);
+    setHasStartedAction(false);
+    setCheckedInCheckpointIds(new Set());
+    completedSubtasksRef.current = new Set();
+    hasCalledCompleteAction.current = false;
+
+    if (actionIdFromRoute !== null) {
+      dispatch(fetchActionById(actionIdFromRoute));
+
+      const userId = Number(localStorage.getItem('userId') || '1');
+      if (Number.isInteger(userId) && userId > 0) {
+        dispatch(fetchUserActions({userId, active: true}))
+          .unwrap()
+          .then((userActions: UserActionHistoryDto[]) => {
+            if (!isMounted) {
+              return;
+            }
+
+            const matchingActionEntries = userActions.filter((userAction) => userAction.actionId === actionIdFromRoute);
+            if (matchingActionEntries.length === 0) {
+              return;
+            }
+
+            const matchedAction = matchingActionEntries.find((userAction) => !userAction.isSubtask) ?? null;
+
+            if (!matchedAction) {
+              return;
+            }
+
+            setActiveUserHistoryAction(matchedAction);
+            setHasStartedAction(true);
+
+            const completedSubtaskIds = matchingActionEntries
+              .filter((userAction) => userAction.isSubtask)
+              .map((userAction) => Number(userAction.subtaskId ?? userAction.subactionId))
+              .filter((subtaskId) => Number.isInteger(subtaskId) && subtaskId > 0);
+            const completedSubtaskSet = new Set(completedSubtaskIds);
+
+            setCheckedInCheckpointIds(completedSubtaskSet);
+            completedSubtasksRef.current = completedSubtaskSet;
+          })
+          .catch(() => {
+            if (!isMounted) {
+              return;
+            }
+
+            setActiveUserHistoryAction(null);
+          });
+      }
     }
 
     return () => {
+      isMounted = false;
       dispatch(clearSelectedAction());
     };
-  }, [id, dispatch]);
+  }, [actionIdFromRoute, dispatch]);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -223,11 +289,11 @@ export function GpsActionDetailPage() {
             if (!completedSubtasksRef.current.has(cp.id)) {
               completedSubtasksRef.current.add(cp.id);
               const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
-              if (userId && id) {
+              if (userId && actionIdFromRoute !== null) {
                 dispatch(
                   completeSubTask({
                     userId: Number(userId),
-                    actionId: Number(id),
+                    actionId: actionIdFromRoute,
                     subTaskId: cp.id,
                     actionType: 'GPS',
                   }),
@@ -265,16 +331,16 @@ export function GpsActionDetailPage() {
       }
       setIsTrackingLocation(false);
     };
-  }, [t, initialCheckpoints, id, dispatch, hasStartedAction]);
+  }, [t, initialCheckpoints, checkedInCheckpointIds, actionIdFromRoute, actionIdFromRoute, dispatch, hasStartedAction]);
 
   const allCheckpointsCheckedIn = checkpoints.length > 0 && checkpoints.every((cp) => cp.isCheckedIn);
   const checkedInCount = checkpoints.filter((cp) => cp.isCheckedIn).length;
 
   useEffect(() => {
     const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
-    if (allCheckpointsCheckedIn && userId && !hasCalledCompleteAction.current && id) {
+    if (allCheckpointsCheckedIn && userId && !hasCalledCompleteAction.current && actionIdFromRoute !== null) {
       hasCalledCompleteAction.current = true;
-      dispatch(completeAction({userId: Number(userId), actionId: Number(id)}))
+      dispatch(completeAction({userId: Number(userId), actionId: actionIdFromRoute}))
         .unwrap()
         .then(() => {
           toast.success(t('gpsActionDetail.actionCompleted'));
@@ -283,8 +349,7 @@ export function GpsActionDetailPage() {
           hasCalledCompleteAction.current = false;
         });
     }
-  }, [allCheckpointsCheckedIn, dispatch, id, t]);
-
+  }, [allCheckpointsCheckedIn, dispatch, actionIdFromRoute, t]);
   const polylinePositions = checkpoints.map((cp) => cp.position);
 
   const handleBack = () => {
@@ -324,16 +389,20 @@ export function GpsActionDetailPage() {
 
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{selectedAction.displayName}</h1>
-            <p className="text-muted-foreground">{selectedAction.description}</p>
+            <h1 className="text-3xl font-bold mb-2">
+              {activeUserHistoryAction?.displayName ?? selectedAction.displayName}
+            </h1>
+            <p className="text-muted-foreground">
+              {activeUserHistoryAction?.description ?? selectedAction.description}
+            </p>
           </div>
           <div className="flex items-center gap-4">
             <Badge
               variant="secondary"
               className="text-lg px-4 py-2 bg-brand-container border-brand text-on-brand-container"
             >
-              <Award className="h-4 w-4 mr-1" aria-hidden="true" />
-              {selectedAction.points} {t('points')}
+              <Award className="h-4 w-4 mr-1" />
+              {activeUserHistoryAction?.points ?? selectedAction.points} {t('points')}
             </Badge>
             {!hasStartedAction && (
               <Button

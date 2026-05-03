@@ -4,6 +4,7 @@ import {Card} from '../../ui/card';
 import {Badge} from '../../ui/badge';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router';
+import {ROUTES} from '../../../routes';
 
 export const ActionCard = ({action, onClick}: {action: ActionDto; onClick?: () => void}) => {
   const {t} = useTranslation();
@@ -11,7 +12,7 @@ export const ActionCard = ({action, onClick}: {action: ActionDto; onClick?: () =
 
   const handleClick = () => {
     if (action.type === 'GPS') {
-      navigate(`/actions/${action.id}`);
+      navigate(ROUTES.actionDetails(action.id));
     } else if (onClick) {
       onClick();
     } else {

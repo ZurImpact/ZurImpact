@@ -42,6 +42,15 @@ const actionFixture = {
   ],
 };
 
+const activeHistoryActionFixture = {
+  actionId: 1,
+  displayName: 'Running GPS City Walk',
+  description: 'Continue where you left off',
+  points: 125,
+  completionState: 'ACTIVE',
+  isSubtask: false,
+};
+
 vi.mock('../../api/apiClient', () => ({
   default: {
     get: (...args: unknown[]) => mockGet(...args),
@@ -126,6 +135,7 @@ describe('GpsActionDetailPage', () => {
     });
 
     mockGet.mockImplementation((url: string) => {
+      if (url === '/userActionHistory/getUserActions?userId=5&active=true') return Promise.resolve({data: []});
       if (url === '/actions/1') return Promise.resolve({data: actionFixture});
       return Promise.resolve({data: {}});
     });
@@ -153,6 +163,31 @@ describe('GpsActionDetailPage', () => {
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith('/actions/1');
+    });
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith('/userActionHistory/getUserActions?userId=5&active=true');
+    });
+  });
+
+  it('loads matched active user history action from url id into state', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/userActionHistory/getUserActions?userId=5&active=true') {
+        return Promise.resolve({data: [activeHistoryActionFixture]});
+      }
+      if (url === '/actions/1') return Promise.resolve({data: actionFixture});
+      return Promise.resolve({data: {}});
+    });
+
+    renderPage({
+      actions: createActionState(),
+    });
+
+    expect(await screen.findByText('Running GPS City Walk')).toBeInTheDocument();
+    expect(await screen.findByText('Continue where you left off')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.queryByRole('button', {name: 'gpsActionDetail.startAction'})).not.toBeInTheDocument();
     });
   });
 

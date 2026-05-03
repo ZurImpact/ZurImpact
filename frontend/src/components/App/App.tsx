@@ -18,7 +18,7 @@ function App() {
             <Route path={ROUTES.dashboard} element={<ActionDashboard />} />
             <Route path={ROUTES.track} element={<MapTrackingPage />} />
             <Route path={ROUTES.rewards} element={<RewardsPage />} />
-            <Route path={'/actions/:id'} element={<GpsActionDetailPage />} />
+            <Route path={ROUTES.actionDetailsPattern} element={<GpsActionDetailPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
