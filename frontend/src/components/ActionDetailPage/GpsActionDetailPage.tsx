@@ -247,7 +247,7 @@ export function GpsActionDetailPage() {
         }
       });
     },
-    [actionIdFromRoute, dispatch, hasStartedAction, initialCheckpoints, isDevMode, t],
+    [actionIdFromRoute, dispatch, hasStartedAction, initialCheckpoints, t],
   );
 
   const checkpoints = useMemo(() => {
