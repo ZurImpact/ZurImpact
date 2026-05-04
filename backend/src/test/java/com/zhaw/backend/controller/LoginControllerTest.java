@@ -183,6 +183,9 @@ class LoginControllerTest {
                             new SimpleGrantedAuthority("ROLE_USER"),
                             new SimpleGrantedAuthority("ROLE_ADMIN")));
 
+            when(userService.findUserByUsername("alice"))
+                    .thenReturn(UserDto.builder().id(1L).username("alice").build());
+
             ResponseEntity<?> response = loginController.whoami(auth);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
