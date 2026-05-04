@@ -37,6 +37,20 @@ if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = vi.fn();
 }
 
+const _ls: Record<string, string> = {};
+vi.stubGlobal('localStorage', {
+  getItem: (k: string) => _ls[k] ?? null,
+  setItem: (k: string, v: string) => {
+    _ls[k] = v;
+  },
+  removeItem: (k: string) => {
+    delete _ls[k];
+  },
+  clear: () => {
+    for (const k in _ls) delete _ls[k];
+  },
+});
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({

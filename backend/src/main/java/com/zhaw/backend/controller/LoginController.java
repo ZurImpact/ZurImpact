@@ -13,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
@@ -76,7 +75,7 @@ public class LoginController {
     }
 
     @PostMapping("/dev-login")
-    public ResponseEntity<?> devLogin(HttpServletRequest httpRequest, @Valid @RequestBody DevLoginRequest request) throws Exception {
+    public ResponseEntity<?> devLogin(HttpServletRequest httpRequest, @Valid @RequestBody DevLoginRequest request) {
         if (userService.findUserByUsername(request.username()) == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "User not found"));
@@ -109,7 +108,14 @@ public class LoginController {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
 
+        var user = userService.findUserByUsername(authentication.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "User not found"));
+        }
+
         return ResponseEntity.ok(Map.of(
+                "id", user.getId(),
                 "username", authentication.getName(),
                 "roles", roles
         ));

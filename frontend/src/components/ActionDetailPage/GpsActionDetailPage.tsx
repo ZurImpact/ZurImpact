@@ -17,6 +17,7 @@ import {
   type ActionDto,
   type UserActionHistoryDto,
 } from '../../store/slices/ActionSlice';
+import {fetchCurrentUser} from '../../store/slices/UserSlice';
 import {useTranslation} from 'react-i18next';
 import {toast} from 'sonner';
 import {MapPin, Navigation, CheckCircle2, Circle, ArrowLeft, Award, Target, X} from 'lucide-react';
@@ -344,6 +345,7 @@ export function GpsActionDetailPage() {
         .unwrap()
         .then(() => {
           toast.success(t('gpsActionDetail.actionCompleted'));
+          dispatch(fetchCurrentUser());
         })
         .catch(() => {
           hasCalledCompleteAction.current = false;

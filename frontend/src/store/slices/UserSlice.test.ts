@@ -45,7 +45,7 @@ describe('UserSlice', () => {
   describe('synchronous reducers', () => {
     it('logout resets currentUser, isAuthenticated and error', async () => {
       const store = createTestStore();
-      mockedGet.mockResolvedValueOnce({data: {}});
+      mockedGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({data: stubUser});
       await store.dispatch(fetchCurrentUser());
       expect(store.getState().user.isAuthenticated).toBe(true);
       expect(store.getState().user.currentUser).not.toBeNull();
@@ -71,7 +71,7 @@ describe('UserSlice', () => {
   describe('fetchCurrentUser', () => {
     it('stores user and marks authenticated on success', async () => {
       const store = createTestStore();
-      mockedGet.mockResolvedValueOnce({data: {}});
+      mockedGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({data: stubUser});
 
       await store.dispatch(fetchCurrentUser());
 
@@ -160,7 +160,7 @@ describe('UserSlice', () => {
       await store.dispatch(fetchCurrentUser());
       expect(store.getState().user.error).toBe('fail');
 
-      mockedGet.mockResolvedValueOnce({data: {}});
+      mockedGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({data: stubUser});
       await store.dispatch(fetchCurrentUser());
       expect(store.getState().user.error).toBeNull();
     });
