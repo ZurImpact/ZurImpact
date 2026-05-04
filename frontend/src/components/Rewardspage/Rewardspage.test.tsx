@@ -46,6 +46,7 @@ describe('RewardsPage', () => {
 
     mockGet.mockImplementation((url: string) => {
       if (url === '/auth/whoami') return Promise.resolve({data: {id: 1}});
+      if (url.startsWith('/users/')) return Promise.resolve({data: {id: 1, name: 'User', email: 'user@example.com', points: 300}});
       if (url === '/vouchers') return Promise.resolve({data: baseRewards});
       return Promise.resolve({data: {}});
     });

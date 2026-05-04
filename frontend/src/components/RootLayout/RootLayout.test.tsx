@@ -74,9 +74,8 @@ describe('RootLayout', () => {
     mockApiGet.mockReset();
     mockApiGet
       .mockRejectedValueOnce({response: {status: 401, data: {error: 'not authenticated'}}})
-      .mockResolvedValueOnce({
-        data: {id: 1, name: 'Test User', email: 'test@test.com', points: 123},
-      });
+      .mockResolvedValueOnce({data: {id: 1}})
+      .mockResolvedValueOnce({data: {id: 1, name: 'Test User', email: 'test@test.com', points: 123}});
 
     renderWithRouter();
 
