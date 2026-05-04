@@ -223,7 +223,7 @@ export function GpsActionDetailPage() {
             return next;
           });
 
-          if (!isDevMode && !completedSubtasksRef.current.has(cp.id)) {
+          if (!completedSubtasksRef.current.has(cp.id)) {
             completedSubtasksRef.current.add(cp.id);
             const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
             if (userId && actionIdFromRoute !== null) {
