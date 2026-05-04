@@ -2,6 +2,7 @@ package com.zhaw.backend.mappers;
 
 import com.zhaw.backend.enums.Role;
 import com.zhaw.backend.model.dto.UserDto;
+import com.zhaw.backend.model.dto.UserResponseDto;
 import com.zhaw.backend.model.entities.User;
 import org.junit.jupiter.api.Test;
 
@@ -58,6 +59,37 @@ class UserMapperTest {
         assertNotNull(dto);
         assertNull(dto.getCreatedAt());
         assertNull(dto.getRole());
+    }
+
+    @Test
+    void toResponseDto_null_returnsNull() {
+        assertNull(UserMapper.toResponseDto(null));
+    }
+
+    @Test
+    void toResponseDto_mapsFieldsExcludingPassword() {
+        LocalDateTime createdAt = LocalDateTime.of(2026, 4, 22, 14, 30);
+
+        User entity = new User();
+        entity.setId(1L);
+        entity.setUsername("alice");
+        entity.setEmail("alice@example.com");
+        entity.setPasswordHash("secret");
+        entity.setAddress(11L);
+        entity.setCreatedAt(createdAt);
+        entity.setPoints(99);
+        entity.setRole("ROLE_ADMIN");
+
+        UserResponseDto dto = UserMapper.toResponseDto(entity);
+
+        assertNotNull(dto);
+        assertEquals(entity.getId(), dto.getId());
+        assertEquals(entity.getUsername(), dto.getUsername());
+        assertEquals(entity.getEmail(), dto.getEmail());
+        assertEquals(entity.getAddress(), dto.getAddress());
+        assertEquals(createdAt.toString(), dto.getCreatedAt());
+        assertEquals(entity.getPoints(), dto.getPoints());
+        assertEquals(Role.ROLE_ADMIN, dto.getRole());
     }
 }
 

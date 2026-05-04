@@ -90,3 +90,22 @@ No body required.
 
 ### POST /api/actions/{id}/complete
 No body required.
+
+---
+
+## Users
+
+### GET /api/users/{id}
+No body required.
+Example response:
+```json
+{
+  "id": 1,
+  "username": "admin",
+  "email": "admin@example.com",
+  "address": 1,
+  "createdAt": "2026-04-22T14:30:00",
+  "points": 500,
+  "role": "ROLE_ADMIN"
+}
+```
