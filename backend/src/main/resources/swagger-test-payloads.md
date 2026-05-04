@@ -14,7 +14,7 @@
 
 ## Actions
 
-### POST /api/actions — Create action without subactions
+### POST /api/actions — Create action without subtasks
 ```json
 {
   "description": "Pick up litter in your neighbourhood",
@@ -27,7 +27,7 @@
 }
 ```
 
-### POST /api/actions — Create action with GPS subactions
+### POST /api/actions — Create action with GPS subtasks
 ```json
 {
   "description": "Visit all recycling stations in the city",
@@ -37,7 +37,7 @@
   "type": "GPS",
   "hasSubtasks": true,
   "validUntil": "2026-12-31T23:59:59",
-  "subActions": [
+  "subTasks": [
     {
       "type": "GPS",
       "description": "Recycling station Hauptbahnhof",
@@ -90,3 +90,22 @@ No body required.
 
 ### POST /api/actions/{id}/complete
 No body required.
+
+---
+
+## Users
+
+### GET /api/users/{id}
+No body required.
+Example response:
+```json
+{
+  "id": 1,
+  "username": "admin",
+  "email": "admin@example.com",
+  "address": 1,
+  "createdAt": "2026-04-22T14:30:00",
+  "points": 500,
+  "role": "ROLE_ADMIN"
+}
+```

@@ -2,11 +2,13 @@ package com.zhaw.backend.model.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "gps_action_tasks")
 @Getter
 @Setter
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class GpsActionTask extends SubTask {

@@ -150,6 +150,7 @@ src/test/java/com/zhaw/backend/
 │   ├── SettingsControllerTest.java
 │   ├── SubTaskControllerTest.java
 │   ├── UserActionHistoryControllerTest.java
+│   ├── UserControllerTest.java
 │   └── VoucherControllerTest.java
 ├── mappers/
 │   ├── ActionFilterMapperTest.java
@@ -157,6 +158,7 @@ src/test/java/com/zhaw/backend/
 │   ├── CompanyMapperTest.java
 │   ├── SubTaskMapperTest.java
 │   ├── UserActionHistoryMapperTest.java
+│   ├── UserMapperTest.java
 │   └── VoucherMapperTest.java
 ├── model/dao/
 │   └── UserDaoIntegrationTest.java           ← SQL + constraint integration tests
