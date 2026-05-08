@@ -145,6 +145,7 @@ export function GpsActionDetailPage() {
   const [activeUserHistoryAction, setActiveUserHistoryAction] = useState<UserActionHistoryDto | null>(null);
   const completedSubtasksRef = useRef<Set<number>>(new Set());
   const {selectedAction, loading, error} = useAppSelector((state) => state.actions);
+  const currentUser = useAppSelector((state) => state.user.currentUser);
 
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [checkedInCheckpointIds, setCheckedInCheckpointIds] = useState<Set<number>>(new Set());
@@ -158,7 +159,7 @@ export function GpsActionDetailPage() {
   const hasCalledCompleteAction = useRef(false);
 
   const handleStartAction = async () => {
-    const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
+    const userId = currentUser?.id;
 
     if (!userId || actionIdFromRoute === null) {
       toast.error(t('gpsActionDetail.actionNotFound'));
@@ -167,7 +168,7 @@ export function GpsActionDetailPage() {
 
     setIsStartingAction(true);
     try {
-      await dispatch(startAction({userId: Number(userId), actionId: actionIdFromRoute})).unwrap();
+      await dispatch(startAction({userId, actionId: actionIdFromRoute})).unwrap();
       setHasStartedAction(true);
       setShowStartDialog(false);
       toast.success(t('gpsActionDetail.actionStarted'));
@@ -214,8 +215,8 @@ export function GpsActionDetailPage() {
     if (actionIdFromRoute !== null) {
       dispatch(fetchActionById(actionIdFromRoute));
 
-      const userId = Number(localStorage.getItem('userId') || '1');
-      if (Number.isInteger(userId) && userId > 0) {
+      const userId = currentUser?.id;
+      if (userId !== undefined && userId > 0) {
         dispatch(fetchUserActions({userId, active: true}))
           .unwrap()
           .then((userActions: UserActionHistoryDto[]) => {
@@ -289,11 +290,11 @@ export function GpsActionDetailPage() {
 
             if (!completedSubtasksRef.current.has(cp.id)) {
               completedSubtasksRef.current.add(cp.id);
-              const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
+              const userId = currentUser?.id;
               if (userId && actionIdFromRoute !== null) {
                 dispatch(
                   completeSubTask({
-                    userId: Number(userId),
+                    userId,
                     actionId: actionIdFromRoute,
                     subTaskId: cp.id,
                     actionType: 'GPS',
@@ -338,10 +339,10 @@ export function GpsActionDetailPage() {
   const checkedInCount = checkpoints.filter((cp) => cp.isCheckedIn).length;
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
+    const userId = currentUser?.id;
     if (allCheckpointsCheckedIn && userId && !hasCalledCompleteAction.current && actionIdFromRoute !== null) {
       hasCalledCompleteAction.current = true;
-      dispatch(completeAction({userId: Number(userId), actionId: actionIdFromRoute}))
+      dispatch(completeAction({userId, actionId: actionIdFromRoute}))
         .unwrap()
         .then(() => {
           toast.success(t('gpsActionDetail.actionCompleted'));
