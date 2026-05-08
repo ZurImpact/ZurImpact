@@ -105,12 +105,19 @@ const installGeolocation = () => {
   });
 };
 
+const defaultUserState: DeepPartial<RootState['user']> = {
+  currentUser: {id: 5, name: 'Test User', email: 'test@test.com', points: 100},
+  isAuthenticated: true,
+  loading: false,
+  error: null,
+};
+
 const renderPage = (preloadedState: DeepPartial<RootState> = {}) =>
   renderWithProviders(
     <MemoryRouter>
       <GpsActionDetailPage />
     </MemoryRouter>,
-    {preloadedState},
+    {preloadedState: {user: defaultUserState, ...preloadedState}},
   );
 
 const createActionState = (overrides: DeepPartial<RootState['actions']> = {}): DeepPartial<RootState['actions']> => ({
@@ -148,7 +155,6 @@ describe('GpsActionDetailPage', () => {
     });
 
     installGeolocation();
-    localStorage.setItem('userId', '5');
   });
 
   it('fetches action details on mount and renders action content', async () => {
