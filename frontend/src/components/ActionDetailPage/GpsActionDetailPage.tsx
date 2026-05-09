@@ -301,7 +301,7 @@ export function GpsActionDetailPage() {
                     actionId: actionIdFromRoute,
                     subTaskId: cp.id,
                     actionType: 'GPS',
-                    additionalData: { latitude, longitude },
+                    additionalData: {latitude, longitude},
                   }),
                 );
               }
