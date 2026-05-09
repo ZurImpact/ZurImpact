@@ -4,6 +4,7 @@ export const ROUTES = {
   dashboard: '/dashboard',
   track: '/track',
   rewards: '/rewards',
+  home: '/home',
   actionDetailsPattern: '/actions/:id',
   actionDetails: (actionId: number | string) => `/actions/${actionId}`,
 };
