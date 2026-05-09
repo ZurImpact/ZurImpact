@@ -47,7 +47,7 @@ describe('RewardsPage', () => {
     mockGet.mockImplementation((url: string) => {
       if (url === '/auth/whoami') return Promise.resolve({data: {id: 1}});
       if (url.startsWith('/users/'))
-        return Promise.resolve({data: {id: 1, name: 'User', email: 'user@example.com', points: 300}});
+        return Promise.resolve({data: {id: 1, username: 'User', email: 'user@example.com', points: 300}});
       if (url === '/vouchers') return Promise.resolve({data: baseRewards});
       return Promise.resolve({data: {}});
     });
@@ -61,7 +61,7 @@ describe('RewardsPage', () => {
         rewards: baseRewards,
       },
       user: {
-        currentUser: {id: 1, name: 'User', email: 'user@example.com', points: 300},
+        currentUser: {id: 1, username: 'User', email: 'user@example.com', points: 300},
         isAuthenticated: true,
       },
     });
@@ -123,7 +123,7 @@ describe('RewardsPage', () => {
         rewards: baseRewards,
       },
       user: {
-        currentUser: {id: 1, name: 'User', email: 'user@example.com', points: 300},
+        currentUser: {id: 1, username: 'User', email: 'user@example.com', points: 300},
         isAuthenticated: true,
       },
     });
@@ -145,7 +145,7 @@ describe('RewardsPage', () => {
         rewards: baseRewards,
       },
       user: {
-        currentUser: {id: 1, name: 'User', email: 'user@example.com', points: 300},
+        currentUser: {id: 1, username: 'User', email: 'user@example.com', points: 300},
         isAuthenticated: true,
       },
     });
@@ -170,7 +170,7 @@ describe('RewardsPage', () => {
         rewards: baseRewards,
       },
       user: {
-        currentUser: {id: 1, name: 'User', email: 'user@example.com', points: 300},
+        currentUser: {id: 1, username: 'User', email: 'user@example.com', points: 300},
         isAuthenticated: true,
       },
     });
@@ -192,7 +192,7 @@ describe('RewardsPage', () => {
         redemptionError: null,
       },
       user: {
-        currentUser: {id: 1, name: 'User', email: 'user@example.com', points: 300},
+        currentUser: {id: 1, username: 'User', email: 'user@example.com', points: 300},
         isAuthenticated: true,
       },
     });
@@ -215,7 +215,7 @@ describe('RewardsPage', () => {
         redemptionError: 'Voucher unavailable',
       },
       user: {
-        currentUser: {id: 1, name: 'User', email: 'user@example.com', points: 300},
+        currentUser: {id: 1, username: 'User', email: 'user@example.com', points: 300},
         isAuthenticated: true,
       },
     });

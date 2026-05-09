@@ -302,7 +302,6 @@ describe('GpsActionDetailPage', () => {
       } as GeolocationPosition);
     });
 
-    // Explicitly wait for second checkpoint's subTask completion
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
         userId: 5,
@@ -316,8 +315,14 @@ describe('GpsActionDetailPage', () => {
       expect(mockPost).toHaveBeenCalledWith('/actions/completeAction', {userId: 5, actionId: 1});
     });
 
-    expect(mockToastSuccess).toHaveBeenCalledWith('gpsActionDetail.actionCompleted');
-    expect(screen.getByText('gpsActionDetail.allCheckpointsReached')).toBeInTheDocument();
+    // Wrap final assertions in waitFor so we don't race against the React commit that updates the DOM after `completeAction` resolves.
+    await waitFor(() => {
+      expect(mockToastSuccess).toHaveBeenCalledWith('gpsActionDetail.actionCompleted');
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('gpsActionDetail.allCheckpointsReached')).toBeInTheDocument();
+    });
   }, 30000);
 
   it('shows geolocation error toast when geolocation is unavailable', () => {

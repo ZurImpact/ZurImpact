@@ -125,6 +125,10 @@ export function GpsActionDetailPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const {t} = useTranslation();
+  const tRef = useRef(t);
+  useEffect(() => {
+    tRef.current = t;
+  }, [t]);
 
   const actionIdFromRoute = useMemo(() => {
     if (!id) {
@@ -264,7 +268,7 @@ export function GpsActionDetailPage() {
 
   useEffect(() => {
     if (!navigator.geolocation) {
-      toast.error(t('gpsActionDetail.geolocationError'));
+      toast.error(tRef.current('gpsActionDetail.geolocationError'));
       return;
     }
 
@@ -297,12 +301,13 @@ export function GpsActionDetailPage() {
                     actionId: actionIdFromRoute,
                     subTaskId: cp.id,
                     actionType: 'GPS',
+                    additionalData: { latitude, longitude },
                   }),
                 );
               }
             }
             toast.success(
-              t('gpsActionDetail.checkpointReached', {
+              tRef.current('gpsActionDetail.checkpointReached', {
                 checkpoint: cp.index,
                 name: cp.displayName,
               }),
@@ -312,7 +317,7 @@ export function GpsActionDetailPage() {
       },
       (err) => {
         console.error('Geolocation error:', err);
-        toast.error(t('gpsActionDetail.locationError'));
+        toast.error(tRef.current('gpsActionDetail.locationError'));
       },
       {
         enableHighAccuracy: true,
@@ -332,7 +337,7 @@ export function GpsActionDetailPage() {
       }
       setIsTrackingLocation(false);
     };
-  }, [t, initialCheckpoints, checkedInCheckpointIds, actionIdFromRoute, dispatch, hasStartedAction]);
+  }, [initialCheckpoints, checkedInCheckpointIds, actionIdFromRoute, dispatch, hasStartedAction]);
 
   const allCheckpointsCheckedIn = checkpoints.length > 0 && checkpoints.every((cp) => cp.isCheckedIn);
   const checkedInCount = checkpoints.filter((cp) => cp.isCheckedIn).length;
@@ -344,14 +349,14 @@ export function GpsActionDetailPage() {
       dispatch(completeAction({userId: Number(userId), actionId: actionIdFromRoute}))
         .unwrap()
         .then(() => {
-          toast.success(t('gpsActionDetail.actionCompleted'));
+          toast.success(tRef.current('gpsActionDetail.actionCompleted'));
           dispatch(fetchCurrentUser());
         })
         .catch(() => {
           hasCalledCompleteAction.current = false;
         });
     }
-  }, [allCheckpointsCheckedIn, dispatch, actionIdFromRoute, t]);
+  }, [allCheckpointsCheckedIn, dispatch, actionIdFromRoute]);
   const polylinePositions = checkpoints.map((cp) => cp.position);
 
   const handleBack = () => {
