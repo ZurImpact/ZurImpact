@@ -141,7 +141,7 @@ export const startAction = createAsyncThunk(
     try {
       const response = await apiClient.post(
         '/actions/startAction',
-        {},
+        null,
         {
           params: {userId, actionId},
         },
