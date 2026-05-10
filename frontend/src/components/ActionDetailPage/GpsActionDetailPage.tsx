@@ -374,11 +374,11 @@ export function GpsActionDetailPage() {
 
   useEffect(() => {
     const userId = currentUser?.id;
-    
+
     if (isDevMode) {
       return;
     }
-            
+
     if (allCheckpointsCheckedIn && userId && !hasCalledCompleteAction.current && actionIdFromRoute !== null) {
       hasCalledCompleteAction.current = true;
       dispatch(completeAction({userId, actionId: actionIdFromRoute}))
