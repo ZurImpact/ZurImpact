@@ -144,6 +144,8 @@ describe('GpsActionDetailPage', () => {
     mockGet.mockImplementation((url: string) => {
       if (url === '/userActionHistory/getUserActions?userId=5&active=true') return Promise.resolve({data: []});
       if (url === '/actions/1') return Promise.resolve({data: actionFixture});
+      if (url === '/auth/whoami') return Promise.resolve({data: {id: 5}});
+      if (url === '/users/5') return Promise.resolve({data: defaultUserState.currentUser});
       return Promise.resolve({data: {}});
     });
 
