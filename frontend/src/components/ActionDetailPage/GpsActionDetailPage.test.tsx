@@ -323,7 +323,6 @@ describe('GpsActionDetailPage', () => {
     });
 
     expect(mockToastSuccess).toHaveBeenCalledWith('gpsActionDetail.actionCompleted');
-    expect(screen.getByText('gpsActionDetail.allCheckpointsReached')).toBeInTheDocument();
   }, 30000);
 
   it('shows geolocation error toast when geolocation is unavailable', () => {

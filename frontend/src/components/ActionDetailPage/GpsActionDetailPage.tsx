@@ -227,11 +227,10 @@ export function GpsActionDetailPage() {
 
           if (!completedSubtasksRef.current.has(cp.id)) {
             completedSubtasksRef.current.add(cp.id);
-            const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
-            if (userId && actionIdFromRoute !== null) {
+            if (currentUser?.id && actionIdFromRoute !== null) {
               dispatch(
                 completeSubTask({
-                  userId: Number(userId),
+                  userId: currentUser.id,
                   actionId: actionIdFromRoute,
                   subTaskId: cp.id,
                   actionType: 'GPS',
@@ -249,7 +248,7 @@ export function GpsActionDetailPage() {
         }
       });
     },
-    [actionIdFromRoute, dispatch, hasStartedAction, initialCheckpoints, t],
+    [actionIdFromRoute, dispatch, hasStartedAction, initialCheckpoints, t, currentUser],
   );
 
   const checkpoints = useMemo(() => {
@@ -391,7 +390,7 @@ export function GpsActionDetailPage() {
           hasCalledCompleteAction.current = false;
         });
     }
-  }, [allCheckpointsCheckedIn, dispatch, actionIdFromRoute, t, isDevMode]);
+  }, [allCheckpointsCheckedIn, dispatch, actionIdFromRoute, t, isDevMode, currentUser?.id]);
   const polylinePositions = checkpoints.map((cp) => cp.position);
 
   const handleBack = () => {
