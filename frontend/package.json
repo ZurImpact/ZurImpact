@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:mock": "npm-run-all --parallel dev mock:watch",
+    "dev:mock": "npm-run-all --parallel dev:mock-vite mock:watch",
+    "dev:mock-vite": "VITE_USE_MOCK=1 vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

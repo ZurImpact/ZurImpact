@@ -2,10 +2,10 @@ import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
-// https://vite.dev/config/
-// Determine API target: mock server (default) or backend
-// eslint-disable-next-line no-constant-condition
-const API_TARGET = true ? 'http://localhost:8080' : 'http://localhost:4000';
+// API proxy target:
+// - real backend (Tomcat) on :8080 by default
+// - mock server on :4000 when `VITE_USE_MOCK=1` (set by `yarn dev:mock`)
+const API_TARGET = process.env.VITE_USE_MOCK === '1' ? 'http://localhost:4000' : 'http://localhost:8080';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
