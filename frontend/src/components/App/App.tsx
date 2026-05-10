@@ -7,6 +7,8 @@ import {RewardsPage} from '../Rewardspage/Rewardspage';
 import {AuthLayout} from '../Auth/AuthLayout';
 import {ProtectedRoute} from '../Auth/ProtectedRoute';
 import {LoginPage} from '../Auth/LoginPage';
+import {RegisterPage} from '../Auth/RegisterPage';
+import {VerifyEmailPage} from '../Auth/VerifyEmailPage';
 
 import {ROUTES} from '../../routes';
 import {ThemeProvider} from 'next-themes';
@@ -19,8 +21,8 @@ function App() {
           {/* Auth branch — no app nav, centered layout */}
           <Route element={<AuthLayout />}>
             <Route path={ROUTES.login} element={<LoginPage />} />
-            <Route path={ROUTES.register} element={<div data-testid="register-stub">register</div>} />
-            <Route path={ROUTES.verifyEmail} element={<div data-testid="verify-email-stub">verify-email</div>} />
+            <Route path={ROUTES.register} element={<RegisterPage />} />
+            <Route path={ROUTES.verifyEmail} element={<VerifyEmailPage />} />
             <Route path={ROUTES.passwordResetRequest} element={<div data-testid="forgot-password-stub">forgot-password</div>} />
             <Route path={ROUTES.passwordResetConfirm} element={<div data-testid="reset-password-stub">reset-password</div>} />
           </Route>
