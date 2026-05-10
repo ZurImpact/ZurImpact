@@ -40,6 +40,7 @@ function extractErrorCode(error: unknown, fallback: string): string {
     const message = axiosError.response?.data?.message;
     if (status === 401) return 'invalid_credentials';
     if (status === 403 && message === 'email_not_verified') return 'email_not_verified';
+    if (status === 400 && message === 'wrong_current_password') return 'wrong_current_password';
   }
   return fallback;
 }

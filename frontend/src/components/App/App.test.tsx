@@ -47,6 +47,10 @@ vi.mock('../Auth/ResetPasswordPage', () => ({
   ResetPasswordPage: () => <div data-testid="reset-password-stub">reset-password</div>,
 }));
 
+vi.mock('../Profile/ProfilePage', () => ({
+  ProfilePage: () => <div data-testid="profile-stub">profile</div>,
+}));
+
 describe('App', () => {
   beforeEach(() => {
     vi.clearAllMocks();

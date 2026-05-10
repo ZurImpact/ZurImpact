@@ -239,6 +239,27 @@ describe('LoginPage', () => {
     });
   });
 
+  describe('password changed banner', () => {
+    it('renders a success banner when location.state.reason is password_changed', () => {
+      renderWithProviders(
+        <MemoryRouter initialEntries={[{pathname: '/login', state: {reason: 'password_changed'}}]}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+          </Routes>
+        </MemoryRouter>,
+      );
+
+      expect(screen.getByText(/your password has been changed/i)).toBeInTheDocument();
+      expect(screen.getByText(/please sign in again/i)).toBeInTheDocument();
+    });
+
+    it('does not render the banner when no reason is set', () => {
+      renderLoginPage();
+
+      expect(screen.queryByText(/your password has been changed/i)).not.toBeInTheDocument();
+    });
+  });
+
   describe('cleanup on unmount', () => {
     it('does not show stale error after unmount and remount', async () => {
       const user = userEvent.setup();

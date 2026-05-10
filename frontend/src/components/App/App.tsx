@@ -11,6 +11,7 @@ import {RegisterPage} from '../Auth/RegisterPage';
 import {VerifyEmailPage} from '../Auth/VerifyEmailPage';
 import {ForgotPasswordPage} from '../Auth/ForgotPasswordPage';
 import {ResetPasswordPage} from '../Auth/ResetPasswordPage';
+import {ProfilePage} from '../Profile/ProfilePage';
 
 import {ROUTES} from '../../routes';
 import {ThemeProvider} from 'next-themes';
@@ -37,7 +38,7 @@ function App() {
               <Route path={ROUTES.track} element={<MapTrackingPage />} />
               <Route path={ROUTES.rewards} element={<RewardsPage />} />
               <Route path={ROUTES.actionDetailsPattern} element={<GpsActionDetailPage />} />
-              <Route path={ROUTES.profile} element={<div data-testid="profile-stub">profile</div>} />
+              <Route path={ROUTES.profile} element={<ProfilePage />} />
             </Route>
           </Route>
         </Routes>

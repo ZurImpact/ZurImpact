@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useNavigate, useLocation, Link} from 'react-router';
@@ -19,7 +19,9 @@ export function LoginPage() {
   const loginStatus = useAppSelector((s) => s.auth.login.status);
   const loginError = useAppSelector((s) => s.auth.login.error);
 
-  const from = (location.state as {from?: string} | null)?.from;
+  const locationState = location.state as {from?: string; reason?: string} | null;
+  const from = locationState?.from;
+  const [showPasswordChangedBanner] = useState(locationState?.reason === 'password_changed');
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -68,6 +70,15 @@ export function LoginPage() {
       description="Enter your credentials to access your account"
       footer={footer}
     >
+      {showPasswordChangedBanner && (
+        <div
+          role="status"
+          className="mb-4 rounded-md border border-green-500/50 bg-green-500/10 px-4 py-3 text-sm text-green-700 dark:text-green-400"
+        >
+          Your password has been changed. Please sign in again.
+        </div>
+      )}
+
       {loginError === 'invalid_credentials' && (
         <div
           role="alert"
