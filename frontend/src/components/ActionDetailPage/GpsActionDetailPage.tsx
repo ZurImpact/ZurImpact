@@ -1,4 +1,4 @@
-import {useEffect, useState, useRef, useMemo} from 'react';
+import {useEffect, useState, useRef, useMemo, useCallback} from 'react';
 import {useParams, useNavigate} from 'react-router';
 import {MapContainer, TileLayer, Marker, Polyline, Popup, useMap} from 'react-leaflet';
 import L from 'leaflet';
@@ -125,6 +125,13 @@ export function GpsActionDetailPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const {t} = useTranslation();
+  const isDevMode = useMemo(() => {
+    try {
+      return new URLSearchParams(window.location.search).get('dev') === 'true';
+    } catch {
+      return false;
+    }
+  }, []);
 
   const actionIdFromRoute = useMemo(() => {
     if (!id) {
@@ -145,6 +152,7 @@ export function GpsActionDetailPage() {
   const [activeUserHistoryAction, setActiveUserHistoryAction] = useState<UserActionHistoryDto | null>(null);
   const completedSubtasksRef = useRef<Set<number>>(new Set());
   const {selectedAction, loading, error} = useAppSelector((state) => state.actions);
+  const currentUser = useAppSelector((state) => state.user.currentUser);
 
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [checkedInCheckpointIds, setCheckedInCheckpointIds] = useState<Set<number>>(new Set());
@@ -154,11 +162,14 @@ export function GpsActionDetailPage() {
   }, [checkedInCheckpointIds]);
   const [isTrackingLocation, setIsTrackingLocation] = useState(false);
 
+  const [devLatInput, setDevLatInput] = useState('');
+  const [devLngInput, setDevLngInput] = useState('');
+
   const watchIdRef = useRef<number | null>(null);
   const hasCalledCompleteAction = useRef(false);
 
   const handleStartAction = async () => {
-    const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
+    const userId = currentUser?.id;
 
     if (!userId || actionIdFromRoute === null) {
       toast.error(t('gpsActionDetail.actionNotFound'));
@@ -167,7 +178,7 @@ export function GpsActionDetailPage() {
 
     setIsStartingAction(true);
     try {
-      await dispatch(startAction({userId: Number(userId), actionId: actionIdFromRoute})).unwrap();
+      await dispatch(startAction({userId, actionId: actionIdFromRoute})).unwrap();
       setHasStartedAction(true);
       setShowStartDialog(false);
       toast.success(t('gpsActionDetail.actionStarted'));
@@ -195,6 +206,51 @@ export function GpsActionDetailPage() {
     return [avgLat, avgLng];
   }, [initialCheckpoints]);
 
+  const applyLocalLocation = useCallback(
+    (latitude: number, longitude: number) => {
+      const newLocation: [number, number] = [latitude, longitude];
+      setUserLocation(newLocation);
+      setDevLatInput(latitude.toString());
+      setDevLngInput(longitude.toString());
+
+      initialCheckpoints.forEach((cp) => {
+        if (checkedInCheckpointIdsRef.current.has(cp.id)) return;
+
+        const distance = calculateDistance(latitude, longitude, cp.position[0], cp.position[1]);
+        if (distance <= thresholdToMeters(cp.distanceThresholdLevel) && hasStartedAction) {
+          setCheckedInCheckpointIds((prev) => {
+            if (prev.has(cp.id)) return prev;
+            const next = new Set(prev);
+            next.add(cp.id);
+            return next;
+          });
+
+          if (!completedSubtasksRef.current.has(cp.id)) {
+            completedSubtasksRef.current.add(cp.id);
+            if (currentUser?.id && actionIdFromRoute !== null) {
+              dispatch(
+                completeSubTask({
+                  userId: currentUser.id,
+                  actionId: actionIdFromRoute,
+                  subTaskId: cp.id,
+                  actionType: 'GPS',
+                }),
+              );
+            }
+          }
+
+          toast.success(
+            t('gpsActionDetail.checkpointReached', {
+              checkpoint: cp.index,
+              name: cp.displayName,
+            }),
+          );
+        }
+      });
+    },
+    [actionIdFromRoute, dispatch, hasStartedAction, initialCheckpoints, t, currentUser],
+  );
+
   const checkpoints = useMemo(() => {
     return initialCheckpoints.map((cp) => ({
       ...cp,
@@ -214,8 +270,8 @@ export function GpsActionDetailPage() {
     if (actionIdFromRoute !== null) {
       dispatch(fetchActionById(actionIdFromRoute));
 
-      const userId = Number(localStorage.getItem('userId') || '1');
-      if (Number.isInteger(userId) && userId > 0) {
+      const userId = currentUser?.id;
+      if (userId !== undefined && userId > 0) {
         dispatch(fetchUserActions({userId, active: true}))
           .unwrap()
           .then((userActions: UserActionHistoryDto[]) => {
@@ -260,9 +316,14 @@ export function GpsActionDetailPage() {
       isMounted = false;
       dispatch(clearSelectedAction());
     };
-  }, [actionIdFromRoute, dispatch]);
+  }, [actionIdFromRoute, dispatch, currentUser?.id]);
 
   useEffect(() => {
+    if (isDevMode) {
+      setIsTrackingLocation(false);
+      return;
+    }
+
     if (!navigator.geolocation) {
       toast.error(t('gpsActionDetail.geolocationError'));
       return;
@@ -271,44 +332,7 @@ export function GpsActionDetailPage() {
     watchIdRef.current = navigator.geolocation.watchPosition(
       (position) => {
         const {latitude, longitude} = position.coords;
-        const newLocation: [number, number] = [latitude, longitude];
-        setUserLocation(newLocation);
-
-        initialCheckpoints.forEach((cp) => {
-          if (checkedInCheckpointIdsRef.current.has(cp.id)) return;
-
-          const distance = calculateDistance(latitude, longitude, cp.position[0], cp.position[1]);
-
-          if (distance <= thresholdToMeters(cp.distanceThresholdLevel) && hasStartedAction) {
-            setCheckedInCheckpointIds((prev) => {
-              if (prev.has(cp.id)) return prev;
-              const next = new Set(prev);
-              next.add(cp.id);
-              return next;
-            });
-
-            if (!completedSubtasksRef.current.has(cp.id)) {
-              completedSubtasksRef.current.add(cp.id);
-              const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
-              if (userId && actionIdFromRoute !== null) {
-                dispatch(
-                  completeSubTask({
-                    userId: Number(userId),
-                    actionId: actionIdFromRoute,
-                    subTaskId: cp.id,
-                    actionType: 'GPS',
-                  }),
-                );
-              }
-            }
-            toast.success(
-              t('gpsActionDetail.checkpointReached', {
-                checkpoint: cp.index,
-                name: cp.displayName,
-              }),
-            );
-          }
-        });
+        applyLocalLocation(latitude, longitude);
       },
       (err) => {
         console.error('Geolocation error:', err);
@@ -332,16 +356,31 @@ export function GpsActionDetailPage() {
       }
       setIsTrackingLocation(false);
     };
-  }, [t, initialCheckpoints, checkedInCheckpointIds, actionIdFromRoute, dispatch, hasStartedAction]);
+  }, [
+    applyLocalLocation,
+    t,
+    initialCheckpoints,
+    checkedInCheckpointIds,
+    actionIdFromRoute,
+    dispatch,
+    hasStartedAction,
+    currentUser?.id,
+    isDevMode,
+  ]);
 
   const allCheckpointsCheckedIn = checkpoints.length > 0 && checkpoints.every((cp) => cp.isCheckedIn);
   const checkedInCount = checkpoints.filter((cp) => cp.isCheckedIn).length;
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId') || '1'; //remove 1 once auth is fully implemented!!
+    const userId = currentUser?.id;
+
+    if (isDevMode) {
+      return;
+    }
+
     if (allCheckpointsCheckedIn && userId && !hasCalledCompleteAction.current && actionIdFromRoute !== null) {
       hasCalledCompleteAction.current = true;
-      dispatch(completeAction({userId: Number(userId), actionId: actionIdFromRoute}))
+      dispatch(completeAction({userId, actionId: actionIdFromRoute}))
         .unwrap()
         .then(() => {
           toast.success(t('gpsActionDetail.actionCompleted'));
@@ -351,7 +390,7 @@ export function GpsActionDetailPage() {
           hasCalledCompleteAction.current = false;
         });
     }
-  }, [allCheckpointsCheckedIn, dispatch, actionIdFromRoute, t]);
+  }, [allCheckpointsCheckedIn, dispatch, actionIdFromRoute, t, isDevMode, currentUser?.id]);
   const polylinePositions = checkpoints.map((cp) => cp.position);
 
   const handleBack = () => {
@@ -580,6 +619,16 @@ export function GpsActionDetailPage() {
                       {checkpoint.position[0].toFixed(4)}, {checkpoint.position[1].toFixed(4)}
                     </p>
                   </div>
+                  {isDevMode && !checkpoint.isCheckedIn && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        applyLocalLocation(checkpoint.position[0], checkpoint.position[1]);
+                      }}
+                    >
+                      Teleport
+                    </Button>
+                  )}
                 </div>
               ))}
 
@@ -601,7 +650,7 @@ export function GpsActionDetailPage() {
             </div>
           </Card>
 
-          {userLocation && (
+          {userLocation && !isDevMode && (
             <Card className="p-6">
               <div className="flex items-center gap-3">
                 <MapPin className="h-5 w-5 text-destructive" aria-hidden="true" />
@@ -609,6 +658,56 @@ export function GpsActionDetailPage() {
                   <p className="text-sm text-muted-foreground">{t('gpsActionDetail.yourLocation')}</p>
                   <p className="font-mono text-sm">
                     {userLocation[0].toFixed(6)}, {userLocation[1].toFixed(6)}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {isDevMode && (
+            <Card className="p-6">
+              <div className="flex items-center gap-3">
+                <MapPin className="h-5 w-5 text-destructive" aria-hidden="true" />
+                <div className="flex-1">
+                  <p className="text-sm text-muted-foreground">{t('gpsActionDetail.yourLocation')}</p>
+                  <div className="flex gap-2 mt-2">
+                    <input
+                      type="number"
+                      step="0.000001"
+                      className="h-10 w-40 rounded-md border border-border bg-background px-3 text-sm"
+                      value={devLatInput}
+                      onChange={(e) => setDevLatInput(e.target.value)}
+                      aria-label="Latitude"
+                      placeholder="Latitude"
+                    />
+                    <input
+                      type="number"
+                      step="0.000001"
+                      className="h-10 w-40 rounded-md border border-border bg-background px-3 text-sm"
+                      value={devLngInput}
+                      onChange={(e) => setDevLngInput(e.target.value)}
+                      aria-label="Longitude"
+                      placeholder="Longitude"
+                    />
+                    <Button
+                      onClick={() => {
+                        const latitude = Number(devLatInput);
+                        const longitude = Number(devLngInput);
+
+                        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+                          return;
+                        }
+
+                        applyLocalLocation(latitude, longitude);
+                      }}
+                    >
+                      Set location
+                    </Button>
+                  </div>
+                  <p className="font-mono text-sm mt-2">
+                    {userLocation
+                      ? `${userLocation[0].toFixed(6)}, ${userLocation[1].toFixed(6)}`
+                      : t('gpsActionDetail.noLocation')}
                   </p>
                 </div>
               </div>
