@@ -1,5 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import apiClient from '../../api/apiClient';
+import {logoutUser} from './AuthSlice';
 
 export interface UserDto {
   id: number;
@@ -77,6 +78,11 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
         state.isAuthenticated = false;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.currentUser = null;
+        state.isAuthenticated = false;
+        state.error = null;
       });
   },
 });

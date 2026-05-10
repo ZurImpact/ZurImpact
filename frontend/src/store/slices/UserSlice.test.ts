@@ -1,6 +1,7 @@
 import {describe, it, expect, vi, beforeEach} from 'vitest';
 import {configureStore} from '@reduxjs/toolkit';
 import userReducer, {fetchCurrentUser, logout, clearUserError, type UserDto} from './UserSlice';
+import authReducer, {logoutUser} from './AuthSlice';
 
 vi.mock('../../api/apiClient', () => ({
   default: {
@@ -8,13 +9,28 @@ vi.mock('../../api/apiClient', () => ({
   },
 }));
 
+vi.mock('../../api/authApi', () => ({
+  login: vi.fn(),
+  logout: vi.fn(),
+  register: vi.fn(),
+  verifyEmail: vi.fn(),
+  resendVerification: vi.fn(),
+  requestPasswordReset: vi.fn(),
+  confirmPasswordReset: vi.fn(),
+}));
+
+vi.mock('../../api/userApi', () => ({
+  changePassword: vi.fn(),
+}));
+
 import apiClient from '../../api/apiClient';
+import * as authApi from '../../api/authApi';
 
 const mockedGet = vi.mocked(apiClient.get);
 
 const createTestStore = () =>
   configureStore({
-    reducer: {user: userReducer},
+    reducer: {user: userReducer, auth: authReducer},
   });
 
 // Matches the stub payload currently returned by fetchCurrentUser (see UserSlice.ts)
@@ -167,6 +183,26 @@ describe('UserSlice', () => {
       mockedGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({data: stubUser});
       await store.dispatch(fetchCurrentUser());
       expect(store.getState().user.error).toBeNull();
+    });
+  });
+
+  describe('logoutUser integration', () => {
+    it('resets currentUser and isAuthenticated to initial values when logoutUser.fulfilled', async () => {
+      const store = createTestStore();
+      // First set authenticated state
+      mockedGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({data: stubUser});
+      await store.dispatch(fetchCurrentUser());
+      expect(store.getState().user.isAuthenticated).toBe(true);
+      expect(store.getState().user.currentUser).not.toBeNull();
+
+      // Now dispatch logoutUser (calls authApi.logout)
+      vi.mocked(authApi.logout).mockResolvedValueOnce(undefined);
+      await store.dispatch(logoutUser());
+
+      const state = store.getState().user;
+      expect(state.currentUser).toBeNull();
+      expect(state.isAuthenticated).toBe(false);
+      expect(state.error).toBeNull();
     });
   });
 });

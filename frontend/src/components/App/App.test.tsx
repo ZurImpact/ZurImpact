@@ -27,6 +27,10 @@ vi.mock('../Rewardspage/Rewardspage', () => ({
   RewardsPage: () => <div data-testid="rewards-stub">rewards</div>,
 }));
 
+vi.mock('../Auth/LoginPage', () => ({
+  LoginPage: () => <div data-testid="login-stub">login</div>,
+}));
+
 describe('App', () => {
   beforeEach(() => {
     vi.clearAllMocks();

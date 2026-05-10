@@ -1,22 +1,24 @@
-import {Link, useLocation} from 'react-router';
-import {Mountain, Award, Menu, Moon, Sun, LogOut, LogIn} from 'lucide-react';
+import {Link, useLocation, useNavigate} from 'react-router';
+import {Mountain, Award, Menu, Moon, Sun, LogOut, LogIn, User} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from 'next-themes';
 import {useState} from 'react';
 import {Sheet, SheetContent, SheetTrigger} from '../ui/sheet';
 import {Button} from '../ui/button';
 import apiClient from '../../api/apiClient';
-import {logout, fetchCurrentUser} from '../../store/slices/UserSlice';
+import {fetchCurrentUser} from '../../store/slices/UserSlice';
+import {logoutUser} from '../../store/slices/AuthSlice';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {ROUTES} from '../../routes';
 
 export const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const {t} = useTranslation();
   const {theme, setTheme} = useTheme();
   const dispatch = useAppDispatch();
   const {currentUser, isAuthenticated, loading} = useAppSelector((s) => s.user);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isDevLoggingIn, setIsDevLoggingIn] = useState(false);
   const points = currentUser?.points ?? 0;
 
   const navLinks = [
@@ -24,27 +26,6 @@ export const Navigation = () => {
     {to: ROUTES.track, label: t('rootLayout.track')},
     {to: ROUTES.rewards, label: t('rootLayout.rewards')},
   ];
-
-  /**
-   * const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'de' : 'en';
-    i18n.changeLanguage(newLang);
-  };
-   */
-
-  const renderLanguageButton = () => (
-    <></>
-    /**
-     * <button
-     *   onClick={toggleLanguage}
-     *   className="p-2 rounded-md hover:bg-surface-container-high"
-     *   aria-label={t('rootLayout.switchLanguage')}
-     * >
-     *   <Languages className="h-5 w-5" aria-hidden="true" />
-     *   <span className="text-xs font-medium">{i18n.language.toUpperCase()}</span>
-     * </button>
-     */
-  );
 
   const renderThemeButton = () => (
     <button
@@ -61,41 +42,94 @@ export const Navigation = () => {
     </button>
   );
 
-  const handleLogin = async () => {
-    setIsAuthenticating(true);
+  const handleDevLogin = async () => {
+    setIsDevLoggingIn(true);
     try {
       await apiClient.post('/auth/dev-login', {username: 'alice'});
       await dispatch(fetchCurrentUser());
     } finally {
-      setIsAuthenticating(false);
+      setIsDevLoggingIn(false);
     }
   };
 
-  const handleAuthAction = () => {
+  const handleSignOut = async () => {
+    await dispatch(logoutUser());
+    navigate(ROUTES.login);
+  };
+
+  const renderAuthControls = (className = '') => {
     if (isAuthenticated) {
-      dispatch(logout());
-      return;
+      return (
+        <div className={`flex items-center gap-2 ${className}`.trim()}>
+          <span className="text-sm font-medium">{currentUser?.username}</span>
+          <Link
+            to={ROUTES.profile}
+            className="flex items-center gap-1 text-sm hover:text-brand transition-colors"
+            aria-label="Profile"
+          >
+            <User className="h-4 w-4" aria-hidden="true" />
+            Profile
+          </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2 bg-card border"
+            onClick={() => void handleSignOut()}
+          >
+            <LogOut className="h-4 w-4" aria-hidden="true" />
+            Sign out
+          </Button>
+        </div>
+      );
     }
 
-    void handleLogin();
+    return (
+      <div className={`flex items-center gap-2 ${className}`.trim()}>
+        <Link
+          to={ROUTES.login}
+          className="flex items-center gap-1 text-sm hover:text-brand transition-colors"
+          aria-label="Sign in"
+        >
+          <LogIn className="h-4 w-4" aria-hidden="true" />
+          Sign in
+        </Link>
+        <Link
+          to={ROUTES.register}
+          className="flex items-center gap-1 text-sm hover:text-brand transition-colors"
+          aria-label="Sign up"
+        >
+          Sign up
+        </Link>
+      </div>
+    );
   };
 
-  const renderAuthButton = (className = '') => (
-    <Button
-      variant="outline"
-      size="sm"
-      className={`flex items-center gap-2 bg-card border ${className}`.trim()}
-      onClick={handleAuthAction}
-      disabled={!isAuthenticated && (loading || isAuthenticating)}
-    >
-      {isAuthenticated ? (
-        <LogOut className="h-4 w-4" aria-hidden="true" />
-      ) : (
-        <LogIn className="h-4 w-4" aria-hidden="true" />
-      )}
-      {isAuthenticated ? t('rootLayout.logout') : t('rootLayout.login')}
-    </Button>
-  );
+  const renderDevLoginButton = () => {
+    if (!import.meta.env.DEV) return null;
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        className="text-xs text-muted-foreground"
+        onClick={() => void handleDevLogin()}
+        disabled={loading || isDevLoggingIn}
+      >
+        Dev login (alice)
+      </Button>
+    );
+  };
+
+  const renderPointsDisplay = () => {
+    if (!isAuthenticated) return null;
+    return (
+      <div className="flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full">
+        <Award className="h-4 w-4 text-on-brand-container" aria-hidden="true" />
+        <span className="font-medium text-on-brand-container">
+          {`${points} ${t('points')}`}
+        </span>
+      </div>
+    );
+  };
 
   return (
     <nav className="bg-background border-b sticky top-0 z-50 shadow-sm">
@@ -119,20 +153,14 @@ export const Navigation = () => {
               </Link>
             ))}
             {renderThemeButton()}
-            {renderLanguageButton()}
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full">
-                <Award className="h-4 w-4 text-on-brand-container" aria-hidden="true" />
-                <span className="font-medium text-on-brand-container">
-                  {`${points} ${t('points')}` /*TODO Get actual points from auth state*/}
-                </span>
-              </div>
-              {renderAuthButton()}
+              {renderPointsDisplay()}
+              {renderAuthControls()}
+              {renderDevLoginButton()}
             </div>
           </div>
           <div className="flex md:hidden items-center gap-4">
             {renderThemeButton()}
-            {renderLanguageButton()}
             <Sheet>
               <SheetTrigger asChild>
                 <button
@@ -157,11 +185,9 @@ export const Navigation = () => {
                     </Link>
                   ))}
                   <div className="mt-4 flex flex-col gap-3 pr-8">
-                    <div className="flex items-center gap-2 px-3 py-1 bg-brand-container rounded-full w-fit">
-                      <Award className="h-4 w-4 text-on-brand-container" aria-hidden="true" />
-                      <span className="font-medium text-on-brand-container">{`${points} ${t('points')}`}</span>
-                    </div>
-                    {renderAuthButton('w-full justify-center')}
+                    {renderPointsDisplay()}
+                    {renderAuthControls('w-full flex-col')}
+                    {renderDevLoginButton()}
                   </div>
                 </div>
               </SheetContent>

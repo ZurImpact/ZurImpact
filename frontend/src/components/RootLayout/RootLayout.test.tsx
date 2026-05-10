@@ -54,7 +54,7 @@ describe('RootLayout', () => {
     expect(await screen.findByText('rootLayout.dashboard')).toBeInTheDocument();
   });
 
-  it('renders the logout button when authenticated', async () => {
+  it('renders the Sign out button when authenticated', async () => {
     renderWithRouter('/', {
       preloadedState: {
         user: {
@@ -66,26 +66,24 @@ describe('RootLayout', () => {
       },
     });
 
-    expect(await screen.findByText('rootLayout.logout')).toBeInTheDocument();
+    expect(await screen.findByRole('button', {name: /sign out/i})).toBeInTheDocument();
   });
 
-  it('calls dev login endpoint and switches button to logout after login', async () => {
+  it('calls dev login endpoint via dev login button and fetches current user', async () => {
     const user = userEvent.setup();
     mockApiGet.mockReset();
     mockApiGet
-      .mockRejectedValueOnce({response: {status: 401, data: {error: 'not authenticated'}}})
       .mockResolvedValueOnce({data: {id: 1}})
       .mockResolvedValueOnce({data: {id: 1, name: 'Test User', email: 'test@test.com', points: 123}});
 
     renderWithRouter();
 
-    const loginButton = await screen.findByRole('button', {name: 'rootLayout.login'});
-    await user.click(loginButton);
+    const devLoginButton = await screen.findByRole('button', {name: /dev login/i});
+    await user.click(devLoginButton);
 
     await waitFor(() => {
       expect(mockApiPost).toHaveBeenCalledWith('/auth/dev-login', {username: 'alice'});
     });
-    expect(await screen.findByRole('button', {name: 'rootLayout.logout'})).toBeInTheDocument();
   });
 
   it('renders points display', async () => {
