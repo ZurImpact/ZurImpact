@@ -123,7 +123,7 @@ class AuthControllerTest {
         void loginOk() {
             AuthService.AuthResult result = new AuthService.AuthResult(11L, "alice", Role.ROLE_USER);
             when(authService.authenticate("alice", "secret")).thenReturn(result);
-            when(sessionService.createSession(11L, "alice", Role.ROLE_USER)).thenReturn("session-token");
+            when(sessionService.createSession(11L, Role.ROLE_USER)).thenReturn("session-token");
 
             ResponseEntity<?> response = controller.login(new LoginRequest("alice", "secret"), request);
 

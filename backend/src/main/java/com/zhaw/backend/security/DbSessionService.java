@@ -29,7 +29,7 @@ public class DbSessionService implements SessionService {
 
     @Override
     @Transactional
-    public String createSession(Long userId, String username, Role role) {
+    public String createSession(Long userId, Role role) {
         String rawToken = TokenHashing.randomHexToken();
         String tokenHash = TokenHashing.sha256Hex(rawToken);
         LocalDateTime now = LocalDateTime.now();

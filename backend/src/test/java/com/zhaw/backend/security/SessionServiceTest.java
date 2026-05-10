@@ -34,7 +34,7 @@ class SessionServiceTest {
     @Test
     @DisplayName("createSession returns raw token and persists its sha256 hash")
     void createSessionStoresHashedToken() {
-        String raw = service.createSession(11L, "alice", Role.ROLE_USER);
+        String raw = service.createSession(11L, Role.ROLE_USER);
 
         assertNotNull(raw);
         assertEquals(64, raw.length(), "raw token must be 32-byte hex");
