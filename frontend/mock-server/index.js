@@ -61,6 +61,17 @@ function newToken() {
   return `tok_${Math.random().toString(36).slice(2)}_${Date.now().toString(36)}`;
 }
 
+function logToken(kind, email, token) {
+  const banner = '='.repeat(72);
+  console.log(`\n${banner}`);
+  console.log(`[mock] ${kind} token for ${email}`);
+  console.log(`       ${token}`);
+  console.log(
+    `       open: http://localhost:5173/${kind === 'verify-email' ? 'verify-email' : 'password-reset/confirm'}?token=${token}`,
+  );
+  console.log(`${banner}\n`);
+}
+
 function setSessionCookie(res, sessionId) {
   res.cookie(SESSION_COOKIE, sessionId, {
     httpOnly: true,
@@ -295,7 +306,7 @@ app.post(BASE_URL + '/auth/register', (req, res) => {
 
   const token = newToken();
   verifyTokens.set(token, email);
-  console.log(`[mock] verify-email token for ${email}: ${token}`);
+  logToken('verify-email', email, token);
 
   res.status(201).end();
 });
@@ -324,7 +335,7 @@ app.post(BASE_URL + '/auth/resend-verification', (req, res) => {
       if (u.email === email && !u.emailVerified) {
         const token = newToken();
         verifyTokens.set(token, email);
-        console.log(`[mock] resend verify token for ${email}: ${token}`);
+        logToken('verify-email', email, token);
         break;
       }
     }
@@ -358,6 +369,23 @@ app.post(BASE_URL + '/auth/dev-login', (req, res) => {
   res.status(200).json({message: 'Login successful (mock)', userId: user.id});
 });
 
+// GET /auth/dev-tokens — dev-only helper: lists all outstanding verify/reset
+// tokens so devs don't have to hunt for them in the terminal output. Returns
+// the most recent token first for each email. NOT a real backend endpoint.
+app.get(BASE_URL + '/auth/dev-tokens', (req, res) => {
+  const verify = [...verifyTokens.entries()].map(([token, email]) => ({
+    email,
+    token,
+    url: `http://localhost:5173/verify-email?token=${token}`,
+  }));
+  const reset = [...resetTokens.entries()].map(([token, email]) => ({
+    email,
+    token,
+    url: `http://localhost:5173/password-reset/confirm?token=${token}`,
+  }));
+  res.json({verifyEmail: verify, passwordReset: reset});
+});
+
 // POST /auth/logout
 app.post(BASE_URL + '/auth/logout', (req, res) => {
   const sid = req.cookies?.[SESSION_COOKIE];
@@ -386,7 +414,7 @@ app.post(BASE_URL + '/auth/password-reset/request', (req, res) => {
       if (u.email === email) {
         const token = newToken();
         resetTokens.set(token, email);
-        console.log(`[mock] password-reset token for ${email}: ${token}`);
+        logToken('password-reset', email, token);
         break;
       }
     }
