@@ -285,35 +285,57 @@ describe('GpsActionDetailPage', () => {
       watchSuccessCallback?.({
         coords: {latitude: 47.3769, longitude: 8.5417} as GeolocationCoordinates,
       } as GeolocationPosition);
+      await new Promise((r) => setTimeout(r, 100));
     });
 
-    await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
-        userId: 5,
-        actionId: 1,
-        subTaskId: 101,
-        actionType: 'GPS',
-      });
-    });
+    // allow async operations to complete and add the additionalData
+    await waitFor(
+      () => {
+        expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
+          userId: 5,
+          actionId: 1,
+          subTaskId: 101,
+          actionType: 'GPS',
+          additionalData: {
+            latitude: 47.3769,
+            longitude: 8.5417,
+          },
+        });
+      },
+      {timeout: 5000},
+    );
 
     await act(async () => {
       watchSuccessCallback?.({
         coords: {latitude: 47.3772, longitude: 8.5419} as GeolocationCoordinates,
       } as GeolocationPosition);
+      await new Promise((r) => setTimeout(r, 100));
     });
 
-    await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
-        userId: 5,
-        actionId: 1,
-        subTaskId: 102,
-        actionType: 'GPS',
-      });
-    });
+    // allow async operations to complete + additionalData
+    await waitFor(
+      () => {
+        expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
+          userId: 5,
+          actionId: 1,
+          subTaskId: 102,
+          actionType: 'GPS',
+          additionalData: {
+            latitude: 47.3772,
+            longitude: 8.5419,
+          },
+        });
+      },
+      {timeout: 5000},
+    );
 
-    await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith('/actions/completeAction', {userId: 5, actionId: 1});
-    });
+    // allow async operations to complete
+    await waitFor(
+      () => {
+        expect(mockPost).toHaveBeenCalledWith('/actions/completeAction', {userId: 5, actionId: 1});
+      },
+      {timeout: 5000},
+    );
 
     // Wrap final assertions in waitFor so we don't race against the React commit that updates the DOM after `completeAction` resolves.
     await waitFor(() => {
@@ -397,6 +419,7 @@ describe('GpsActionDetailPage', () => {
         watchSuccessCallback?.({
           coords: {latitude: tenMetersNorth.latitude, longitude: tenMetersNorth.longitude} as GeolocationCoordinates,
         } as GeolocationPosition);
+        await new Promise((r) => setTimeout(r, 100));
       });
       await waitFor(() => {
         expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
@@ -404,6 +427,10 @@ describe('GpsActionDetailPage', () => {
           actionId: 1,
           subTaskId: 201,
           actionType: 'GPS',
+          additionalData: {
+            latitude: tenMetersNorth.latitude,
+            longitude: tenMetersNorth.longitude,
+          },
         });
       });
     }, 15000);
@@ -453,6 +480,7 @@ describe('GpsActionDetailPage', () => {
             longitude: threeMetersNorth.longitude,
           } as GeolocationCoordinates,
         } as GeolocationPosition);
+        await new Promise((r) => setTimeout(r, 100));
       });
       await waitFor(() => {
         expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
@@ -460,6 +488,10 @@ describe('GpsActionDetailPage', () => {
           actionId: 1,
           subTaskId: 201,
           actionType: 'GPS',
+          additionalData: {
+            latitude: threeMetersNorth.latitude,
+            longitude: threeMetersNorth.longitude,
+          },
         });
       });
     }, 15000);
