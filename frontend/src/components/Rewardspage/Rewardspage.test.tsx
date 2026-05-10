@@ -47,7 +47,18 @@ describe('RewardsPage', () => {
     mockGet.mockImplementation((url: string) => {
       if (url === '/auth/whoami') return Promise.resolve({data: {id: 1}});
       if (url.startsWith('/users/'))
-        return Promise.resolve({data: {id: 1, username: 'testuser', email: 'user@example.com', role: 'USER', emailVerified: true, points: 300, address: null, createdAt: null}});
+        return Promise.resolve({
+          data: {
+            id: 1,
+            username: 'testuser',
+            email: 'user@example.com',
+            role: 'USER',
+            emailVerified: true,
+            points: 300,
+            address: null,
+            createdAt: null,
+          },
+        });
       if (url === '/vouchers') return Promise.resolve({data: baseRewards});
       return Promise.resolve({data: {}});
     });
@@ -61,7 +72,16 @@ describe('RewardsPage', () => {
         rewards: baseRewards,
       },
       user: {
-        currentUser: {id: 1, username: 'testuser', email: 'user@example.com', role: 'USER', emailVerified: true, points: 300, address: null, createdAt: null},
+        currentUser: {
+          id: 1,
+          username: 'testuser',
+          email: 'user@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 300,
+          address: null,
+          createdAt: null,
+        },
         isAuthenticated: true,
       },
     });
@@ -123,7 +143,16 @@ describe('RewardsPage', () => {
         rewards: baseRewards,
       },
       user: {
-        currentUser: {id: 1, username: 'testuser', email: 'user@example.com', role: 'USER', emailVerified: true, points: 300, address: null, createdAt: null},
+        currentUser: {
+          id: 1,
+          username: 'testuser',
+          email: 'user@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 300,
+          address: null,
+          createdAt: null,
+        },
         isAuthenticated: true,
       },
     });
@@ -145,7 +174,16 @@ describe('RewardsPage', () => {
         rewards: baseRewards,
       },
       user: {
-        currentUser: {id: 1, username: 'testuser', email: 'user@example.com', role: 'USER', emailVerified: true, points: 300, address: null, createdAt: null},
+        currentUser: {
+          id: 1,
+          username: 'testuser',
+          email: 'user@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 300,
+          address: null,
+          createdAt: null,
+        },
         isAuthenticated: true,
       },
     });
@@ -170,7 +208,16 @@ describe('RewardsPage', () => {
         rewards: baseRewards,
       },
       user: {
-        currentUser: {id: 1, username: 'testuser', email: 'user@example.com', role: 'USER', emailVerified: true, points: 300, address: null, createdAt: null},
+        currentUser: {
+          id: 1,
+          username: 'testuser',
+          email: 'user@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 300,
+          address: null,
+          createdAt: null,
+        },
         isAuthenticated: true,
       },
     });
@@ -192,7 +239,16 @@ describe('RewardsPage', () => {
         redemptionError: null,
       },
       user: {
-        currentUser: {id: 1, username: 'testuser', email: 'user@example.com', role: 'USER', emailVerified: true, points: 300, address: null, createdAt: null},
+        currentUser: {
+          id: 1,
+          username: 'testuser',
+          email: 'user@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 300,
+          address: null,
+          createdAt: null,
+        },
         isAuthenticated: true,
       },
     });
@@ -215,7 +271,16 @@ describe('RewardsPage', () => {
         redemptionError: 'Voucher unavailable',
       },
       user: {
-        currentUser: {id: 1, username: 'testuser', email: 'user@example.com', role: 'USER', emailVerified: true, points: 300, address: null, createdAt: null},
+        currentUser: {
+          id: 1,
+          username: 'testuser',
+          email: 'user@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 300,
+          address: null,
+          createdAt: null,
+        },
         isAuthenticated: true,
       },
     });

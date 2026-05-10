@@ -45,16 +45,13 @@ function extractErrorCode(error: unknown, fallback: string): string {
   return fallback;
 }
 
-export const loginUser = createAsyncThunk(
-  'auth/login',
-  async (req: authApi.LoginRequest, {rejectWithValue}) => {
-    try {
-      return await authApi.login(req);
-    } catch (error: unknown) {
-      return rejectWithValue(extractErrorCode(error, 'login_failed'));
-    }
-  },
-);
+export const loginUser = createAsyncThunk('auth/login', async (req: authApi.LoginRequest, {rejectWithValue}) => {
+  try {
+    return await authApi.login(req);
+  } catch (error: unknown) {
+    return rejectWithValue(extractErrorCode(error, 'login_failed'));
+  }
+});
 
 export const registerUser = createAsyncThunk(
   'auth/register',

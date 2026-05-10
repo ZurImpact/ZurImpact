@@ -58,7 +58,16 @@ describe('RootLayout', () => {
     renderWithRouter('/', {
       preloadedState: {
         user: {
-          currentUser: {id: 1, points: 123, username: 'testuser', email: 'test@test.com', role: 'USER', emailVerified: true, address: null, createdAt: null},
+          currentUser: {
+            id: 1,
+            points: 123,
+            username: 'testuser',
+            email: 'test@test.com',
+            role: 'USER',
+            emailVerified: true,
+            address: null,
+            createdAt: null,
+          },
           isAuthenticated: true,
           loading: false,
           error: null,
@@ -90,7 +99,16 @@ describe('RootLayout', () => {
     renderWithRouter('/', {
       preloadedState: {
         user: {
-          currentUser: {id: 1, points: 123, username: 'testuser', email: 'test@test.com', role: 'USER', emailVerified: true, address: null, createdAt: null},
+          currentUser: {
+            id: 1,
+            points: 123,
+            username: 'testuser',
+            email: 'test@test.com',
+            role: 'USER',
+            emailVerified: true,
+            address: null,
+            createdAt: null,
+          },
           isAuthenticated: true,
           loading: false,
           error: null,

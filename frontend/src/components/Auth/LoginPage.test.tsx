@@ -123,9 +123,18 @@ describe('LoginPage', () => {
     it('dispatches loginUser with the typed username and password on valid submit', async () => {
       const user = userEvent.setup();
       vi.mocked(authApi.login).mockResolvedValueOnce({username: 'alice', role: 'USER'});
-      mockApiGet
-        .mockResolvedValueOnce({data: {id: 1}})
-        .mockResolvedValueOnce({data: {id: 1, username: 'alice', email: 'alice@example.com', role: 'USER', emailVerified: true, points: 0, address: null, createdAt: null}});
+      mockApiGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({
+        data: {
+          id: 1,
+          username: 'alice',
+          email: 'alice@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 0,
+          address: null,
+          createdAt: null,
+        },
+      });
 
       renderLoginPage();
 
@@ -141,7 +150,11 @@ describe('LoginPage', () => {
     it('disables submit button while login is pending', async () => {
       const user = userEvent.setup();
       let resolveLogin!: (value: {username: string; role: string}) => void;
-      vi.mocked(authApi.login).mockReturnValueOnce(new Promise<{username: string; role: string}>((res) => { resolveLogin = res; }));
+      vi.mocked(authApi.login).mockReturnValueOnce(
+        new Promise<{username: string; role: string}>((res) => {
+          resolveLogin = res;
+        }),
+      );
 
       renderLoginPage();
 
@@ -198,9 +211,18 @@ describe('LoginPage', () => {
     it('navigates to /dashboard on successful login when no from state', async () => {
       const user = userEvent.setup();
       vi.mocked(authApi.login).mockResolvedValueOnce({username: 'alice', role: 'USER'});
-      mockApiGet
-        .mockResolvedValueOnce({data: {id: 1}})
-        .mockResolvedValueOnce({data: {id: 1, username: 'alice', email: 'alice@example.com', role: 'USER', emailVerified: true, points: 0, address: null, createdAt: null}});
+      mockApiGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({
+        data: {
+          id: 1,
+          username: 'alice',
+          email: 'alice@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 0,
+          address: null,
+          createdAt: null,
+        },
+      });
 
       renderLoginPage();
 
@@ -216,9 +238,18 @@ describe('LoginPage', () => {
     it('navigates to from route when location.state.from is set', async () => {
       const user = userEvent.setup();
       vi.mocked(authApi.login).mockResolvedValueOnce({username: 'alice', role: 'USER'});
-      mockApiGet
-        .mockResolvedValueOnce({data: {id: 1}})
-        .mockResolvedValueOnce({data: {id: 1, username: 'alice', email: 'alice@example.com', role: 'USER', emailVerified: true, points: 0, address: null, createdAt: null}});
+      mockApiGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({
+        data: {
+          id: 1,
+          username: 'alice',
+          email: 'alice@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 0,
+          address: null,
+          createdAt: null,
+        },
+      });
 
       renderWithProviders(
         <MemoryRouter initialEntries={[{pathname: '/login', state: {from: '/some-from'}}]}>

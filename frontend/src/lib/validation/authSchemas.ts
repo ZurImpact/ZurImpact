@@ -7,9 +7,15 @@ export const loginSchema = z.object({
 
 export const registerSchema = z
   .object({
-    username: z.string().min(3, 'Username must be at least 3 characters').max(50, 'Username must be at most 50 characters'),
+    username: z
+      .string()
+      .min(3, 'Username must be at least 3 characters')
+      .max(50, 'Username must be at most 50 characters'),
     email: z.string().email('Invalid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters').max(100, 'Password must be at most 100 characters'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(100, 'Password must be at most 100 characters'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -24,7 +30,10 @@ export const forgotPasswordSchema = z.object({
 export const resetPasswordSchema = z
   .object({
     token: z.string().min(1, 'Token is required'),
-    newPassword: z.string().min(8, 'Password must be at least 8 characters').max(100, 'Password must be at most 100 characters'),
+    newPassword: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(100, 'Password must be at most 100 characters'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -35,7 +44,10 @@ export const resetPasswordSchema = z
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, 'Current password is required'),
-    newPassword: z.string().min(8, 'Password must be at least 8 characters').max(100, 'Password must be at most 100 characters'),
+    newPassword: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(100, 'Password must be at most 100 characters'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {

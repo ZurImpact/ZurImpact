@@ -159,7 +159,11 @@ describe('RegisterPage', () => {
     it('disables submit button and shows loading state while pending', async () => {
       const user = userEvent.setup();
       let resolveRegister!: (value: undefined) => void;
-      vi.mocked(authApi.register).mockReturnValueOnce(new Promise<undefined>((res) => { resolveRegister = res; }));
+      vi.mocked(authApi.register).mockReturnValueOnce(
+        new Promise<undefined>((res) => {
+          resolveRegister = res;
+        }),
+      );
 
       renderRegisterPage();
 

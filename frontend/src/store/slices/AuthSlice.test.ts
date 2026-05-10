@@ -43,7 +43,16 @@ describe('AuthSlice', () => {
     it('has all ops as idle with null errors', () => {
       const store = createTestStore();
       const state = store.getState().auth;
-      const ops = ['login', 'register', 'logout', 'verifyEmail', 'resendVerification', 'requestPasswordReset', 'confirmPasswordReset', 'changePassword'] as const;
+      const ops = [
+        'login',
+        'register',
+        'logout',
+        'verifyEmail',
+        'resendVerification',
+        'requestPasswordReset',
+        'confirmPasswordReset',
+        'changePassword',
+      ] as const;
       for (const op of ops) {
         expect(state[op].status).toBe('idle');
         expect(state[op].error).toBeNull();

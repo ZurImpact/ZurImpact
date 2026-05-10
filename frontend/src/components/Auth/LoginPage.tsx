@@ -67,11 +67,7 @@ export function LoginPage() {
   );
 
   return (
-    <AuthFormCard
-      title={t('auth.login.title')}
-      description={t('auth.login.description')}
-      footer={footer}
-    >
+    <AuthFormCard title={t('auth.login.title')} description={t('auth.login.description')} footer={footer}>
       {showPasswordChangedBanner && (
         <div
           role="status"

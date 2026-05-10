@@ -53,9 +53,7 @@ export function ForgotPasswordPage() {
         footer={footer}
       >
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            {t('auth.forgotPassword.successMessage')}
-          </p>
+          <p className="text-sm text-muted-foreground">{t('auth.forgotPassword.successMessage')}</p>
           <Button
             type="button"
             variant="ghost"

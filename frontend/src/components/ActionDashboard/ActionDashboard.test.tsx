@@ -41,7 +41,16 @@ const renderAuthenticatedDashboard = () =>
     {
       preloadedState: {
         user: {
-          currentUser: {id: 1, username: 'testuser', email: 'test@example.com', role: 'USER', emailVerified: true, points: 100, address: null, createdAt: null},
+          currentUser: {
+            id: 1,
+            username: 'testuser',
+            email: 'test@example.com',
+            role: 'USER',
+            emailVerified: true,
+            points: 100,
+            address: null,
+            createdAt: null,
+          },
           isAuthenticated: true,
           loading: false,
           error: null,
@@ -72,7 +81,9 @@ describe('ActionDashboard', () => {
     renderAuthenticatedDashboard();
 
     await waitFor(() => {
-      expect(screen.getByText("You haven't completed any actions yet. Start making an impact today!")).toBeInTheDocument();
+      expect(
+        screen.getByText("You haven't completed any actions yet. Start making an impact today!"),
+      ).toBeInTheDocument();
     });
   });
 

@@ -41,10 +41,7 @@ export function RegisterPage() {
     );
 
     if (registerUser.fulfilled.match(result)) {
-      navigate(
-        `${ROUTES.verifyEmail}?pending=1&email=${encodeURIComponent(submittedEmail)}`,
-        {replace: true},
-      );
+      navigate(`${ROUTES.verifyEmail}?pending=1&email=${encodeURIComponent(submittedEmail)}`, {replace: true});
     }
   };
 
@@ -60,11 +57,7 @@ export function RegisterPage() {
   );
 
   return (
-    <AuthFormCard
-      title={t('auth.register.title')}
-      description={t('auth.register.description')}
-      footer={footer}
-    >
+    <AuthFormCard title={t('auth.register.title')} description={t('auth.register.description')} footer={footer}>
       {registerError && registerStatus === 'rejected' && (
         <div
           role="alert"

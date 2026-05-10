@@ -76,7 +76,18 @@ function renderNavigation(preloadedState?: DeepPartial<RootState>) {
 describe('Navigation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockApiGet.mockResolvedValue({data: {id: 1, username: 'alice', email: 'alice@example.com', role: 'USER', emailVerified: true, points: 42, address: null, createdAt: null}});
+    mockApiGet.mockResolvedValue({
+      data: {
+        id: 1,
+        username: 'alice',
+        email: 'alice@example.com',
+        role: 'USER',
+        emailVerified: true,
+        points: 42,
+        address: null,
+        createdAt: null,
+      },
+    });
     mockApiPost.mockResolvedValue({});
   });
 
@@ -165,9 +176,18 @@ describe('Navigation', () => {
   describe('dev login button', () => {
     it('dev login button calls dev-login endpoint and dispatches fetchCurrentUser when clicked', async () => {
       const user = userEvent.setup();
-      mockApiGet
-        .mockResolvedValueOnce({data: {id: 1}})
-        .mockResolvedValueOnce({data: {id: 1, username: 'alice', email: 'alice@example.com', role: 'USER', emailVerified: true, points: 42, address: null, createdAt: null}});
+      mockApiGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({
+        data: {
+          id: 1,
+          username: 'alice',
+          email: 'alice@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 42,
+          address: null,
+          createdAt: null,
+        },
+      });
 
       renderNavigation(unauthenticatedState);
 

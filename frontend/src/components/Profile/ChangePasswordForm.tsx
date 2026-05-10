@@ -64,14 +64,16 @@ export function ChangePasswordForm() {
           </div>
         )}
 
-        {changePasswordError && changePasswordError !== 'wrong_current_password' && changePasswordStatus === 'rejected' && (
-          <div
-            role="alert"
-            className="mb-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
-          >
-            {t('profile.changePassword.errorGeneric')}
-          </div>
-        )}
+        {changePasswordError &&
+          changePasswordError !== 'wrong_current_password' &&
+          changePasswordStatus === 'rejected' && (
+            <div
+              role="alert"
+              className="mb-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+            >
+              {t('profile.changePassword.errorGeneric')}
+            </div>
+          )}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -82,7 +84,11 @@ export function ChangePasswordForm() {
                 <FormItem>
                   <FormLabel>{t('profile.changePassword.currentPasswordLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder={t('profile.changePassword.currentPasswordPlaceholder')} {...field} />
+                    <Input
+                      type="password"
+                      placeholder={t('profile.changePassword.currentPasswordPlaceholder')}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -96,7 +102,11 @@ export function ChangePasswordForm() {
                 <FormItem>
                   <FormLabel>{t('profile.changePassword.newPasswordLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder={t('profile.changePassword.newPasswordPlaceholder')} {...field} />
+                    <Input
+                      type="password"
+                      placeholder={t('profile.changePassword.newPasswordPlaceholder')}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -110,7 +120,11 @@ export function ChangePasswordForm() {
                 <FormItem>
                   <FormLabel>{t('profile.changePassword.confirmPasswordLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder={t('profile.changePassword.confirmPasswordPlaceholder')} {...field} />
+                    <Input
+                      type="password"
+                      placeholder={t('profile.changePassword.confirmPasswordPlaceholder')}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

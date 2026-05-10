@@ -96,7 +96,11 @@ describe('ResendVerificationForm', () => {
     it('disables submit button while pending', async () => {
       const user = userEvent.setup();
       let resolveResend!: (value: undefined) => void;
-      vi.mocked(authApi.resendVerification).mockReturnValueOnce(new Promise<undefined>((res) => { resolveResend = res; }));
+      vi.mocked(authApi.resendVerification).mockReturnValueOnce(
+        new Promise<undefined>((res) => {
+          resolveResend = res;
+        }),
+      );
 
       renderResendForm();
 

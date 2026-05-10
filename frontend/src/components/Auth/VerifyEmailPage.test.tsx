@@ -93,11 +93,7 @@ describe('VerifyEmailPage', () => {
       renderVerifyEmailPage('/verify-email?token=abc123');
 
       await waitFor(() => {
-        expect(replaceStateSpy).toHaveBeenCalledWith(
-          expect.anything(),
-          expect.anything(),
-          '/verify-email',
-        );
+        expect(replaceStateSpy).toHaveBeenCalledWith(expect.anything(), expect.anything(), '/verify-email');
       });
 
       replaceStateSpy.mockRestore();
@@ -106,7 +102,9 @@ describe('VerifyEmailPage', () => {
     it('renders loading state while verification is pending', () => {
       let resolveVerify!: (value: undefined) => void;
       vi.mocked(authApi.verifyEmail).mockReturnValueOnce(
-        new Promise<undefined>((res) => { resolveVerify = res; }),
+        new Promise<undefined>((res) => {
+          resolveVerify = res;
+        }),
       );
 
       renderVerifyEmailPage('/verify-email?token=abc123');

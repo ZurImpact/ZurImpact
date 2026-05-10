@@ -40,9 +40,7 @@ export function ResendVerificationForm({defaultEmail}: ResendVerificationFormPro
   if (isFulfilled) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-muted-foreground">
-          {t('auth.resendVerification.successMessage')}
-        </p>
+        <p className="text-sm text-muted-foreground">{t('auth.resendVerification.successMessage')}</p>
         <Button
           type="button"
           variant="ghost"

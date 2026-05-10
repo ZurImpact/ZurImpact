@@ -79,6 +79,9 @@ describe('authApi', () => {
   it('confirmPasswordReset posts to /auth/password-reset/confirm with token and newPassword', async () => {
     mockedPost.mockResolvedValueOnce({data: {}});
     await confirmPasswordReset({token: 'tok123', newPassword: 'NewPass1!'});
-    expect(mockedPost).toHaveBeenCalledWith('/auth/password-reset/confirm', {token: 'tok123', newPassword: 'NewPass1!'});
+    expect(mockedPost).toHaveBeenCalledWith('/auth/password-reset/confirm', {
+      token: 'tok123',
+      newPassword: 'NewPass1!',
+    });
   });
 });

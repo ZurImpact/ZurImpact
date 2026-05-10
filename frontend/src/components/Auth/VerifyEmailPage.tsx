@@ -42,7 +42,10 @@ export function VerifyEmailPage() {
       return (
         <AuthFormCard title={t('auth.verifyEmail.titleVerifying')}>
           <div className="flex items-center justify-center py-6">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" aria-hidden="true" />
+            <div
+              className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"
+              aria-hidden="true"
+            />
           </div>
           <p className="text-center text-sm text-muted-foreground">{t('auth.verifyEmail.verifyingMessage')}</p>
         </AuthFormCard>
@@ -54,9 +57,7 @@ export function VerifyEmailPage() {
         <AuthFormCard title={t('auth.verifyEmail.titleSuccess')}>
           <div className="flex flex-col items-center gap-4 py-4">
             <CheckCircle2 className="h-12 w-12 text-green-500" />
-            <p className="text-center text-sm text-muted-foreground">
-              {t('auth.verifyEmail.descriptionSuccess')}
-            </p>
+            <p className="text-center text-sm text-muted-foreground">{t('auth.verifyEmail.descriptionSuccess')}</p>
             <Button asChild className="w-full">
               <Link to={ROUTES.login}>{t('auth.verifyEmail.continueButton')}</Link>
             </Button>
@@ -74,9 +75,7 @@ export function VerifyEmailPage() {
           >
             {t('auth.verifyEmail.descriptionFailed')}
           </div>
-          <p className="mb-4 text-sm text-muted-foreground">
-            {t('auth.verifyEmail.resendHintFailed')}
-          </p>
+          <p className="mb-4 text-sm text-muted-foreground">{t('auth.verifyEmail.resendHintFailed')}</p>
           <ResendVerificationForm />
         </AuthFormCard>
       );
@@ -85,13 +84,8 @@ export function VerifyEmailPage() {
 
   // Pending mode (?pending=1) or idle/fallback (no params)
   return (
-    <AuthFormCard
-      title={t('auth.verifyEmail.titlePending')}
-      description={t('auth.verifyEmail.descriptionPending')}
-    >
-      <p className="mb-4 text-sm text-muted-foreground">
-        {t('auth.verifyEmail.resendHint')}
-      </p>
+    <AuthFormCard title={t('auth.verifyEmail.titlePending')} description={t('auth.verifyEmail.descriptionPending')}>
+      <p className="mb-4 text-sm text-muted-foreground">{t('auth.verifyEmail.resendHint')}</p>
       <ResendVerificationForm defaultEmail={pending && emailParam ? decodeURIComponent(emailParam) : undefined} />
     </AuthFormCard>
   );

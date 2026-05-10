@@ -82,11 +82,7 @@ describe('ResetPasswordPage', () => {
       renderResetPasswordPage('/reset-password?token=abc123');
 
       await waitFor(() => {
-        expect(replaceStateSpy).toHaveBeenCalledWith(
-          expect.anything(),
-          expect.anything(),
-          '/reset-password',
-        );
+        expect(replaceStateSpy).toHaveBeenCalledWith(expect.anything(), expect.anything(), '/reset-password');
       });
 
       replaceStateSpy.mockRestore();

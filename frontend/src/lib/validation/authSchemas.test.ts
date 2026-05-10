@@ -85,7 +85,9 @@ describe('resetPasswordSchema', () => {
   });
 
   it('fails when newPassword is too short', () => {
-    expect(resetPasswordSchema.safeParse({...valid, newPassword: 'short', confirmPassword: 'short'}).success).toBe(false);
+    expect(resetPasswordSchema.safeParse({...valid, newPassword: 'short', confirmPassword: 'short'}).success).toBe(
+      false,
+    );
   });
 
   it('fails when newPassword is too long (> 100 chars)', () => {
@@ -110,7 +112,9 @@ describe('changePasswordSchema', () => {
   });
 
   it('fails when newPassword is too short', () => {
-    expect(changePasswordSchema.safeParse({...valid, newPassword: 'short', confirmPassword: 'short'}).success).toBe(false);
+    expect(changePasswordSchema.safeParse({...valid, newPassword: 'short', confirmPassword: 'short'}).success).toBe(
+      false,
+    );
   });
 
   it('fails when newPassword is too long (> 100 chars)', () => {
