@@ -62,13 +62,13 @@ function newToken() {
 }
 
 function logToken(kind, email, token) {
+  // Map mock kind → actual FE route (see frontend/src/routes.ts).
+  const fePath = kind === 'verify-email' ? '/verify-email' : '/reset-password';
   const banner = '='.repeat(72);
   console.log(`\n${banner}`);
   console.log(`[mock] ${kind} token for ${email}`);
   console.log(`       ${token}`);
-  console.log(
-    `       open: http://localhost:5173/${kind === 'verify-email' ? 'verify-email' : 'password-reset/confirm'}?token=${token}`,
-  );
+  console.log(`       open: http://localhost:5173${fePath}?token=${token}`);
   console.log(`${banner}\n`);
 }
 
@@ -381,7 +381,7 @@ app.get(BASE_URL + '/auth/dev-tokens', (req, res) => {
   const reset = [...resetTokens.entries()].map(([token, email]) => ({
     email,
     token,
-    url: `http://localhost:5173/password-reset/confirm?token=${token}`,
+    url: `http://localhost:5173/reset-password?token=${token}`,
   }));
   res.json({verifyEmail: verify, passwordReset: reset});
 });
