@@ -42,7 +42,7 @@ public class DevAuthController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found"));
         }
         Role role = user.getRole() == null ? Role.ROLE_USER : user.getRole();
-        String token = sessionService.createSession(user.getId(), role);
+        String token = sessionService.createSession(user.getId());
         ResponseCookie cookie = ResponseCookie.from(AuthCookieFilter.AUTH_COOKIE_NAME, token)
                 .httpOnly(true)
                 .secure(httpRequest.isSecure())

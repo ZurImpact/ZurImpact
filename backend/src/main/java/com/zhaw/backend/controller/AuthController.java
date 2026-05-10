@@ -79,7 +79,7 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         try {
             AuthService.AuthResult result = authService.authenticate(request.username(), request.password());
-            String token = sessionService.createSession(result.userId(), result.role());
+            String token = sessionService.createSession(result.userId());
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, sessionCookie(token, httpRequest, Duration.ofHours(8)).toString())
                     .body(new LoginResponse(result.username(), result.role().name()));
