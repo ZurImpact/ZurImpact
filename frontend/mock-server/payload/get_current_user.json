@@ -1,7 +1,10 @@
 {
   "id": 1,
-  "name": "Max Mustermann",
+  "username": "max.mustermann",
   "email": "max.mustermann@example.com",
+  "role": "ROLE_USER",
+  "emailVerified": true,
   "points": 123,
+  "address": null,
   "createdAt": "2024-01-15T10:30:00Z"
 }

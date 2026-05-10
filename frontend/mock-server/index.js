@@ -1,26 +1,94 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import {loadJSON} from './fileManager.ts';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+// CORS must allow credentials so AUTH_SESSION cookie round-trips with withCredentials: true.
+// origin: reflect request origin (cannot use "*" with credentials).
+app.use(
+  cors({
+    origin: (origin, cb) => cb(null, origin ?? true),
+    credentials: true,
+  }),
+);
 app.use(express.json());
+app.use(cookieParser());
+
 const BASE_URL = '/backend_war_exploded/api';
 const mockActions = loadJSON('get_actions.json');
 const mockUserActions = loadJSON('get_useractions.json');
 const mockRewards = loadJSON('get_rewards.json');
 const mockCurrentUser = loadJSON('get_current_user.json');
 
-let isMockAuthenticated = false;
-
 let mockUserPoints = {
   userId: mockCurrentUser.id,
   points: mockCurrentUser.points,
 };
 
-// GET all actions (with optional filters)
+// ---------------------------------------------------------------------------
+// In-memory mock auth state
+// ---------------------------------------------------------------------------
+
+const SESSION_COOKIE = 'AUTH_SESSION';
+
+/** sessionId -> {userId} */
+const sessions = new Map();
+
+/** username -> {id, username, email, password, emailVerified, role, ...} */
+const users = new Map();
+
+/** token -> email */
+const verifyTokens = new Map();
+
+/** token -> email */
+const resetTokens = new Map();
+
+// Seed: the mock user from JSON is treated as already-registered & verified,
+// with password "Password1!" (matches the password the FE tests/devs use).
+users.set(mockCurrentUser.username, {
+  ...mockCurrentUser,
+  password: 'Password1!',
+});
+
+function newSessionId() {
+  return `sess_${Math.random().toString(36).slice(2)}_${Date.now().toString(36)}`;
+}
+
+function newToken() {
+  return `tok_${Math.random().toString(36).slice(2)}_${Date.now().toString(36)}`;
+}
+
+function setSessionCookie(res, sessionId) {
+  res.cookie(SESSION_COOKIE, sessionId, {
+    httpOnly: true,
+    sameSite: 'lax',
+    path: '/',
+  });
+}
+
+function clearSessionCookie(res) {
+  res.clearCookie(SESSION_COOKIE, {path: '/'});
+}
+
+function currentUserFromReq(req) {
+  const sid = req.cookies?.[SESSION_COOKIE];
+  if (!sid) return null;
+  const session = sessions.get(sid);
+  if (!session) return null;
+  // Lookup user by id
+  for (const u of users.values()) {
+    if (u.id === session.userId) return {user: u, sessionId: sid};
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Actions
+// ---------------------------------------------------------------------------
+
 app.get(BASE_URL + '/actions', (req, res) => {
   let filtered = [...mockActions];
   if (req.query.text) {
@@ -43,7 +111,6 @@ app.get(BASE_URL + '/actions', (req, res) => {
   res.json(filtered);
 });
 
-// GET action by ID (for /api/actions/getAction?id=...) - MUST come before /actions/:id
 app.get(BASE_URL + '/actions/getAction', (req, res) => {
   const action = mockActions.find((a) => a.id === parseInt(req.query.id));
   if (action) {
@@ -53,7 +120,6 @@ app.get(BASE_URL + '/actions/getAction', (req, res) => {
   }
 });
 
-// GET action by ID (for /api/actions/:id)
 app.get(BASE_URL + '/actions/:id', (req, res) => {
   const action = mockActions.find((a) => a.id === parseInt(req.params.id));
   if (action) {
@@ -63,17 +129,12 @@ app.get(BASE_URL + '/actions/:id', (req, res) => {
   }
 });
 
-// POST create new action
 app.post(BASE_URL + '/actions', (req, res) => {
-  const newAction = {
-    id: mockActions.length + 1,
-    ...req.body,
-  };
+  const newAction = {id: mockActions.length + 1, ...req.body};
   mockActions.push(newAction);
   res.status(201).json(newAction);
 });
 
-// PUT update action by ID
 app.put(BASE_URL + '/actions/:id', (req, res) => {
   const idx = mockActions.findIndex((a) => a.id === parseInt(req.params.id));
   if (idx !== -1) {
@@ -84,7 +145,6 @@ app.put(BASE_URL + '/actions/:id', (req, res) => {
   }
 });
 
-// DELETE action by ID
 app.delete(BASE_URL + '/actions/:id', (req, res) => {
   const idx = mockActions.findIndex((a) => a.id === parseInt(req.params.id));
   if (idx !== -1) {
@@ -95,39 +155,39 @@ app.delete(BASE_URL + '/actions/:id', (req, res) => {
   }
 });
 
-// GET user actions (aligned with UserActionHistoryDto)
 app.get(BASE_URL + '/userActionHistory/getUserActions', (req, res) => {
-  const userActions = mockUserActions;
-  res.json(userActions);
+  res.json(mockUserActions);
 });
 
-// POST startAction
 app.post(BASE_URL + '/actions/startAction', (req, res) => {
   res.status(200).json({message: 'Action started (mock)'});
 });
 
-// POST completeAction
 app.post(BASE_URL + '/actions/completeAction', (req, res) => {
   res.status(200).json({message: 'Action completed (mock)'});
 });
 
-// POST cancelAction
 app.post(BASE_URL + '/actions/cancelAction', (req, res) => {
   res.status(200).json({message: 'Action cancelled (mock)'});
 });
 
-// POST completeSubTask
 app.post(BASE_URL + '/subTasks/completeSubTask', (req, res) => {
   console.log('completeSubTask called with:', req.body);
   res.status(200).json({message: 'SubTask completed (mock)'});
 });
 
-// GET all rewards
+// ---------------------------------------------------------------------------
+// Rewards
+// ---------------------------------------------------------------------------
+
 app.get(BASE_URL + '/rewards', (req, res) => {
   res.json(mockRewards);
 });
 
-// GET current authenticated user
+// ---------------------------------------------------------------------------
+// Users
+// ---------------------------------------------------------------------------
+
 app.get(BASE_URL + '/users/current', (req, res) => {
   const currentUserWithPoints = {
     ...mockCurrentUser,
@@ -136,7 +196,6 @@ app.get(BASE_URL + '/users/current', (req, res) => {
   res.json(currentUserWithPoints);
 });
 
-// GET user points
 app.get(BASE_URL + '/users/:userId/points', (req, res) => {
   const userId = parseInt(req.params.userId);
   if (mockUserPoints.userId === userId) {
@@ -146,33 +205,55 @@ app.get(BASE_URL + '/users/:userId/points', (req, res) => {
   }
 });
 
-// POST redeem voucher
+// GET /users/{id} — full profile (used by Profile page)
+app.get(BASE_URL + '/users/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  for (const u of users.values()) {
+    if (u.id === id) {
+      // Don't leak password
+      const {password: _pw, ...rest} = u;
+      return res.json({...rest, points: mockUserPoints.points});
+    }
+  }
+  res.status(404).json({error: 'User not found'});
+});
+
+// POST /users/me/password-change — revokes ALL sessions (incl. caller's)
+app.post(BASE_URL + '/users/me/password-change', (req, res) => {
+  const ctx = currentUserFromReq(req);
+  if (!ctx) return res.status(401).json({message: 'Not authenticated'});
+
+  const {currentPassword, newPassword} = req.body ?? {};
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({message: 'invalid_request'});
+  }
+  if (ctx.user.password !== currentPassword) {
+    return res.status(400).json({message: 'wrong_current_password'});
+  }
+
+  ctx.user.password = newPassword;
+
+  // Revoke all sessions belonging to this user
+  for (const [sid, s] of sessions.entries()) {
+    if (s.userId === ctx.user.id) sessions.delete(sid);
+  }
+  clearSessionCookie(res);
+  res.status(204).end();
+});
+
 app.post(BASE_URL + '/users/redemptions', (req, res) => {
   const {userId, voucherId} = req.query;
-
   if (!userId || !voucherId) {
     return res.status(400).json({error: 'userId and voucherId are required'});
   }
-
   const rewardIndex = mockRewards.findIndex((r) => r.id === voucherId);
-
-  if (rewardIndex === -1) {
-    return res.status(404).json({error: 'Reward not found'});
-  }
-
+  if (rewardIndex === -1) return res.status(404).json({error: 'Reward not found'});
   const reward = mockRewards[rewardIndex];
-
-  if (reward.available <= 0) {
-    return res.status(400).json({error: 'No more rewards available'});
-  }
-
-  if (mockUserPoints.points < reward.points) {
-    return res.status(400).json({error: 'Not enough points'});
-  }
+  if (reward.available <= 0) return res.status(400).json({error: 'No more rewards available'});
+  if (mockUserPoints.points < reward.points) return res.status(400).json({error: 'Not enough points'});
 
   mockUserPoints.points -= reward.points;
   mockRewards[rewardIndex].available -= 1;
-
   const voucherCode = `VCHR-${Date.now().toString(36).toUpperCase()}`;
 
   res.json({
@@ -183,26 +264,154 @@ app.post(BASE_URL + '/users/redemptions', (req, res) => {
   });
 });
 
-app.get(BASE_URL + '/auth/whoami', (req, res) => {
-  if (isMockAuthenticated) {
-    // Return mock user data matching the real backend's response structure
-    res.status(200).json({
-      username: mockCurrentUser.name,
-      roles: ['ROLE_USER'],
-    });
-  } else {
-    res.status(401).json({message: 'Not authenticated'});
+// ---------------------------------------------------------------------------
+// Auth
+// ---------------------------------------------------------------------------
+
+// POST /auth/register — creates an unverified account, emits a verify token
+app.post(BASE_URL + '/auth/register', (req, res) => {
+  const {username, email, password} = req.body ?? {};
+  if (!username || !email || !password) {
+    return res.status(400).json({message: 'invalid_request'});
   }
+  if (users.has(username)) {
+    // Real backend may return 409 here; FE treats register errors generically.
+    return res.status(409).json({message: 'username_taken'});
+  }
+
+  const id = users.size + 1000;
+  const user = {
+    id,
+    username,
+    email,
+    password,
+    role: 'ROLE_USER',
+    emailVerified: false,
+    points: 0,
+    address: null,
+    createdAt: new Date().toISOString(),
+  };
+  users.set(username, user);
+
+  const token = newToken();
+  verifyTokens.set(token, email);
+  console.log(`[mock] verify-email token for ${email}: ${token}`);
+
+  res.status(201).end();
 });
 
+// POST /auth/verify-email
+app.post(BASE_URL + '/auth/verify-email', (req, res) => {
+  const {token} = req.body ?? {};
+  if (!token) return res.status(400).json({message: 'invalid_token'});
+  const email = verifyTokens.get(token);
+  if (!email) return res.status(400).json({message: 'invalid_token'});
+  for (const u of users.values()) {
+    if (u.email === email) {
+      u.emailVerified = true;
+      verifyTokens.delete(token);
+      return res.status(204).end();
+    }
+  }
+  res.status(400).json({message: 'invalid_token'});
+});
+
+// POST /auth/resend-verification — anti-enumeration: always 204
+app.post(BASE_URL + '/auth/resend-verification', (req, res) => {
+  const {email} = req.body ?? {};
+  if (email) {
+    for (const u of users.values()) {
+      if (u.email === email && !u.emailVerified) {
+        const token = newToken();
+        verifyTokens.set(token, email);
+        console.log(`[mock] resend verify token for ${email}: ${token}`);
+        break;
+      }
+    }
+  }
+  res.status(204).end();
+});
+
+// POST /auth/login
+app.post(BASE_URL + '/auth/login', (req, res) => {
+  const {username, password} = req.body ?? {};
+  const user = users.get(username);
+  if (!user || user.password !== password) {
+    return res.status(401).json({message: 'invalid_credentials'});
+  }
+  if (!user.emailVerified) {
+    return res.status(403).json({message: 'email_not_verified'});
+  }
+  const sid = newSessionId();
+  sessions.set(sid, {userId: user.id});
+  setSessionCookie(res, sid);
+  res.status(200).json({username: user.username, role: user.role});
+});
+
+// POST /auth/dev-login — convenience for local dev
 app.post(BASE_URL + '/auth/dev-login', (req, res) => {
-  isMockAuthenticated = true; // Track successful login
-  res.status(200).json({message: 'Login successful (mock)', userId: 123});
+  const user = users.get(mockCurrentUser.username);
+  if (!user) return res.status(500).json({message: 'mock user missing'});
+  const sid = newSessionId();
+  sessions.set(sid, {userId: user.id});
+  setSessionCookie(res, sid);
+  res.status(200).json({message: 'Login successful (mock)', userId: user.id});
 });
 
+// POST /auth/logout
 app.post(BASE_URL + '/auth/logout', (req, res) => {
-  isMockAuthenticated = false;
-  res.status(200).json({message: 'Logged out successfully'});
+  const sid = req.cookies?.[SESSION_COOKIE];
+  if (sid) sessions.delete(sid);
+  clearSessionCookie(res);
+  res.status(204).end();
+});
+
+// GET /auth/whoami
+app.get(BASE_URL + '/auth/whoami', (req, res) => {
+  const ctx = currentUserFromReq(req);
+  if (!ctx) return res.status(401).json({message: 'Not authenticated'});
+  res.status(200).json({
+    id: ctx.user.id,
+    username: ctx.user.username,
+    roles: [ctx.user.role],
+    emailVerified: ctx.user.emailVerified,
+  });
+});
+
+// POST /auth/password-reset/request — anti-enumeration: always 204
+app.post(BASE_URL + '/auth/password-reset/request', (req, res) => {
+  const {email} = req.body ?? {};
+  if (email) {
+    for (const u of users.values()) {
+      if (u.email === email) {
+        const token = newToken();
+        resetTokens.set(token, email);
+        console.log(`[mock] password-reset token for ${email}: ${token}`);
+        break;
+      }
+    }
+  }
+  res.status(204).end();
+});
+
+// POST /auth/password-reset/confirm
+app.post(BASE_URL + '/auth/password-reset/confirm', (req, res) => {
+  const {token, newPassword} = req.body ?? {};
+  if (!token || !newPassword) return res.status(400).json({message: 'invalid_token'});
+  const email = resetTokens.get(token);
+  if (!email) return res.status(400).json({message: 'invalid_token'});
+  for (const u of users.values()) {
+    if (u.email === email) {
+      u.password = newPassword;
+      resetTokens.delete(token);
+      // Revoke any active sessions for that user
+      for (const [sid, s] of sessions.entries()) {
+        if (s.userId === u.id) sessions.delete(sid);
+      }
+      return res.status(204).end();
+    }
+  }
+  res.status(400).json({message: 'invalid_token'});
 });
 
 app.listen(PORT, () => {
