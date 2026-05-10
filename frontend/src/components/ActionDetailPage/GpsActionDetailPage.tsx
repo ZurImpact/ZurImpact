@@ -261,7 +261,7 @@ export function GpsActionDetailPage() {
       isMounted = false;
       dispatch(clearSelectedAction());
     };
-  }, [actionIdFromRoute, dispatch]);
+  }, [actionIdFromRoute, dispatch, currentUser?.id]);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -333,7 +333,7 @@ export function GpsActionDetailPage() {
       }
       setIsTrackingLocation(false);
     };
-  }, [t, initialCheckpoints, checkedInCheckpointIds, actionIdFromRoute, dispatch, hasStartedAction]);
+  }, [t, initialCheckpoints, checkedInCheckpointIds, actionIdFromRoute, dispatch, hasStartedAction, currentUser?.id]);
 
   const allCheckpointsCheckedIn = checkpoints.length > 0 && checkpoints.every((cp) => cp.isCheckedIn);
   const checkedInCount = checkpoints.filter((cp) => cp.isCheckedIn).length;
