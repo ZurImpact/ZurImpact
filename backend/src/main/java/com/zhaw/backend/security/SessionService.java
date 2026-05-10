@@ -16,7 +16,7 @@ public interface SessionService {
      * Creates a session for the given user and returns the raw opaque token
      * that should be set as the AUTH_SESSION cookie value.
      */
-    String createSession(Long userId, String username, Role role);
+    String createSession(Long userId, Role role);
 
     /**
      * Validates a raw cookie token. Returns the session record on hit,
