@@ -289,6 +289,7 @@ const actionSlice = createSlice({
       })
       .addCase(completeSubTask.rejected, (state, action) => {
         state.error = action.payload as string;
+        state.loading = false;
       });
   },
 });
