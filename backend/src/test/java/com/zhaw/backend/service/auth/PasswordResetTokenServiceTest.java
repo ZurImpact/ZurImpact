@@ -45,6 +45,35 @@ class PasswordResetTokenServiceTest {
     }
 
     @Test
+    @DisplayName("lookupValid returns token for valid, unconsumed, unexpired token")
+    void lookupValidOk() {
+        String raw = "deadbeef".repeat(8);
+        PasswordResetToken token = PasswordResetToken.builder()
+                .tokenHash(TokenHashing.sha256Hex(raw))
+                .userId(11L)
+                .createdAt(LocalDateTime.now().minusMinutes(1))
+                .expiresAt(LocalDateTime.now().plusMinutes(10))
+                .build();
+        when(dao.findByTokenHash(TokenHashing.sha256Hex(raw))).thenReturn(Optional.of(token));
+
+        assertTrue(service.lookupValid(raw).isPresent());
+    }
+
+    @Test
+    @DisplayName("lookupValid returns empty for null token")
+    void lookupValidNullReturnsEmpty() {
+        assertTrue(service.lookupValid(null).isEmpty());
+        verifyNoInteractions(dao);
+    }
+
+    @Test
+    @DisplayName("lookupValid returns empty for blank token")
+    void lookupValidBlankReturnsEmpty() {
+        assertTrue(service.lookupValid("  ").isEmpty());
+        verifyNoInteractions(dao);
+    }
+
+    @Test
     @DisplayName("markConsumed delegates to DAO with hashed token")
     void markConsumedDelegates() {
         String raw = "deadbeef".repeat(8);
@@ -52,5 +81,13 @@ class PasswordResetTokenServiceTest {
         service.markConsumed(raw);
 
         verify(dao).markConsumed(eq(TokenHashing.sha256Hex(raw)), any(LocalDateTime.class));
+    }
+
+    @Test
+    @DisplayName("invalidateAllForUser delegates to DAO")
+    void invalidateAllForUserDelegates() {
+        service.invalidateAllForUser(11L);
+
+        verify(dao).deleteByUserId(11L);
     }
 }

@@ -90,6 +90,26 @@ class SessionServiceTest {
     }
 
     @Test
+    @DisplayName("validate returns empty and deletes session when user no longer exists")
+    void validateUserNotFoundDeletesSession() {
+        String raw = "beefdead".repeat(8);
+        String hash = TokenHashing.sha256Hex(raw);
+        AuthSession session = AuthSession.builder()
+                .tokenHash(hash)
+                .userId(99L)
+                .createdAt(LocalDateTime.now().minusMinutes(1))
+                .expiresAt(LocalDateTime.now().plusMinutes(5))
+                .build();
+        when(authSessionDao.findByTokenHash(hash)).thenReturn(Optional.of(session));
+        when(userDao.findById(99L)).thenReturn(Optional.empty());
+
+        Optional<SessionService.SessionRecord> record = service.validate(raw);
+
+        assertTrue(record.isEmpty());
+        verify(authSessionDao).deleteByTokenHash(hash);
+    }
+
+    @Test
     @DisplayName("validate returns empty for null/blank/unknown raw token")
     void validateInvalidInputs() {
         assertTrue(service.validate(null).isEmpty());

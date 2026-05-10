@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.testcontainers.shaded.org.apache.commons.lang3.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -232,8 +231,53 @@ class UserServiceImplTest {
 
             boolean result = userService.addPointsToUser(404L, 5);
 
-            assertTrue(!result);
+            assertFalse(result);
             verify(userDao).findById(404L);
+            verify(userDao, never()).save(any(User.class));
+        }
+    }
+
+    // ── deductPointsFromUser ─────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("deductPointsFromUser")
+    class DeductPointsFromUser {
+
+        @Test
+        @DisplayName("deducts points and saves when user has enough points")
+        void deductsPointsAndSaves_whenSufficient() {
+            sampleUser.setPoints(50);
+            when(userDao.findById(1L)).thenReturn(Optional.of(sampleUser));
+            when(userDao.save(sampleUser)).thenReturn(sampleUser);
+
+            boolean result = userService.deductPointsFromUser(1L, 20);
+
+            assertTrue(result);
+            assertEquals(30, sampleUser.getPoints());
+            verify(userDao).save(sampleUser);
+        }
+
+        @Test
+        @DisplayName("returns false and does not save when points are insufficient")
+        void returnsFalse_whenInsufficientPoints() {
+            sampleUser.setPoints(10);
+            when(userDao.findById(1L)).thenReturn(Optional.of(sampleUser));
+
+            boolean result = userService.deductPointsFromUser(1L, 50);
+
+            assertFalse(result);
+            assertEquals(10, sampleUser.getPoints());
+            verify(userDao, never()).save(any(User.class));
+        }
+
+        @Test
+        @DisplayName("returns false when user does not exist")
+        void returnsFalse_whenUserMissing() {
+            when(userDao.findById(404L)).thenReturn(Optional.empty());
+
+            boolean result = userService.deductPointsFromUser(404L, 10);
+
+            assertFalse(result);
             verify(userDao, never()).save(any(User.class));
         }
     }

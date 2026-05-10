@@ -152,5 +152,23 @@ class UserControllerTest {
             assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
             verify(authService, never()).changePassword(anyLong(), anyString(), anyString());
         }
+
+        @Test
+        @DisplayName("returns 401 when user not found in DB")
+        void changeUserNotFound() {
+            Authentication auth = new UsernamePasswordAuthenticationToken(
+                    new AuthenticatedUser(11L, "alice"), null, Set.of());
+            when(currentUserResolver.userIdOf(auth)).thenReturn(11L);
+            when(authService.changePassword(eq(11L), eq("old"), anyString()))
+                    .thenReturn(AuthService.ChangePasswordResult.USER_NOT_FOUND);
+
+            ResponseEntity<?> response = controller.changePassword(
+                    new PasswordChangeRequest("old", "newPassword123"), auth);
+
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            @SuppressWarnings("unchecked")
+            Map<String, String> body = (Map<String, String>) response.getBody();
+            assertEquals("Not authenticated", body.get("message"));
+        }
     }
 }

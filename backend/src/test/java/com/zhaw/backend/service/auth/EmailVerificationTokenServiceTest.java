@@ -76,6 +76,20 @@ class EmailVerificationTokenServiceTest {
     }
 
     @Test
+    @DisplayName("lookupValid returns empty for null token")
+    void lookupValidNullReturnsEmpty() {
+        assertTrue(service.lookupValid(null).isEmpty());
+        verifyNoInteractions(dao);
+    }
+
+    @Test
+    @DisplayName("lookupValid returns empty for blank token")
+    void lookupValidBlankReturnsEmpty() {
+        assertTrue(service.lookupValid("  ").isEmpty());
+        verifyNoInteractions(dao);
+    }
+
+    @Test
     @DisplayName("markConsumed delegates to DAO with hashed token")
     void markConsumedDelegates() {
         String raw = "feedface".repeat(8);
@@ -83,5 +97,13 @@ class EmailVerificationTokenServiceTest {
         service.markConsumed(raw);
 
         verify(dao).markConsumed(eq(TokenHashing.sha256Hex(raw)), any(LocalDateTime.class));
+    }
+
+    @Test
+    @DisplayName("invalidateAllForUser delegates to DAO")
+    void invalidateAllForUserDelegates() {
+        service.invalidateAllForUser(11L);
+
+        verify(dao).deleteByUserId(11L);
     }
 }
