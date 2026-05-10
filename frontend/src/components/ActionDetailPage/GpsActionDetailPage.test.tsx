@@ -365,6 +365,9 @@ describe('GpsActionDetailPage', () => {
       actions: createActionState(),
     });
 
+    await screen.findByText('GPS City Walk');
+    await waitFor(() => expect(watchPositionMock).toHaveBeenCalled());
+
     await act(async () => {
       watchErrorCallback?.({message: 'location unavailable'} as GeolocationPositionError);
     });
@@ -437,9 +440,11 @@ describe('GpsActionDetailPage', () => {
 
     it('HARD: check-in does NOT trigger when user is 10m away', async () => {
       const fixture = makeFixture('HARD');
-      mockGet.mockImplementation((url: string) =>
-        url === '/actions/1' ? Promise.resolve({data: fixture}) : Promise.resolve({data: {}}),
-      );
+      mockGet.mockImplementation((url: string) => {
+        if (url === '/actions/1') return Promise.resolve({data: fixture});
+        if (url === '/userActionHistory/getUserActions?userId=5&active=true') return Promise.resolve({data: []});
+        return Promise.resolve({data: {}});
+      });
       const user = userEvent.setup();
       renderPage({actions: {...createActionState(), selectedAction: fixture}});
       await user.click(await screen.findByRole('button', {name: 'gpsActionDetail.startAction'}));

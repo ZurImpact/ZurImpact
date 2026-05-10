@@ -129,7 +129,7 @@ export function GpsActionDetailPage() {
   useEffect(() => {
     tRef.current = t;
   }, [t]);
-  
+
   const isDevMode = useMemo(() => {
     try {
       return new URLSearchParams(window.location.search).get('dev') === 'true';
@@ -239,13 +239,14 @@ export function GpsActionDetailPage() {
                   actionId: actionIdFromRoute,
                   subTaskId: cp.id,
                   actionType: 'GPS',
+                  additionalData: {latitude, longitude},
                 }),
               );
             }
           }
 
           toast.success(
-            t('gpsActionDetail.checkpointReached', {
+            tRef.current('gpsActionDetail.checkpointReached', {
               checkpoint: cp.index,
               name: cp.displayName,
             }),
@@ -253,7 +254,7 @@ export function GpsActionDetailPage() {
         }
       });
     },
-    [actionIdFromRoute, dispatch, hasStartedAction, initialCheckpoints, t],
+    [actionIdFromRoute, dispatch, hasStartedAction, initialCheckpoints],
   );
 
   const checkpoints = useMemo(() => {
