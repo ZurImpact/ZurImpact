@@ -25,6 +25,7 @@ public final class UserMapper {
 				.createdAt(entity.getCreatedAt() == null ? null : entity.getCreatedAt().toString())
 				.points(entity.getPoints())
 				.role(entity.getRole() == null ? null : Role.valueOf(entity.getRole()))
+				.emailVerified(entity.getEmailVerified())
 				.build();
 	}
 
@@ -41,6 +42,7 @@ public final class UserMapper {
 				.createdAt(entity.getCreatedAt() == null ? null : entity.getCreatedAt().toString())
 				.points(entity.getPoints())
 				.role(entity.getRole() == null ? null : Role.valueOf(entity.getRole()))
+				.emailVerified(entity.getEmailVerified())
 				.build();
 	}
 }

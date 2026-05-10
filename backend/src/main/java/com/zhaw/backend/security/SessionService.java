@@ -1,48 +1,41 @@
 package com.zhaw.backend.security;
 
 import com.zhaw.backend.enums.Role;
-import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-@Service
-public class SessionService {
+/**
+ * Session management contract. Implementations persist sessions in a backing
+ * store, generate opaque tokens on createSession, and validate raw tokens
+ * by comparing their hash against the store.
+ */
+public interface SessionService {
 
-    private static final long SESSION_TTL_SECONDS = 8 * 60 * 60; // 8h
+    /**
+     * Creates a session for the given user and returns the raw opaque token
+     * that should be set as the AUTH_SESSION cookie value.
+     */
+    String createSession(Long userId, String username, Role role);
 
-    private final Map<String, SessionRecord> sessions = new ConcurrentHashMap<>();
+    /**
+     * Validates a raw cookie token. Returns the session record on hit,
+     * or empty on miss / expired / invalid input.
+     */
+    Optional<SessionRecord> validate(String rawToken);
 
-    public String createSession(String username, Role role) {
-        String token = UUID.randomUUID().toString();
-        Instant expiresAt = Instant.now().plusSeconds(SESSION_TTL_SECONDS);
-        sessions.put(token, new SessionRecord(username, role, expiresAt));
-        return token;
-    }
+    /**
+     * Invalidates a single session identified by its raw cookie token.
+     */
+    void invalidate(String rawToken);
 
-    public Optional<SessionRecord> validate(String token) {
-        if (token == null || token.isBlank()) {
-            return Optional.empty();
-        }
-        SessionRecord record = sessions.get(token);
-        if (record == null) {
-            return Optional.empty();
-        }
-        if (record.expiresAt().isBefore(Instant.now())) {
-            sessions.remove(token);
-            return Optional.empty();
-        }
-        return Optional.of(record);
-    }
+    /**
+     * Removes every session for the given user. Used on password reset
+     * confirmation and password change.
+     *
+     * @return number of sessions removed
+     */
+    int invalidateAllForUser(Long userId);
 
-    public void invalidate(String token) {
-        if (token != null) {
-            sessions.remove(token);
-        }
-    }
-
-    public record SessionRecord(String username, Role role, Instant expiresAt) {}
+    record SessionRecord(Long userId, String username, Role role, Instant expiresAt) {}
 }

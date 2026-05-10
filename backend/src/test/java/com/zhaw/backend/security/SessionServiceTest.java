@@ -1,74 +1,120 @@
 package com.zhaw.backend.security;
 
 import com.zhaw.backend.enums.Role;
+import com.zhaw.backend.model.dao.AuthSessionDao;
+import com.zhaw.backend.model.dao.UserDao;
+import com.zhaw.backend.model.entities.AuthSession;
+import com.zhaw.backend.model.entities.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
-import java.lang.reflect.Field;
-import java.time.Instant;
-import java.util.Map;
+import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
+@DisplayName("DbSessionService - Unit Tests")
 class SessionServiceTest {
 
-    @Test
-    @DisplayName("createSession + validate returns session record")
-    void createSessionAndValidateReturnsRecord() {
-        SessionService sessionService = new SessionService();
+    private AuthSessionDao authSessionDao;
+    private UserDao userDao;
+    private DbSessionService service;
 
-        String token = sessionService.createSession("alice", Role.ROLE_USER);
-        Optional<SessionService.SessionRecord> result = sessionService.validate(token);
-
-        assertTrue(result.isPresent());
-        assertEquals("alice", result.get().username());
-        assertSame(result.get().role(), Role.ROLE_USER);
+    @BeforeEach
+    void setUp() {
+        authSessionDao = mock(AuthSessionDao.class);
+        userDao = mock(UserDao.class);
+        service = new DbSessionService(authSessionDao, userDao);
     }
 
     @Test
-    @DisplayName("validate returns empty for null blank and unknown token")
-    void validateReturnsEmptyForInvalidTokenInputs() {
-        SessionService sessionService = new SessionService();
+    @DisplayName("createSession returns raw token and persists its sha256 hash")
+    void createSessionStoresHashedToken() {
+        String raw = service.createSession(11L, "alice", Role.ROLE_USER);
 
-        assertTrue(sessionService.validate(null).isEmpty());
-        assertTrue(sessionService.validate(" ").isEmpty());
-        assertTrue(sessionService.validate("unknown-token").isEmpty());
+        assertNotNull(raw);
+        assertEquals(64, raw.length(), "raw token must be 32-byte hex");
+
+        ArgumentCaptor<AuthSession> captor = ArgumentCaptor.forClass(AuthSession.class);
+        verify(authSessionDao).insert(captor.capture());
+        AuthSession stored = captor.getValue();
+        assertEquals(TokenHashing.sha256Hex(raw), stored.getTokenHash());
+        assertEquals(11L, stored.getUserId());
+        assertNotEquals(raw, stored.getTokenHash(), "DB row must store the hash, not the raw token");
     }
 
     @Test
-    @DisplayName("invalidate removes active session")
-    void invalidateRemovesSession() {
-        SessionService sessionService = new SessionService();
-        String token = sessionService.createSession("bob", Role.ROLE_ADMIN);
+    @DisplayName("validate returns SessionRecord with current user role for live sessions")
+    void validateReturnsRecord() {
+        String raw = "deadbeef".repeat(8);
+        String hash = TokenHashing.sha256Hex(raw);
+        AuthSession session = AuthSession.builder()
+                .tokenHash(hash)
+                .userId(11L)
+                .createdAt(LocalDateTime.now().minusMinutes(1))
+                .expiresAt(LocalDateTime.now().plusMinutes(5))
+                .build();
+        when(authSessionDao.findByTokenHash(hash)).thenReturn(Optional.of(session));
+        User user = User.builder().id(11L).username("alice").role("ROLE_USER").build();
+        when(userDao.findById(11L)).thenReturn(Optional.of(user));
 
-        sessionService.invalidate(token);
+        Optional<SessionService.SessionRecord> record = service.validate(raw);
 
-        assertTrue(sessionService.validate(token).isEmpty());
+        assertTrue(record.isPresent());
+        assertEquals(11L, record.get().userId());
+        assertEquals("alice", record.get().username());
+        assertEquals(Role.ROLE_USER, record.get().role());
     }
 
     @Test
-    @DisplayName("validate removes expired session")
-    @SuppressWarnings("unchecked")
-    void validateRemovesExpiredSession() throws Exception {
-        SessionService sessionService = new SessionService();
+    @DisplayName("validate returns empty and deletes the row for expired sessions")
+    void validateExpiredDeletes() {
+        String raw = "cafebabe".repeat(8);
+        String hash = TokenHashing.sha256Hex(raw);
+        AuthSession session = AuthSession.builder()
+                .tokenHash(hash)
+                .userId(11L)
+                .createdAt(LocalDateTime.now().minusMinutes(10))
+                .expiresAt(LocalDateTime.now().minusMinutes(1))
+                .build();
+        when(authSessionDao.findByTokenHash(hash)).thenReturn(Optional.of(session));
 
-        Field sessionsField = SessionService.class.getDeclaredField("sessions");
-        sessionsField.setAccessible(true);
-        Map<String, SessionService.SessionRecord> sessions =
-                (Map<String, SessionService.SessionRecord>) sessionsField.get(sessionService);
+        Optional<SessionService.SessionRecord> record = service.validate(raw);
 
-        String expiredToken = "expired-token";
-        sessions.put(expiredToken, new SessionService.SessionRecord(
-                "carol",
-                Role.ROLE_USER,
-                Instant.now().minusSeconds(60)));
+        assertTrue(record.isEmpty());
+        verify(authSessionDao).deleteByTokenHash(hash);
+    }
 
-        Optional<SessionService.SessionRecord> result = sessionService.validate(expiredToken);
+    @Test
+    @DisplayName("validate returns empty for null/blank/unknown raw token")
+    void validateInvalidInputs() {
+        assertTrue(service.validate(null).isEmpty());
+        assertTrue(service.validate(" ").isEmpty());
+        when(authSessionDao.findByTokenHash(anyString())).thenReturn(Optional.empty());
+        assertTrue(service.validate("nope").isEmpty());
+    }
 
-        assertTrue(result.isEmpty());
-        assertFalse(sessions.containsKey(expiredToken));
+    @Test
+    @DisplayName("invalidate deletes the row matching the hashed cookie token")
+    void invalidateDeletes() {
+        String raw = "feedface".repeat(8);
+
+        service.invalidate(raw);
+
+        verify(authSessionDao).deleteByTokenHash(TokenHashing.sha256Hex(raw));
+    }
+
+    @Test
+    @DisplayName("invalidateAllForUser delegates to DAO")
+    void invalidateAllForUser() {
+        when(authSessionDao.deleteByUserId(11L)).thenReturn(3);
+
+        int removed = service.invalidateAllForUser(11L);
+
+        assertEquals(3, removed);
     }
 }
-

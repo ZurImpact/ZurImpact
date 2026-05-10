@@ -40,7 +40,7 @@ public class User {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(name = "address_id", unique = true, nullable = false)
+    @Column(name = "address_id")
     private Long address;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -52,6 +52,9 @@ public class User {
     @Column(name = "role", nullable = false, length = 50)
     private String role;
 
+    @Column(name = "email_verified", nullable = false)
+    private Boolean emailVerified;
+
     /**
      * Sets createdAt in-memory before INSERT so the field is never null
      * immediately after em.persist() — without waiting for a DB round-trip.
@@ -60,6 +63,9 @@ public class User {
     protected void onCreate() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
+        }
+        if (emailVerified == null) {
+            emailVerified = Boolean.FALSE;
         }
     }
 }
