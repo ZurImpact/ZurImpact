@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useAppSelector} from '../../store/store';
 import {Card, CardContent, CardHeader, CardTitle} from '../ui/card';
 import {Badge} from '../ui/badge';
@@ -16,12 +17,13 @@ function formatDate(dateString: string): string {
 }
 
 export function ProfilePage() {
+  const {t} = useTranslation();
   const currentUser = useAppSelector((s) => s.user.currentUser);
 
   if (!currentUser) {
     return (
       <div data-testid="profile-page" className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-        <p className="text-muted-foreground">Loading…</p>
+        <p className="text-muted-foreground">{t('profile.loadingState')}</p>
       </div>
     );
   }
@@ -34,40 +36,40 @@ export function ProfilePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-[120px_1fr] gap-2 text-sm">
-            <span className="text-muted-foreground font-medium">Email</span>
+            <span className="text-muted-foreground font-medium">{t('profile.emailLabel')}</span>
             <span>{currentUser.email}</span>
 
-            <span className="text-muted-foreground font-medium">Role</span>
+            <span className="text-muted-foreground font-medium">{t('profile.roleLabel')}</span>
             <span>
               <Badge variant="secondary">{currentUser.role}</Badge>
             </span>
 
-            <span className="text-muted-foreground font-medium">Email status</span>
+            <span className="text-muted-foreground font-medium">{t('profile.emailStatusLabel')}</span>
             <span>
               {currentUser.emailVerified ? (
-                <Badge variant="default">Verified</Badge>
+                <Badge variant="default">{t('profile.verifiedBadge')}</Badge>
               ) : (
-                <Badge variant="destructive">Not verified</Badge>
+                <Badge variant="destructive">{t('profile.notVerifiedBadge')}</Badge>
               )}
             </span>
 
-            <span className="text-muted-foreground font-medium">Credits</span>
+            <span className="text-muted-foreground font-medium">{t('profile.creditsLabel')}</span>
             <span>
               <span className="text-2xl font-bold">{currentUser.points}</span>{' '}
-              <span className="text-muted-foreground">credits</span>
+              <span className="text-muted-foreground">{t('profile.creditsUnit')}</span>
             </span>
 
             {currentUser.createdAt && (
               <>
-                <span className="text-muted-foreground font-medium">Member since</span>
+                <span className="text-muted-foreground font-medium">{t('profile.memberSinceLabel')}</span>
                 <span>{formatDate(currentUser.createdAt)}</span>
               </>
             )}
 
             {currentUser.address !== null && (
               <>
-                <span className="text-muted-foreground font-medium">Address</span>
-                <span>Address #{currentUser.address}</span>
+                <span className="text-muted-foreground font-medium">{t('profile.addressLabel')}</span>
+                <span>{t('profile.addressFormat', {id: currentUser.address})}</span>
               </>
             )}
           </div>

@@ -2,6 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Link, useSearchParams} from 'react-router';
+import {useTranslation} from 'react-i18next';
 import {AuthFormCard} from './AuthFormCard';
 import {Form, FormField, FormItem, FormLabel, FormControl, FormMessage} from '../ui/form';
 import {Input} from '../ui/input';
@@ -12,6 +13,7 @@ import {resetPasswordSchema, type ResetPasswordInput} from '../../lib/validation
 import {ROUTES} from '../../routes';
 
 export function ResetPasswordPage() {
+  const {t} = useTranslation();
   const dispatch = useAppDispatch();
   const [searchParams] = useSearchParams();
   const confirmStatus = useAppSelector((s) => s.auth.confirmPasswordReset.status);
@@ -52,15 +54,15 @@ export function ResetPasswordPage() {
   // Missing-token mode
   if (!capturedToken) {
     return (
-      <AuthFormCard title="Set a new password" description="Enter and confirm your new password.">
+      <AuthFormCard title={t('auth.resetPassword.title')} description={t('auth.resetPassword.description')}>
         <div
           role="alert"
           className="mb-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
-          This reset link is invalid. Request a new one.
+          {t('auth.resetPassword.errorMissingToken')}
         </div>
         <Button asChild variant="outline" className="w-full">
-          <Link to={ROUTES.passwordResetRequest}>Request a new one</Link>
+          <Link to={ROUTES.passwordResetRequest}>{t('auth.resetPassword.requestNewLinkButton')}</Link>
         </Button>
       </AuthFormCard>
     );
@@ -69,13 +71,13 @@ export function ResetPasswordPage() {
   // Success mode
   if (isFulfilled) {
     return (
-      <AuthFormCard title="Set a new password" description="Enter and confirm your new password.">
+      <AuthFormCard title={t('auth.resetPassword.title')} description={t('auth.resetPassword.description')}>
         <div className="flex flex-col items-center gap-4 py-4">
           <p className="text-center text-sm text-muted-foreground">
-            Your password has been reset. You can now sign in.
+            {t('auth.resetPassword.descriptionSuccess')}
           </p>
           <Button asChild className="w-full">
-            <Link to={ROUTES.login}>Sign in</Link>
+            <Link to={ROUTES.login}>{t('auth.resetPassword.signInButton')}</Link>
           </Button>
         </div>
       </AuthFormCard>
@@ -84,15 +86,15 @@ export function ResetPasswordPage() {
 
   // Form mode (idle, pending) or form-with-error mode (rejected)
   return (
-    <AuthFormCard title="Set a new password" description="Enter and confirm your new password.">
+    <AuthFormCard title={t('auth.resetPassword.title')} description={t('auth.resetPassword.description')}>
       {isRejected && confirmError && (
         <div
           role="alert"
           className="mb-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
-          This reset link is invalid or has expired.{' '}
+          {t('auth.resetPassword.errorTokenInvalid')}{' '}
           <Link to={ROUTES.passwordResetRequest} className="underline hover:text-foreground">
-            Request a new one
+            {t('auth.resetPassword.requestNewLinkInline')}
           </Link>
           .
         </div>
@@ -105,9 +107,9 @@ export function ResetPasswordPage() {
             name="newPassword"
             render={({field}) => (
               <FormItem>
-                <FormLabel>New Password</FormLabel>
+                <FormLabel>{t('auth.resetPassword.newPasswordLabel')}</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
+                  <Input type="password" placeholder={t('auth.resetPassword.newPasswordPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -119,9 +121,9 @@ export function ResetPasswordPage() {
             name="confirmPassword"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel>{t('auth.resetPassword.confirmPasswordLabel')}</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
+                  <Input type="password" placeholder={t('auth.resetPassword.confirmPasswordPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -129,7 +131,7 @@ export function ResetPasswordPage() {
           />
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? 'Resetting…' : 'Reset password'}
+            {isPending ? t('auth.resetPassword.submitPending') : t('auth.resetPassword.submit')}
           </Button>
         </form>
       </Form>

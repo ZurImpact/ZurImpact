@@ -2,6 +2,7 @@ import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Link} from 'react-router';
+import {useTranslation} from 'react-i18next';
 import {AuthFormCard} from './AuthFormCard';
 import {Form, FormField, FormItem, FormLabel, FormControl, FormMessage} from '../ui/form';
 import {Input} from '../ui/input';
@@ -12,6 +13,7 @@ import {forgotPasswordSchema, type ForgotPasswordInput} from '../../lib/validati
 import {ROUTES} from '../../routes';
 
 export function ForgotPasswordPage() {
+  const {t} = useTranslation();
   const dispatch = useAppDispatch();
   const resetStatus = useAppSelector((s) => s.auth.requestPasswordReset.status);
   const resetError = useAppSelector((s) => s.auth.requestPasswordReset.error);
@@ -36,9 +38,9 @@ export function ForgotPasswordPage() {
 
   const footer = (
     <div className="text-sm text-muted-foreground">
-      Remember your password?{' '}
+      {t('auth.forgotPassword.rememberPassword')}{' '}
       <Link to={ROUTES.login} className="underline hover:text-foreground">
-        Sign in
+        {t('auth.forgotPassword.signInLink')}
       </Link>
     </div>
   );
@@ -46,13 +48,13 @@ export function ForgotPasswordPage() {
   if (isFulfilled) {
     return (
       <AuthFormCard
-        title="Forgot your password?"
-        description="Enter your email and we'll send you a link to reset it."
+        title={t('auth.forgotPassword.title')}
+        description={t('auth.forgotPassword.description')}
         footer={footer}
       >
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            If an account with that address exists, we've sent a password reset link. Check your inbox.
+            {t('auth.forgotPassword.successMessage')}
           </p>
           <Button
             type="button"
@@ -64,7 +66,7 @@ export function ForgotPasswordPage() {
               dispatch(resetAuthOp('requestPasswordReset'));
             }}
           >
-            Send to a different address
+            {t('auth.forgotPassword.sendDifferent')}
           </Button>
         </div>
       </AuthFormCard>
@@ -73,8 +75,8 @@ export function ForgotPasswordPage() {
 
   return (
     <AuthFormCard
-      title="Forgot your password?"
-      description="Enter your email and we'll send you a link to reset it."
+      title={t('auth.forgotPassword.title')}
+      description={t('auth.forgotPassword.description')}
       footer={footer}
     >
       {resetError && resetStatus === 'rejected' && (
@@ -82,7 +84,7 @@ export function ForgotPasswordPage() {
           role="alert"
           className="mb-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
-          Couldn't reach the server, please try again.
+          {t('auth.forgotPassword.errorGeneric')}
         </div>
       )}
 
@@ -93,11 +95,11 @@ export function ForgotPasswordPage() {
             name="email"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('auth.forgotPassword.emailLabel')}</FormLabel>
                 <FormControl>
                   {/* type="email" — jsdom blocks invalid email strings via HTML5 validation;
                       Zod email validation is tested separately in authSchemas.test.ts */}
-                  <Input type="email" placeholder="you@example.com" {...field} />
+                  <Input type="email" placeholder={t('auth.forgotPassword.emailPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -105,7 +107,7 @@ export function ForgotPasswordPage() {
           />
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? 'Sending…' : 'Send reset link'}
+            {isPending ? t('auth.forgotPassword.submitPending') : t('auth.forgotPassword.submit')}
           </Button>
         </form>
       </Form>

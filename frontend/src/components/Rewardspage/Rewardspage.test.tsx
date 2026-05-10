@@ -79,7 +79,7 @@ describe('RewardsPage', () => {
       },
     });
 
-    expect(screen.getByText('rewardsPage.loading')).toBeInTheDocument();
+    expect(screen.getByText('Loading rewards...')).toBeInTheDocument();
   });
 
   it('renders login prompt for unauthenticated users and retries auth', async () => {
@@ -105,9 +105,9 @@ describe('RewardsPage', () => {
       },
     });
 
-    expect(await screen.findByText('rewardsPage.loginRequired')).toBeInTheDocument();
+    expect(await screen.findByText('Login Required')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'rewardsPage.tryAgain'}));
+    await user.click(screen.getByRole('button', {name: 'Try Again'}));
 
     await waitFor(() => {
       const authCalls = mockGet.mock.calls.filter(([url]) => url === '/auth/whoami');
@@ -150,15 +150,15 @@ describe('RewardsPage', () => {
       },
     });
 
-    const redeemButtons = await screen.findAllByRole('button', {name: 'rewardsPage.redeem'});
+    const redeemButtons = await screen.findAllByRole('button', {name: 'Redeem'});
     await user.click(redeemButtons[0]);
 
-    expect(screen.getByText('rewardsPage.redeemReward')).toBeInTheDocument();
+    expect(screen.getByText('Redeem Reward')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'rewardsPage.cancel'}));
+    await user.click(screen.getByRole('button', {name: 'Cancel'}));
 
     await waitFor(() => {
-      expect(screen.queryByText('rewardsPage.redeemReward')).not.toBeInTheDocument();
+      expect(screen.queryByText('Redeem Reward')).not.toBeInTheDocument();
     });
   });
 
@@ -175,9 +175,9 @@ describe('RewardsPage', () => {
       },
     });
 
-    const redeemButtons = await screen.findAllByRole('button', {name: 'rewardsPage.redeem'});
+    const redeemButtons = await screen.findAllByRole('button', {name: 'Redeem'});
     await user.click(redeemButtons[0]);
-    await user.click(screen.getByRole('button', {name: 'rewardsPage.confirmRedemptionBtn'}));
+    await user.click(screen.getByRole('button', {name: 'Confirm Redemption'}));
 
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith('/vouchers/r1/redeem');
@@ -198,7 +198,7 @@ describe('RewardsPage', () => {
     });
 
     await waitFor(() => {
-      expect(mockToastSuccess).toHaveBeenCalledWith('rewardsPage.redeemSuccess');
+      expect(mockToastSuccess).toHaveBeenCalledWith('Reward redeemed successfully!');
     });
 
     await waitFor(() => {

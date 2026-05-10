@@ -55,8 +55,8 @@ describe('ActionDashboard', () => {
     mockGet.mockResolvedValue({data: []});
     renderAuthenticatedDashboard();
 
-    expect(await screen.findByText('actionDashboard.header')).toBeInTheDocument();
-    expect(await screen.findByText('actionDashboard.subheader')).toBeInTheDocument();
+    expect(await screen.findByText('Activities')).toBeInTheDocument();
+    expect(await screen.findByText('Log your sustainable activities and earn points')).toBeInTheDocument();
   });
 
   it('shows loading state while fetching', () => {
@@ -64,7 +64,7 @@ describe('ActionDashboard', () => {
     mockGet.mockReturnValue(new Promise(() => {}));
     renderAuthenticatedDashboard();
 
-    expect(screen.getByText('actionDashboard.loading')).toBeInTheDocument();
+    expect(screen.getByText('Loading actions...')).toBeInTheDocument();
   });
 
   it('shows empty state when API returns no actions', async () => {
@@ -72,7 +72,7 @@ describe('ActionDashboard', () => {
     renderAuthenticatedDashboard();
 
     await waitFor(() => {
-      expect(screen.getByText('actionDashboard.noActions')).toBeInTheDocument();
+      expect(screen.getByText("You haven't completed any actions yet. Start making an impact today!")).toBeInTheDocument();
     });
   });
 
@@ -111,7 +111,7 @@ describe('ActionDashboard', () => {
     mockGet.mockResolvedValue({data: []});
     renderAuthenticatedDashboard();
 
-    expect(await screen.findByText('actionDashboard.historyTitle')).toBeInTheDocument();
+    expect(await screen.findByText('Your Activity History')).toBeInTheDocument();
   });
 
   it('shows login prompt when user is not authenticated', () => {
@@ -131,6 +131,6 @@ describe('ActionDashboard', () => {
       },
     );
 
-    expect(screen.getByText('actionDashboard.loginPrompt')).toBeInTheDocument();
+    expect(screen.getByText('Please login first.')).toBeInTheDocument();
   });
 });

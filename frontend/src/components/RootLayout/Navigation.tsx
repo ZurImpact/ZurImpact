@@ -65,10 +65,10 @@ export const Navigation = () => {
           <Link
             to={ROUTES.profile}
             className="flex items-center gap-1 text-sm hover:text-brand transition-colors"
-            aria-label="Profile"
+            aria-label={t('rootLayout.profile')}
           >
             <User className="h-4 w-4" aria-hidden="true" />
-            Profile
+            {t('rootLayout.profile')}
           </Link>
           <Button
             variant="outline"
@@ -77,7 +77,7 @@ export const Navigation = () => {
             onClick={() => void handleSignOut()}
           >
             <LogOut className="h-4 w-4" aria-hidden="true" />
-            Sign out
+            {t('rootLayout.signOut')}
           </Button>
         </div>
       );
@@ -88,17 +88,17 @@ export const Navigation = () => {
         <Link
           to={ROUTES.login}
           className="flex items-center gap-1 text-sm hover:text-brand transition-colors"
-          aria-label="Sign in"
+          aria-label={t('rootLayout.signIn')}
         >
           <LogIn className="h-4 w-4" aria-hidden="true" />
-          Sign in
+          {t('rootLayout.signIn')}
         </Link>
         <Link
           to={ROUTES.register}
           className="flex items-center gap-1 text-sm hover:text-brand transition-colors"
-          aria-label="Sign up"
+          aria-label={t('rootLayout.signUp')}
         >
-          Sign up
+          {t('rootLayout.signUp')}
         </Link>
       </div>
     );
@@ -114,7 +114,7 @@ export const Navigation = () => {
         onClick={() => void handleDevLogin()}
         disabled={loading || isDevLoggingIn}
       >
-        Dev login (alice)
+        {t('rootLayout.devLogin')}
       </Button>
     );
   };

@@ -1,6 +1,7 @@
 import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
+import {useTranslation} from 'react-i18next';
 import {Form, FormField, FormItem, FormLabel, FormControl, FormMessage} from '../ui/form';
 import {Input} from '../ui/input';
 import {Button} from '../ui/button';
@@ -13,6 +14,7 @@ interface ResendVerificationFormProps {
 }
 
 export function ResendVerificationForm({defaultEmail}: ResendVerificationFormProps) {
+  const {t} = useTranslation();
   const dispatch = useAppDispatch();
   const resendStatus = useAppSelector((s) => s.auth.resendVerification.status);
   const resendError = useAppSelector((s) => s.auth.resendVerification.error);
@@ -39,7 +41,7 @@ export function ResendVerificationForm({defaultEmail}: ResendVerificationFormPro
     return (
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          If an account with that address exists, we've sent a fresh verification link. Check your inbox.
+          {t('auth.resendVerification.successMessage')}
         </p>
         <Button
           type="button"
@@ -48,7 +50,7 @@ export function ResendVerificationForm({defaultEmail}: ResendVerificationFormPro
           className="text-xs"
           onClick={() => dispatch(resetAuthOp('resendVerification'))}
         >
-          Send to a different address
+          {t('auth.resendVerification.sendDifferent')}
         </Button>
       </div>
     );
@@ -61,7 +63,7 @@ export function ResendVerificationForm({defaultEmail}: ResendVerificationFormPro
           role="alert"
           className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
-          Couldn't reach the server, please try again.
+          {t('auth.resendVerification.errorGeneric')}
         </div>
       )}
 
@@ -72,9 +74,9 @@ export function ResendVerificationForm({defaultEmail}: ResendVerificationFormPro
             name="email"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('auth.resendVerification.emailLabel')}</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="you@example.com" {...field} />
+                  <Input type="email" placeholder={t('auth.resendVerification.emailPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -82,7 +84,7 @@ export function ResendVerificationForm({defaultEmail}: ResendVerificationFormPro
           />
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? 'Sending…' : 'Resend verification email'}
+            {isPending ? t('auth.resendVerification.submitPending') : t('auth.resendVerification.submit')}
           </Button>
         </form>
       </Form>

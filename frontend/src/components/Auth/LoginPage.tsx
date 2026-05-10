@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useNavigate, useLocation, Link} from 'react-router';
+import {useTranslation} from 'react-i18next';
 import {AuthFormCard} from './AuthFormCard';
 import {Form, FormField, FormItem, FormLabel, FormControl, FormMessage} from '../ui/form';
 import {Input} from '../ui/input';
@@ -13,6 +14,7 @@ import {loginSchema, type LoginInput} from '../../lib/validation/authSchemas';
 import {ROUTES} from '../../routes';
 
 export function LoginPage() {
+  const {t} = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,18 +58,18 @@ export function LoginPage() {
   const footer = (
     <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
       <Link to={ROUTES.register} className="underline hover:text-foreground">
-        Register for an account
+        {t('auth.login.signUpLink')}
       </Link>
       <Link to={ROUTES.passwordResetRequest} className="underline hover:text-foreground">
-        Forgot password?
+        {t('auth.login.forgotLink')}
       </Link>
     </div>
   );
 
   return (
     <AuthFormCard
-      title="Sign in"
-      description="Enter your credentials to access your account"
+      title={t('auth.login.title')}
+      description={t('auth.login.description')}
       footer={footer}
     >
       {showPasswordChangedBanner && (
@@ -75,7 +77,7 @@ export function LoginPage() {
           role="status"
           className="mb-4 rounded-md border border-green-500/50 bg-green-500/10 px-4 py-3 text-sm text-green-700 dark:text-green-400"
         >
-          Your password has been changed. Please sign in again.
+          {t('auth.login.bannerPasswordChanged')}
         </div>
       )}
 
@@ -84,7 +86,7 @@ export function LoginPage() {
           role="alert"
           className="mb-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
-          Invalid username or password. Please try again.
+          {t('auth.login.errorInvalidCredentials')}
         </div>
       )}
 
@@ -95,9 +97,9 @@ export function LoginPage() {
             name="username"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Username</FormLabel>
+                <FormLabel>{t('auth.login.usernameLabel')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="your_username" {...field} />
+                  <Input placeholder={t('auth.login.usernamePlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -109,9 +111,9 @@ export function LoginPage() {
             name="password"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t('auth.login.passwordLabel')}</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
+                  <Input type="password" placeholder={t('auth.login.passwordPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -119,7 +121,7 @@ export function LoginPage() {
           />
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? 'Signing in…' : 'Sign in'}
+            {isPending ? t('auth.login.submitPending') : t('auth.login.submit')}
           </Button>
         </form>
       </Form>

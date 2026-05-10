@@ -66,8 +66,8 @@ describe('MapTrackingPage', () => {
   it('renders header and start tracking button', () => {
     renderWithProviders(<MapTrackingPage />);
 
-    expect(screen.getByText('actionDetail.header')).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: /actionDetail.startTracking/})).toBeInTheDocument();
+    expect(screen.getByText('Track Your Route')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /start tracking/i})).toBeInTheDocument();
     expect(screen.getByTestId('map-container')).toBeInTheDocument();
   });
 
@@ -81,9 +81,9 @@ describe('MapTrackingPage', () => {
 
     renderWithProviders(<MapTrackingPage />);
 
-    await user.click(screen.getByRole('button', {name: /actionDetail.startTracking/}));
+    await user.click(screen.getByRole('button', {name: /start tracking/i}));
 
-    expect(mockToastError).toHaveBeenCalledWith('actionDetail.geolocationError');
+    expect(mockToastError).toHaveBeenCalledWith('Geolocation is not supported by your browser');
   });
 
   it('starts, tracks distance, and stops with saved activity toast', async () => {
@@ -91,7 +91,7 @@ describe('MapTrackingPage', () => {
 
     renderWithProviders(<MapTrackingPage />);
 
-    await user.click(screen.getByRole('button', {name: /actionDetail.startTracking/}));
+    await user.click(screen.getByRole('button', {name: /start tracking/i}));
 
     expect(watchPositionMock).toHaveBeenCalledTimes(1);
     expect(screen.getByText('Currently Tracking')).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe('MapTrackingPage', () => {
 
     renderWithProviders(<MapTrackingPage />);
 
-    await user.click(screen.getByRole('button', {name: /actionDetail.startTracking/}));
+    await user.click(screen.getByRole('button', {name: /start tracking/i}));
 
     await act(async () => {
       watchErrorCallback?.({message: 'Permission denied'} as GeolocationPositionError);

@@ -2,6 +2,7 @@ import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useNavigate} from 'react-router';
+import {useTranslation} from 'react-i18next';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '../ui/card';
 import {Form, FormField, FormItem, FormLabel, FormControl, FormMessage} from '../ui/form';
 import {Input} from '../ui/input';
@@ -13,6 +14,7 @@ import {changePasswordSchema, type ChangePasswordInput} from '../../lib/validati
 import {ROUTES} from '../../routes';
 
 export function ChangePasswordForm() {
+  const {t} = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const changePasswordStatus = useAppSelector((s) => s.auth.changePassword.status);
@@ -49,8 +51,8 @@ export function ChangePasswordForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Change password</CardTitle>
-        <CardDescription>Changing your password will sign you out of all devices.</CardDescription>
+        <CardTitle>{t('profile.changePassword.title')}</CardTitle>
+        <CardDescription>{t('profile.changePassword.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         {changePasswordError === 'wrong_current_password' && (
@@ -58,7 +60,7 @@ export function ChangePasswordForm() {
             role="alert"
             className="mb-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
           >
-            Your current password is incorrect. Please try again.
+            {t('profile.changePassword.errorWrongCurrentPassword')}
           </div>
         )}
 
@@ -67,7 +69,7 @@ export function ChangePasswordForm() {
             role="alert"
             className="mb-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
           >
-            Couldn&apos;t change password, please try again.
+            {t('profile.changePassword.errorGeneric')}
           </div>
         )}
 
@@ -78,9 +80,9 @@ export function ChangePasswordForm() {
               name="currentPassword"
               render={({field}) => (
                 <FormItem>
-                  <FormLabel>Current Password</FormLabel>
+                  <FormLabel>{t('profile.changePassword.currentPasswordLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder={t('profile.changePassword.currentPasswordPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -92,9 +94,9 @@ export function ChangePasswordForm() {
               name="newPassword"
               render={({field}) => (
                 <FormItem>
-                  <FormLabel>New Password</FormLabel>
+                  <FormLabel>{t('profile.changePassword.newPasswordLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder={t('profile.changePassword.newPasswordPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -106,9 +108,9 @@ export function ChangePasswordForm() {
               name="confirmPassword"
               render={({field}) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>{t('profile.changePassword.confirmPasswordLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder={t('profile.changePassword.confirmPasswordPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -116,7 +118,7 @@ export function ChangePasswordForm() {
             />
 
             <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? 'Changing password…' : 'Change password'}
+              {isPending ? t('profile.changePassword.submitPending') : t('profile.changePassword.submit')}
             </Button>
           </form>
         </Form>

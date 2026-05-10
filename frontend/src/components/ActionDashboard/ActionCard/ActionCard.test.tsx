@@ -34,14 +34,14 @@ describe('ActionCard', () => {
     expect(screen.getByText('Help clean the local park')).toBeInTheDocument();
   });
 
-  it('renders points with the points label key', () => {
+  it('renders points with the points label', () => {
     render(
       <BrowserRouter>
         <ActionCard action={baseAction} onClick={vi.fn()} />
       </BrowserRouter>,
     );
 
-    expect(screen.getByText('50 points')).toBeInTheDocument();
+    expect(screen.getByText('50 Points')).toBeInTheDocument();
   });
 
   it('calls onClick when card is clicked', async () => {
@@ -68,7 +68,7 @@ describe('ActionCard', () => {
     );
 
     expect(screen.getByText('Walk')).toBeInTheDocument();
-    expect(screen.getByText('10 points')).toBeInTheDocument();
+    expect(screen.getByText('10 Points')).toBeInTheDocument();
   });
 
   it('renders with zero points', () => {
@@ -80,6 +80,6 @@ describe('ActionCard', () => {
       </BrowserRouter>,
     );
 
-    expect(screen.getByText('0 points')).toBeInTheDocument();
+    expect(screen.getByText('0 Points')).toBeInTheDocument();
   });
 });

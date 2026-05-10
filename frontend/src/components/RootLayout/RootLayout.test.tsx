@@ -45,13 +45,13 @@ describe('RootLayout', () => {
   it('renders the app name translation key', async () => {
     renderWithRouter();
 
-    expect(await screen.findByText('appName')).toBeInTheDocument();
+    expect(await screen.findByText('ZurImpact')).toBeInTheDocument();
   });
 
   it('renders the dashboard navigation link', async () => {
     renderWithRouter();
 
-    expect(await screen.findByText('rootLayout.dashboard')).toBeInTheDocument();
+    expect(await screen.findByText('Dashboard')).toBeInTheDocument();
   });
 
   it('renders the Sign out button when authenticated', async () => {
@@ -100,7 +100,7 @@ describe('RootLayout', () => {
 
     // "123 points" is combined in a single span
     expect(await screen.findByText(/123/)).toBeInTheDocument();
-    expect(await screen.findByText(/points/)).toBeInTheDocument();
+    expect(await screen.findByText(/points/i)).toBeInTheDocument();
   });
 
   it('renders the child route via Outlet', async () => {
@@ -112,7 +112,7 @@ describe('RootLayout', () => {
   it('highlights dashboard link when on dashboard route', async () => {
     renderWithRouter('/dashboard');
 
-    const dashboardLink = await screen.findByText('rootLayout.dashboard');
+    const dashboardLink = await screen.findByText('Dashboard');
     expect(dashboardLink).toHaveClass('text-brand');
   });
 });

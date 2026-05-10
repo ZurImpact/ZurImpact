@@ -2,6 +2,7 @@ import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useNavigate, Link} from 'react-router';
+import {useTranslation} from 'react-i18next';
 import {AuthFormCard} from './AuthFormCard';
 import {Form, FormField, FormItem, FormLabel, FormControl, FormMessage} from '../ui/form';
 import {Input} from '../ui/input';
@@ -12,6 +13,7 @@ import {registerSchema, type RegisterInput} from '../../lib/validation/authSchem
 import {ROUTES} from '../../routes';
 
 export function RegisterPage() {
+  const {t} = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const registerStatus = useAppSelector((s) => s.auth.register.status);
@@ -50,17 +52,17 @@ export function RegisterPage() {
 
   const footer = (
     <div className="text-sm text-muted-foreground">
-      Already have an account?{' '}
+      {t('auth.register.alreadyHaveAccount')}{' '}
       <Link to={ROUTES.login} className="underline hover:text-foreground">
-        Sign in
+        {t('auth.register.signInLink')}
       </Link>
     </div>
   );
 
   return (
     <AuthFormCard
-      title="Create your account"
-      description="Fill in the details below to get started"
+      title={t('auth.register.title')}
+      description={t('auth.register.description')}
       footer={footer}
     >
       {registerError && registerStatus === 'rejected' && (
@@ -68,7 +70,7 @@ export function RegisterPage() {
           role="alert"
           className="mb-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
-          Something went wrong, please try again.
+          {t('auth.register.errorGeneric')}
         </div>
       )}
 
@@ -79,9 +81,9 @@ export function RegisterPage() {
             name="username"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Username</FormLabel>
+                <FormLabel>{t('auth.register.usernameLabel')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="your_username" {...field} />
+                  <Input placeholder={t('auth.register.usernamePlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -93,9 +95,9 @@ export function RegisterPage() {
             name="email"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('auth.register.emailLabel')}</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="you@example.com" {...field} />
+                  <Input type="email" placeholder={t('auth.register.emailPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -107,9 +109,9 @@ export function RegisterPage() {
             name="password"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t('auth.register.passwordLabel')}</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
+                  <Input type="password" placeholder={t('auth.register.passwordPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -121,9 +123,9 @@ export function RegisterPage() {
             name="confirmPassword"
             render={({field}) => (
               <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel>{t('auth.register.confirmPasswordLabel')}</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
+                  <Input type="password" placeholder={t('auth.register.confirmPasswordPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -131,7 +133,7 @@ export function RegisterPage() {
           />
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? 'Creating account…' : 'Create account'}
+            {isPending ? t('auth.register.submitPending') : t('auth.register.submit')}
           </Button>
         </form>
       </Form>
