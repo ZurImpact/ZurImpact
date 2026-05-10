@@ -41,7 +41,7 @@ const renderAuthenticatedDashboard = () =>
     {
       preloadedState: {
         user: {
-          currentUser: {id: 1, name: 'Test User', email: 'test@example.com', points: 100},
+          currentUser: {id: 1, username: 'testuser', email: 'test@example.com', role: 'USER', emailVerified: true, points: 100, address: null, createdAt: null},
           isAuthenticated: true,
           loading: false,
           error: null,

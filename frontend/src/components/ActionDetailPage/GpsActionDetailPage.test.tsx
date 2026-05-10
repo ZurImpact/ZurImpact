@@ -106,7 +106,7 @@ const installGeolocation = () => {
 };
 
 const defaultUserState: DeepPartial<RootState['user']> = {
-  currentUser: {id: 5, name: 'Test User', email: 'test@test.com', points: 100},
+  currentUser: {id: 5, username: 'testuser', email: 'test@test.com', role: 'USER', emailVerified: true, points: 100, address: null, createdAt: null},
   isAuthenticated: true,
   loading: false,
   error: null,

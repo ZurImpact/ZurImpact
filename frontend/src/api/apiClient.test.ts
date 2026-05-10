@@ -13,4 +13,8 @@ describe('apiClient', () => {
   it('sets Content-Type to application/json', () => {
     expect(apiClient.defaults.headers['Content-Type']).toBe('application/json');
   });
+
+  it('sends cookies with every request (withCredentials)', () => {
+    expect(apiClient.defaults.withCredentials).toBe(true);
+  });
 });

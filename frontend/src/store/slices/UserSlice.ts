@@ -3,10 +3,13 @@ import apiClient from '../../api/apiClient';
 
 export interface UserDto {
   id: number;
-  name: string;
+  username: string;
   email: string;
+  role: string;
+  emailVerified: boolean;
   points: number;
-  createdAt?: string;
+  address: number | null;
+  createdAt: string | null;
 }
 
 interface UserState {

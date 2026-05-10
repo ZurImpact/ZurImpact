@@ -6,4 +6,10 @@ export const ROUTES = {
   rewards: '/rewards',
   actionDetailsPattern: '/actions/:id',
   actionDetails: (actionId: number | string) => `/actions/${actionId}`,
+  login: '/login',
+  register: '/register',
+  verifyEmail: '/verify-email',
+  passwordResetRequest: '/forgot-password',
+  passwordResetConfirm: '/reset-password',
+  profile: '/profile',
 };
