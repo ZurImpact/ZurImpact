@@ -86,6 +86,7 @@ export function ChangePasswordForm() {
                   <FormControl>
                     <Input
                       type="password"
+                      autoComplete="current-password"
                       placeholder={t('profile.changePassword.currentPasswordPlaceholder')}
                       {...field}
                     />
@@ -104,6 +105,7 @@ export function ChangePasswordForm() {
                   <FormControl>
                     <Input
                       type="password"
+                      autoComplete="new-password"
                       placeholder={t('profile.changePassword.newPasswordPlaceholder')}
                       {...field}
                     />
@@ -122,6 +124,7 @@ export function ChangePasswordForm() {
                   <FormControl>
                     <Input
                       type="password"
+                      autoComplete="new-password"
                       placeholder={t('profile.changePassword.confirmPasswordPlaceholder')}
                       {...field}
                     />

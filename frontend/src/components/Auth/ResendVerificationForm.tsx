@@ -74,7 +74,12 @@ export function ResendVerificationForm({defaultEmail}: ResendVerificationFormPro
               <FormItem>
                 <FormLabel>{t('auth.resendVerification.emailLabel')}</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder={t('auth.resendVerification.emailPlaceholder')} {...field} />
+                  <Input
+                    type="email"
+                    autoComplete="email"
+                    placeholder={t('auth.resendVerification.emailPlaceholder')}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

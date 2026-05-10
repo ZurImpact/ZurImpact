@@ -76,7 +76,7 @@ export function RegisterPage() {
               <FormItem>
                 <FormLabel>{t('auth.register.usernameLabel')}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t('auth.register.usernamePlaceholder')} {...field} />
+                  <Input autoComplete="username" placeholder={t('auth.register.usernamePlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -90,7 +90,12 @@ export function RegisterPage() {
               <FormItem>
                 <FormLabel>{t('auth.register.emailLabel')}</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder={t('auth.register.emailPlaceholder')} {...field} />
+                  <Input
+                    type="email"
+                    autoComplete="email"
+                    placeholder={t('auth.register.emailPlaceholder')}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -104,7 +109,12 @@ export function RegisterPage() {
               <FormItem>
                 <FormLabel>{t('auth.register.passwordLabel')}</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder={t('auth.register.passwordPlaceholder')} {...field} />
+                  <Input
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder={t('auth.register.passwordPlaceholder')}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -118,7 +128,12 @@ export function RegisterPage() {
               <FormItem>
                 <FormLabel>{t('auth.register.confirmPasswordLabel')}</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder={t('auth.register.confirmPasswordPlaceholder')} {...field} />
+                  <Input
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder={t('auth.register.confirmPasswordPlaceholder')}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

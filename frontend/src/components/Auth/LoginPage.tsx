@@ -95,7 +95,7 @@ export function LoginPage() {
               <FormItem>
                 <FormLabel>{t('auth.login.usernameLabel')}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t('auth.login.usernamePlaceholder')} {...field} />
+                  <Input autoComplete="username" placeholder={t('auth.login.usernamePlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -109,7 +109,12 @@ export function LoginPage() {
               <FormItem>
                 <FormLabel>{t('auth.login.passwordLabel')}</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder={t('auth.login.passwordPlaceholder')} {...field} />
+                  <Input
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder={t('auth.login.passwordPlaceholder')}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

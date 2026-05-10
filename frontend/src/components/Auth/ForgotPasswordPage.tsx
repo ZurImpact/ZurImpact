@@ -97,7 +97,12 @@ export function ForgotPasswordPage() {
                 <FormControl>
                   {/* type="email" — jsdom blocks invalid email strings via HTML5 validation;
                       Zod email validation is tested separately in authSchemas.test.ts */}
-                  <Input type="email" placeholder={t('auth.forgotPassword.emailPlaceholder')} {...field} />
+                  <Input
+                    type="email"
+                    autoComplete="email"
+                    placeholder={t('auth.forgotPassword.emailPlaceholder')}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
