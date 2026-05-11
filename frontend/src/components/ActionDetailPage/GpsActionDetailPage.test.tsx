@@ -106,7 +106,7 @@ const installGeolocation = () => {
 };
 
 const defaultUserState: DeepPartial<RootState['user']> = {
-  currentUser: {id: 5, name: 'Test User', email: 'test@test.com', points: 100},
+  currentUser: {id: 5, username: 'Test User', email: 'test@test.com', points: 100},
   isAuthenticated: true,
   loading: false,
   error: null,
@@ -144,6 +144,8 @@ describe('GpsActionDetailPage', () => {
     mockGet.mockImplementation((url: string) => {
       if (url === '/userActionHistory/getUserActions?userId=5&active=true') return Promise.resolve({data: []});
       if (url === '/actions/1') return Promise.resolve({data: actionFixture});
+      if (url === '/auth/whoami') return Promise.resolve({data: {id: 5}});
+      if (url === '/users/5') return Promise.resolve({data: defaultUserState.currentUser});
       return Promise.resolve({data: {}});
     });
 
@@ -291,35 +293,65 @@ describe('GpsActionDetailPage', () => {
       watchSuccessCallback?.({
         coords: {latitude: 47.3769, longitude: 8.5417} as GeolocationCoordinates,
       } as GeolocationPosition);
+      await new Promise((r) => setTimeout(r, 100));
     });
 
-    await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
-        userId: 5,
-        actionId: 1,
-        subTaskId: 101,
-        actionType: 'GPS',
-      });
-    });
+    // allow async operations to complete and add the additionalData
+    await waitFor(
+      () => {
+        expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
+          userId: 5,
+          actionId: 1,
+          subTaskId: 101,
+          actionType: 'GPS',
+          additionalData: {
+            latitude: 47.3769,
+            longitude: 8.5417,
+          },
+        });
+      },
+      {timeout: 5000},
+    );
 
     await act(async () => {
       watchSuccessCallback?.({
         coords: {latitude: 47.3772, longitude: 8.5419} as GeolocationCoordinates,
       } as GeolocationPosition);
+      await new Promise((r) => setTimeout(r, 100));
     });
 
-    // Explicitly wait for second checkpoint's subTask completion
+    // allow async operations to complete + additionalData
+    await waitFor(
+      () => {
+        expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
+          userId: 5,
+          actionId: 1,
+          subTaskId: 102,
+          actionType: 'GPS',
+          additionalData: {
+            latitude: 47.3772,
+            longitude: 8.5419,
+          },
+        });
+      },
+      {timeout: 5000},
+    );
+
+    // allow async operations to complete
+    await waitFor(
+      () => {
+        expect(mockPost).toHaveBeenCalledWith('/actions/completeAction', {userId: 5, actionId: 1});
+      },
+      {timeout: 5000},
+    );
+
+    // Wrap final assertions in waitFor so we don't race against the React commit that updates the DOM after `completeAction` resolves.
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
-        userId: 5,
-        actionId: 1,
-        subTaskId: 102,
-        actionType: 'GPS',
-      });
+      expect(mockToastSuccess).toHaveBeenCalledWith('gpsActionDetail.actionCompleted');
     });
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith('/actions/completeAction', {userId: 5, actionId: 1});
+      expect(screen.getByText('gpsActionDetail.allCheckpointsReached')).toBeInTheDocument();
     });
 
     expect(mockToastSuccess).toHaveBeenCalledWith('gpsActionDetail.actionCompleted');
@@ -342,6 +374,9 @@ describe('GpsActionDetailPage', () => {
     renderPage({
       actions: createActionState(),
     });
+
+    await screen.findByText('GPS City Walk');
+    await waitFor(() => expect(watchPositionMock).toHaveBeenCalled());
 
     await act(async () => {
       watchErrorCallback?.({message: 'location unavailable'} as GeolocationPositionError);
@@ -397,6 +432,7 @@ describe('GpsActionDetailPage', () => {
         watchSuccessCallback?.({
           coords: {latitude: tenMetersNorth.latitude, longitude: tenMetersNorth.longitude} as GeolocationCoordinates,
         } as GeolocationPosition);
+        await new Promise((r) => setTimeout(r, 100));
       });
       await waitFor(() => {
         expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
@@ -404,15 +440,21 @@ describe('GpsActionDetailPage', () => {
           actionId: 1,
           subTaskId: 201,
           actionType: 'GPS',
+          additionalData: {
+            latitude: tenMetersNorth.latitude,
+            longitude: tenMetersNorth.longitude,
+          },
         });
       });
     }, 15000);
 
     it('HARD: check-in does NOT trigger when user is 10m away', async () => {
       const fixture = makeFixture('HARD');
-      mockGet.mockImplementation((url: string) =>
-        url === '/actions/1' ? Promise.resolve({data: fixture}) : Promise.resolve({data: {}}),
-      );
+      mockGet.mockImplementation((url: string) => {
+        if (url === '/actions/1') return Promise.resolve({data: fixture});
+        if (url === '/userActionHistory/getUserActions?userId=5&active=true') return Promise.resolve({data: []});
+        return Promise.resolve({data: {}});
+      });
       const user = userEvent.setup();
       renderPage({actions: {...createActionState(), selectedAction: fixture}});
       await user.click(await screen.findByRole('button', {name: 'gpsActionDetail.startAction'}));
@@ -453,6 +495,7 @@ describe('GpsActionDetailPage', () => {
             longitude: threeMetersNorth.longitude,
           } as GeolocationCoordinates,
         } as GeolocationPosition);
+        await new Promise((r) => setTimeout(r, 100));
       });
       await waitFor(() => {
         expect(mockPost).toHaveBeenCalledWith('/subTasks/completeSubTask', {
@@ -460,6 +503,10 @@ describe('GpsActionDetailPage', () => {
           actionId: 1,
           subTaskId: 201,
           actionType: 'GPS',
+          additionalData: {
+            latitude: threeMetersNorth.latitude,
+            longitude: threeMetersNorth.longitude,
+          },
         });
       });
     }, 15000);

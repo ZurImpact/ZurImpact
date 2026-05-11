@@ -97,8 +97,11 @@ app.delete(BASE_URL + '/actions/:id', (req, res) => {
 
 // GET user actions (aligned with UserActionHistoryDto)
 app.get(BASE_URL + '/userActionHistory/getUserActions', (req, res) => {
-  const userActions = mockUserActions;
-  res.json(userActions);
+  const {active} = req.query;
+  if (active === 'true') {
+    return res.json(mockUserActions.filter((a) => a.completionState === 'IN_PROGRESS'));
+  }
+  res.json(mockUserActions);
 });
 
 // POST startAction
@@ -134,6 +137,20 @@ app.get(BASE_URL + '/users/current', (req, res) => {
     points: mockUserPoints.points,
   };
   res.json(currentUserWithPoints);
+});
+
+// GET user by ID
+app.get(BASE_URL + '/users/:userId', (req, res) => {
+  const userId = parseInt(req.params.userId);
+  if (mockCurrentUser.id === userId) {
+    const currentUserWithPoints = {
+      ...mockCurrentUser,
+      points: mockUserPoints.points,
+    };
+    res.json(currentUserWithPoints);
+  } else {
+    res.status(404).json({error: 'User not found'});
+  }
 });
 
 // GET user points
@@ -187,7 +204,8 @@ app.get(BASE_URL + '/auth/whoami', (req, res) => {
   if (isMockAuthenticated) {
     // Return mock user data matching the real backend's response structure
     res.status(200).json({
-      username: mockCurrentUser.name,
+      id: mockCurrentUser.id,
+      username: mockCurrentUser.username,
       roles: ['ROLE_USER'],
     });
   } else {

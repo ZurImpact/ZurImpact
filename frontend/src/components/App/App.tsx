@@ -9,6 +9,7 @@ import {RewardsPage} from '../Rewardspage/Rewardspage';
 
 import {ROUTES} from '../../routes';
 import {ThemeProvider} from 'next-themes';
+import {HomePage} from '../HomePage/HomePage';
 
 function App() {
   return (
@@ -16,7 +17,9 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path={ROUTES.root} element={<RootLayout />}>
-            <Route index element={<Navigate to={ROUTES.dashboard} replace />} />
+            {/* <Route index element={<Navigate to={ROUTES.dashboard} replace />} /> */}
+            <Route index element={<Navigate to={ROUTES.home} replace />} />
+            <Route path={ROUTES.home} element={<HomePage />} />
             <Route path={ROUTES.dashboard} element={<ActionDashboard />} />
             <Route path={ROUTES.about} element={<AboutPage />} />
             <Route path={ROUTES.contact} element={<ContactPage />} />

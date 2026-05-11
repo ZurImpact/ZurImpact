@@ -20,7 +20,7 @@ const createTestStore = () =>
 // Matches the stub payload currently returned by fetchCurrentUser (see UserSlice.ts)
 const stubUser: UserDto = {
   id: 1,
-  name: 'Test User',
+  username: 'Test User',
   email: 'test@example.com',
   points: 100,
 };

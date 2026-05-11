@@ -6,6 +6,7 @@ export const ROUTES = {
   rewards: '/rewards',
   about: '/about',
   contact: '/contact',
+  home: '/home',
   actionDetailsPattern: '/actions/:id',
   actionDetails: (actionId: number | string) => `/actions/${actionId}`,
 };

@@ -17,7 +17,7 @@ describe('App', () => {
     vi.clearAllMocks();
     mockApiGet.mockImplementation((url: string) => {
       if (url === '/users/current') {
-        return Promise.resolve({data: {id: 1, name: 'Test User', email: 'test@test.com', points: 123}});
+        return Promise.resolve({data: {id: 1, username: 'Test User', email: 'test@test.com', points: 123}});
       }
       if (url === '/actions' || url.includes('getUserActions')) {
         return Promise.resolve({data: []});
@@ -28,6 +28,6 @@ describe('App', () => {
 
   it('renders without crashing', async () => {
     renderWithProviders(<App />);
-    expect(await screen.findByText('actionDashboard.header')).toBeInTheDocument();
+    expect(await screen.findByText('homePage.hero.badge')).toBeInTheDocument();
   });
 });

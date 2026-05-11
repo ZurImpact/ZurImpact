@@ -171,7 +171,16 @@ export const completeAction = createAsyncThunk(
 // Async thunk for completing a subtask
 export const completeSubTask = createAsyncThunk(
   'action/completeSubTask',
-  async (request: {userId: number; actionId: number; subTaskId: number; actionType: string}, {rejectWithValue}) => {
+  async (
+    request: {
+      userId: number;
+      actionId: number;
+      subTaskId: number;
+      actionType: string;
+      additionalData?: Record<string, unknown>;
+    },
+    {rejectWithValue},
+  ) => {
     try {
       const response = await apiClient.post('/subTasks/completeSubTask', request);
       return response.data;
