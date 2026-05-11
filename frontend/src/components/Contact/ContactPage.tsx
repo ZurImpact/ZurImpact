@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from 'react';
 import {
   Mail,
   Phone,
@@ -8,29 +8,27 @@ import {
   Building2,
   User,
   MessageSquare,
-} from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { Card } from "../ui/card";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { Button } from "../ui/button";
-import { toast } from "sonner";
+} from 'lucide-react';
+import {useTranslation} from 'react-i18next';
+import {Card} from '../ui/card';
+import {Input} from '../ui/input';
+import {Label} from '../ui/label';
+import {Button} from '../ui/button';
+import {toast} from 'sonner';
 
 export function ContactPage() {
   const {t} = useTranslation();
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    company: "",
-    phone: "",
-    type: "",
-    message: "",
+    name: '',
+    email: '',
+    company: '',
+    phone: '',
+    type: '',
+    message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -41,15 +39,15 @@ export function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const response = await fetch("https://formspree.io/f/xvzwdlbv", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('https://formspree.io/f/xvzwdlbv', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(formData),
     });
 
     if (response.ok) {
       toast.success(t('contactPage.toastSuccess'));
-      setFormData({ name: "", email: "", company: "", phone: "", type: "", message: "" });
+      setFormData({name: '', email: '', company: '', phone: '', type: '', message: ''});
     } else {
       toast.error(t('contactPage.toastError'));
     }
@@ -64,9 +62,7 @@ export function ContactPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl mb-6">{t('contactPage.heroTitle')}</h1>
-            <p className="text-lg">
-              {t('contactPage.heroSubtitle')}
-            </p>
+            <p className="text-lg">{t('contactPage.heroSubtitle')}</p>
           </div>
         </div>
       </section>
@@ -101,7 +97,8 @@ export function ContactPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-foreground">
-                      {t('contactPage.emailLabel')} <span className="text-destructive">{t('contactPage.required')}</span>
+                      {t('contactPage.emailLabel')}{' '}
+                      <span className="text-destructive">{t('contactPage.required')}</span>
                     </Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
@@ -121,7 +118,9 @@ export function ContactPage() {
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="company" className="text-foreground">{t('contactPage.companyLabel')}</Label>
+                    <Label htmlFor="company" className="text-foreground">
+                      {t('contactPage.companyLabel')}
+                    </Label>
                     <div className="relative">
                       <Building2 className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                       <Input
@@ -137,7 +136,9 @@ export function ContactPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-foreground">{t('contactPage.phoneLabel')}</Label>
+                    <Label htmlFor="phone" className="text-foreground">
+                      {t('contactPage.phoneLabel')}
+                    </Label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                       <Input
@@ -155,7 +156,8 @@ export function ContactPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="type" className="text-foreground">
-                    {t('contactPage.inquiryTypeLabel')} <span className="text-destructive">{t('contactPage.required')}</span>
+                    {t('contactPage.inquiryTypeLabel')}{' '}
+                    <span className="text-destructive">{t('contactPage.required')}</span>
                   </Label>
                   <select
                     id="type"
@@ -176,7 +178,8 @@ export function ContactPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="message" className="text-foreground">
-                    {t('contactPage.messageLabel')} <span className="text-destructive">{t('contactPage.required')}</span>
+                    {t('contactPage.messageLabel')}{' '}
+                    <span className="text-destructive">{t('contactPage.required')}</span>
                   </Label>
                   <div className="relative">
                     <MessageSquare className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
