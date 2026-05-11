@@ -3,7 +3,7 @@ import apiClient from '../../api/apiClient';
 
 export interface UserDto {
   id: number;
-  name: string;
+  username: string;
   email: string;
   points: number;
   createdAt?: string;

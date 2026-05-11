@@ -1,4 +1,4 @@
-import {Link, useLocation} from 'react-router';
+import {Link, useLocation, useNavigate} from 'react-router';
 import {Mountain, Award, Menu, Moon, Sun, LogOut, LogIn} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from 'next-themes';
@@ -12,6 +12,7 @@ import {ROUTES} from '../../routes';
 
 export const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const {t} = useTranslation();
   const {theme, setTheme} = useTheme();
   const dispatch = useAppDispatch();
@@ -20,6 +21,7 @@ export const Navigation = () => {
   const points = currentUser?.points ?? 0;
 
   const navLinks = [
+    {to: ROUTES.home, label: t('rootLayout.home')},
     {to: ROUTES.dashboard, label: t('rootLayout.dashboard')},
     {to: ROUTES.track, label: t('rootLayout.track')},
     {to: ROUTES.rewards, label: t('rootLayout.rewards')},
@@ -61,11 +63,46 @@ export const Navigation = () => {
     </button>
   );
 
+  const renderNavLinks = (mobile = false) => {
+    const linksToShow = isAuthenticated ? navLinks : navLinks.filter((link) => link.to === ROUTES.home);
+
+    return linksToShow.map((link) => (
+      <Link
+        key={link.to}
+        to={link.to}
+        className={
+          mobile
+            ? `text-lg hover:text-brand transition-colors ${
+                location.pathname === link.to ? 'text-brand font-semibold' : 'text-muted-foreground'
+              }`
+            : `hover:text-brand transition-colors ${
+                location.pathname === link.to ? 'text-brand' : 'text-muted-foreground'
+              }`
+        }
+        aria-current={location.pathname === link.to ? 'page' : undefined}
+      >
+        {link.label}
+      </Link>
+    ));
+  };
+
+  const renderPoints = () => {
+    if (!isAuthenticated) return null;
+
+    return (
+      <div className="flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full">
+        <Award className="h-4 w-4 text-on-brand-container" aria-hidden="true" />
+        <span className="font-medium text-on-brand-container">{`${points} ${t('points')}`}</span>
+      </div>
+    );
+  };
+
   const handleLogin = async () => {
     setIsAuthenticating(true);
     try {
       await apiClient.post('/auth/dev-login', {username: 'alice'});
       await dispatch(fetchCurrentUser());
+      navigate(ROUTES.dashboard);
     } finally {
       setIsAuthenticating(false);
     }
@@ -74,6 +111,7 @@ export const Navigation = () => {
   const handleAuthAction = () => {
     if (isAuthenticated) {
       dispatch(logout());
+      navigate(ROUTES.home);
       return;
     }
 
@@ -106,27 +144,11 @@ export const Navigation = () => {
             <span className="text-2xl font-bold text-brand">{t('appName')}</span>
           </Link>
           <div className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`hover:text-brand transition-colors ${
-                  location.pathname === link.to ? 'text-brand' : 'text-muted-foreground'
-                }`}
-                aria-current={location.pathname === link.to ? 'page' : undefined}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {renderNavLinks()}
             {renderThemeButton()}
             {renderLanguageButton()}
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full">
-                <Award className="h-4 w-4 text-on-brand-container" aria-hidden="true" />
-                <span className="font-medium text-on-brand-container">
-                  {`${points} ${t('points')}` /*TODO Get actual points from auth state*/}
-                </span>
-              </div>
+              {renderPoints()}
               {renderAuthButton()}
             </div>
           </div>
@@ -144,23 +166,9 @@ export const Navigation = () => {
               </SheetTrigger>
               <SheetContent side="right">
                 <div className="flex flex-col gap-4 mt-13 pl-8">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.to}
-                      to={link.to}
-                      className={`text-lg hover:text-brand transition-colors ${
-                        location.pathname === link.to ? 'text-brand font-semibold' : 'text-muted-foreground'
-                      }`}
-                      aria-current={location.pathname === link.to ? 'page' : undefined}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
+                  {renderNavLinks(true)}
                   <div className="mt-4 flex flex-col gap-3 pr-8">
-                    <div className="flex items-center gap-2 px-3 py-1 bg-brand-container rounded-full w-fit">
-                      <Award className="h-4 w-4 text-on-brand-container" aria-hidden="true" />
-                      <span className="font-medium text-on-brand-container">{`${points} ${t('points')}`}</span>
-                    </div>
+                    {renderPoints()}
                     {renderAuthButton('w-full justify-center')}
                   </div>
                 </div>

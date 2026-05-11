@@ -37,7 +37,7 @@ describe('RootLayout', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockApiGet.mockResolvedValue({
-      data: {id: 1, name: 'Test User', email: 'test@test.com', points: 123},
+      data: {id: 1, username: 'Test User', email: 'test@test.com', points: 123},
     });
     mockApiPost.mockResolvedValue({});
   });
@@ -58,7 +58,7 @@ describe('RootLayout', () => {
     renderWithRouter('/', {
       preloadedState: {
         user: {
-          currentUser: {id: 1, points: 123, name: 'Test User', email: 'test@test.com'},
+          currentUser: {id: 1, points: 123, username: 'Test User', email: 'test@test.com'},
           isAuthenticated: true,
           loading: false,
           error: null,
@@ -75,7 +75,7 @@ describe('RootLayout', () => {
     mockApiGet
       .mockRejectedValueOnce({response: {status: 401, data: {error: 'not authenticated'}}})
       .mockResolvedValueOnce({data: {id: 1}})
-      .mockResolvedValueOnce({data: {id: 1, name: 'Test User', email: 'test@test.com', points: 123}});
+      .mockResolvedValueOnce({data: {id: 1, username: 'Test User', email: 'test@test.com', points: 123}});
 
     renderWithRouter();
 
@@ -92,7 +92,7 @@ describe('RootLayout', () => {
     renderWithRouter('/', {
       preloadedState: {
         user: {
-          currentUser: {id: 1, points: 123, name: 'Test User', email: 'test@test.com'},
+          currentUser: {id: 1, points: 123, username: 'Test User', email: 'test@test.com'},
           isAuthenticated: true,
           loading: false,
           error: null,
