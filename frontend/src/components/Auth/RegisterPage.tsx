@@ -140,7 +140,12 @@ export function RegisterPage() {
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full bg-brand hover:bg-brand/90 text-brand-foreground"
+            disabled={isPending}
+          >
             {isPending ? t('auth.register.submitPending') : t('auth.register.submit')}
           </Button>
         </form>

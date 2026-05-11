@@ -121,7 +121,12 @@ export function LoginPage() {
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full bg-brand hover:bg-brand/90 text-brand-foreground"
+            disabled={isPending}
+          >
             {isPending ? t('auth.login.submitPending') : t('auth.login.submit')}
           </Button>
         </form>

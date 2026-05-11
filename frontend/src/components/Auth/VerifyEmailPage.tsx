@@ -58,7 +58,7 @@ export function VerifyEmailPage() {
           <div className="flex flex-col items-center gap-4 py-4">
             <CheckCircle2 className="h-12 w-12 text-green-500" />
             <p className="text-center text-sm text-muted-foreground">{t('auth.verifyEmail.descriptionSuccess')}</p>
-            <Button asChild className="w-full">
+            <Button asChild size="lg" className="w-full bg-brand hover:bg-brand/90 text-brand-foreground">
               <Link to={ROUTES.login}>{t('auth.verifyEmail.continueButton')}</Link>
             </Button>
           </div>

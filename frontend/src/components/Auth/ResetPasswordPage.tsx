@@ -74,7 +74,7 @@ export function ResetPasswordPage() {
       <AuthFormCard title={t('auth.resetPassword.title')} description={t('auth.resetPassword.description')}>
         <div className="flex flex-col items-center gap-4 py-4">
           <p className="text-center text-sm text-muted-foreground">{t('auth.resetPassword.descriptionSuccess')}</p>
-          <Button asChild className="w-full">
+          <Button asChild size="lg" className="w-full bg-brand hover:bg-brand/90 text-brand-foreground">
             <Link to={ROUTES.login}>{t('auth.resetPassword.signInButton')}</Link>
           </Button>
         </div>
@@ -138,7 +138,12 @@ export function ResetPasswordPage() {
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full bg-brand hover:bg-brand/90 text-brand-foreground"
+            disabled={isPending}
+          >
             {isPending ? t('auth.resetPassword.submitPending') : t('auth.resetPassword.submit')}
           </Button>
         </form>

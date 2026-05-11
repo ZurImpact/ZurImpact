@@ -86,7 +86,12 @@ export function ResendVerificationForm({defaultEmail}: ResendVerificationFormPro
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full bg-brand hover:bg-brand/90 text-brand-foreground"
+            disabled={isPending}
+          >
             {isPending ? t('auth.resendVerification.submitPending') : t('auth.resendVerification.submit')}
           </Button>
         </form>
