@@ -10,7 +10,9 @@
     "switchToDark": "Zu dunklem Modus wechseln",
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
-    "skipToContent": "Zum Hauptinhalt springen"
+    "skipToContent": "Zum Hauptinhalt springen",
+    "about": "Über uns",
+    "contact": "Kontakt"
   },
   "actionDashboard": {
     "header": "Aktivitäten",
@@ -87,6 +89,47 @@
     "howRewardsPoint2": "Löse Punkte für Gutscheine, Geschenke und exklusive Angebote ein",
     "howRewardsPoint3": "Erhalte nach der Einlösung den Gutscheincode",
     "howRewardsPoint4": "Neue Belohnungen werden regelmässig hinzugefügt - schau regelmässig vorbei!"
+  },
+  "contactPage": {
+    "heroTitle": "Kontaktiere uns",
+    "heroSubtitle": "Egal, ob du Partner werden möchtest, Fragen zu unserer Plattform hast oder einfach Hallo sagen möchtest, wir freuen uns, von dir zu hören!",
+    "formTitle": "Sende uns eine Nachricht",
+    "nameLabel": "Vollständiger Name",
+    "emailLabel": "E-Mail",
+    "companyLabel": "Unternehmen/Organisation",
+    "phoneLabel": "Telefonnummer",
+    "inquiryTypeLabel": "Anfragetyp",
+    "messageLabel": "Nachricht",
+    "namePlaceholder": "Max Muster",
+    "emailPlaceholder": "max@example.com",
+    "companyPlaceholder": "Dein Firmenname",
+    "phonePlaceholder": "+41 44 123 45 67",
+    "messagePlaceholder": "Erzähle uns mehr über deine Anfrage...",
+    "inquiryPlaceholder": "Wähle eine Option...",
+    "inquiryOptionPartner": "Partner werden",
+    "inquiryOptionGeneral": "Allgemeine Anfrage",
+    "inquiryOptionSupport": "Support",
+    "inquiryOptionPress": "Presse & Medien",
+    "inquiryOptionOther": "Sonstiges",
+    "sendButton": "Nachricht senden",
+    "sendingButton": "Wird gesendet...",
+    "required": "*",
+    "toastSuccess": "Vielen Dank! Wir melden uns innerhalb von 24-48 Stunden bei dir.",
+    "toastError": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+  },
+  "aboutPage": {
+    "heroTitle": "Über uns",
+    "heroSubtitle": "Wir haben es uns zur Aufgabe gemacht, nachhaltigen Tourismus für alle in Zürich belohnend, zugänglich und wirkungsvoll zu gestalten.",
+    "missionBadge": "Unsere Mission",
+    "missionTitle": "Tourismus durch nachhaltiges Handeln verändern",
+    "missionDescription1": "Inspiriert von Kopenhagens CopenPay belohnt zurimpact umweltbewusstes Verhalten in Zürich.",
+    "missionDescription2": "Durch Partnerschaften mit lokalen Unternehmen und die Einbindung unserer Gemeinschaft schaffen wir ein Tourismus-Ökosystem, in dem nachhaltige Entscheidungen die einfachste und lohnendste Option sind.",
+    "teamTitle": "Lerne unser Team kennen",
+    "teamSubtitle": "Leidenschaftliche Menschen, die daran arbeiten, Zürich nachhaltiger zu gestalten",
+    "ctaTitle": "Möchtest du mehr erfahren?",
+    "ctaSubtitle": "Nimm Kontakt mit unserem Team auf und erfahre, wie du Teil der nachhaltigen Tourismusbewegung in Zürich werden kannst.",
+    "ctaButton": "Kontaktiere uns",
+    "teamRole": "Mitbegründer"
   },
   "points": "Punkte",
   "language": "Sprache"

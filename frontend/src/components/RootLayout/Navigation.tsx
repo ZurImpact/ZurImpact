@@ -21,8 +21,10 @@ export const Navigation = () => {
 
   const navLinks = [
     {to: ROUTES.dashboard, label: t('rootLayout.dashboard')},
+    {to: ROUTES.about, label: t('rootLayout.about')},
     {to: ROUTES.track, label: t('rootLayout.track')},
     {to: ROUTES.rewards, label: t('rootLayout.rewards')},
+    {to: ROUTES.contact, label: t('rootLayout.contact')},
   ];
 
   /**
