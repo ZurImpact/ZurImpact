@@ -148,12 +148,6 @@ export const Navigation = () => {
             {renderThemeButton()}
             {renderLanguageButton()}
             <div className="flex items-center gap-3">
-              {/* <div className="flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full">
-                <Award className="h-4 w-4 text-on-brand-container" aria-hidden="true" />
-                <span className="font-medium text-on-brand-container"> */}
-              {/* {`${points} ${t('points')}`} */}
-              {/* </span>
-              </div> */}
               {renderPoints()}
               {renderAuthButton()}
             </div>

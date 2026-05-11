@@ -95,14 +95,7 @@ export function HomePage() {
             >
               Start Earning Rewards
               <ArrowRight className="size-5" />
-            </button>
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm hover:bg-white/20 dark:text-green-600 px-8 py-3 rounded-lg border border-white/30 dark:border-green-600/30 transition-colors"
-            >
-              View Activities
-            </button>
-          </div> */}
+            </button> */}
         </div>
       </section>
 
@@ -170,16 +163,6 @@ export function HomePage() {
               </Card>
             ))}
           </div>
-
-          {/* <div className="text-center">
-            <button
-              onClick={() => navigate("/activities")}
-              className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
-            >
-              View All Activities
-              <ArrowRight className="size-5" />
-            </button>
-          </div> */}
         </div>
       </section>
 
