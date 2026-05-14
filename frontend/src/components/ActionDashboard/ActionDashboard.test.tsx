@@ -4,6 +4,7 @@ import {BrowserRouter} from 'react-router';
 import {renderWithProviders} from '../../test/test.utils';
 import {ActionDashboard} from './ActionDashboard';
 import type {ActionDto} from '../../store/slices/ActionSlice';
+import type {UserRole} from '../../store/slices/UserSlice';
 
 const mockGet = vi.fn();
 
@@ -51,7 +52,7 @@ const renderAuthenticatedDashboard = () =>
     },
   );
 
-const renderAuthenticatedDashboardWithRoles = (roles: string[]) =>
+const renderAuthenticatedDashboardWithRoles = (roles: UserRole[]) =>
   renderWithProviders(
     <BrowserRouter>
       <ActionDashboard />

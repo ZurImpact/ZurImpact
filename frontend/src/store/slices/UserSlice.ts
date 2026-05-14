@@ -9,7 +9,7 @@ export interface UserDto {
   createdAt?: string;
 }
 
-type UserRole = 'ADMIN' | 'PARTNER' | 'ROLE_ADMIN' | 'ROLE_PARTNER' | 'ROLE_USER';
+export type UserRole = 'ADMIN' | 'PARTNER' | 'ROLE_ADMIN' | 'ROLE_PARTNER' | 'ROLE_USER';
 
 type FetchCurrentUserResult = {
   user: UserDto;
