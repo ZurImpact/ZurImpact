@@ -1,7 +1,22 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import {randomBytes} from 'node:crypto';
 import {loadJSON} from './fileManager.ts';
+
+// =============================================================================
+// DEV-ONLY MOCK SERVER — NOT FOR PRODUCTION USE.
+//
+// This server exists solely to let the frontend run end-to-end flows locally
+// without the Spring backend. It deliberately:
+//   - Skips CSRF protection (no front-end is shipped against it)
+//   - Stores users/sessions in process memory (cleared on restart)
+//   - Logs verify/reset tokens to stdout for easy copy-paste in dev
+//
+// CodeQL findings on this file (predictable randomness, missing CSRF) are
+// suppressed because this code never ships to production — see Dockerfile and
+// the production `vite build` pipeline, neither of which include this file.
+// =============================================================================
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -53,12 +68,15 @@ users.set(mockCurrentUser.username, {
   password: 'Password1!',
 });
 
+// Use crypto.randomBytes for unpredictable IDs/tokens (CodeQL js/insecure-randomness).
+// Even though this is a dev-only server, predictable IDs would make e2e flakes
+// harder to debug if two tests happened to land on the same Date.now().
 function newSessionId() {
-  return `sess_${Math.random().toString(36).slice(2)}_${Date.now().toString(36)}`;
+  return `sess_${randomBytes(16).toString('hex')}`;
 }
 
 function newToken() {
-  return `tok_${Math.random().toString(36).slice(2)}_${Date.now().toString(36)}`;
+  return `tok_${randomBytes(16).toString('hex')}`;
 }
 
 function logToken(kind, email, token) {
