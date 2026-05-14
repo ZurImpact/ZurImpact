@@ -10,6 +10,10 @@ describe('ROUTES', () => {
     expect(ROUTES.dashboard).toBe('/dashboard');
   });
 
+  it('defines action create path', () => {
+    expect(ROUTES.actionCreate).toBe('/actions/new');
+  });
+
   it('defines action details pattern path', () => {
     expect(ROUTES.actionDetailsPattern).toBe('/actions/:id');
   });

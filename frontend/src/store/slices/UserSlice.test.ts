@@ -17,7 +17,6 @@ const createTestStore = () =>
     reducer: {user: userReducer},
   });
 
-// Matches the stub payload currently returned by fetchCurrentUser (see UserSlice.ts)
 const stubUser: UserDto = {
   id: 1,
   username: 'Test User',
@@ -45,7 +44,7 @@ describe('UserSlice', () => {
   describe('synchronous reducers', () => {
     it('logout resets currentUser, isAuthenticated and error', async () => {
       const store = createTestStore();
-      mockedGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({data: stubUser});
+      mockedGet.mockResolvedValueOnce({data: {id: 1, roles: ['ADMIN']}}).mockResolvedValueOnce({data: stubUser});
       await store.dispatch(fetchCurrentUser());
       expect(store.getState().user.isAuthenticated).toBe(true);
       expect(store.getState().user.currentUser).not.toBeNull();
@@ -53,6 +52,7 @@ describe('UserSlice', () => {
       store.dispatch(logout());
       const state = store.getState().user;
       expect(state.currentUser).toBeNull();
+      expect(state.roles).toEqual([]);
       expect(state.isAuthenticated).toBe(false);
       expect(state.error).toBeNull();
     });
@@ -71,12 +71,13 @@ describe('UserSlice', () => {
   describe('fetchCurrentUser', () => {
     it('stores user and marks authenticated on success', async () => {
       const store = createTestStore();
-      mockedGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({data: stubUser});
+      mockedGet.mockResolvedValueOnce({data: {id: 1, roles: ['ADMIN']}}).mockResolvedValueOnce({data: stubUser});
 
       await store.dispatch(fetchCurrentUser());
 
       const state = store.getState().user;
       expect(state.currentUser).toEqual(stubUser);
+      expect(state.roles).toEqual(['ADMIN']);
       expect(state.isAuthenticated).toBe(true);
       expect(state.loading).toBe(false);
       expect(state.error).toBeNull();
@@ -160,7 +161,7 @@ describe('UserSlice', () => {
       await store.dispatch(fetchCurrentUser());
       expect(store.getState().user.error).toBe('fail');
 
-      mockedGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({data: stubUser});
+      mockedGet.mockResolvedValueOnce({data: {id: 1, roles: ['PARTNER']}}).mockResolvedValueOnce({data: stubUser});
       await store.dispatch(fetchCurrentUser());
       expect(store.getState().user.error).toBeNull();
     });

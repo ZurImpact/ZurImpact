@@ -9,8 +9,16 @@ export interface UserDto {
   createdAt?: string;
 }
 
+type UserRole = 'ADMIN' | 'PARTNER' | 'ROLE_ADMIN' | 'ROLE_PARTNER' | 'ROLE_USER';
+
+type FetchCurrentUserResult = {
+  user: UserDto;
+  roles: UserRole[];
+};
+
 interface UserState {
   currentUser: UserDto | null;
+  roles: UserRole[];
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
@@ -18,6 +26,7 @@ interface UserState {
 
 const initialState: UserState = {
   currentUser: null,
+  roles: [],
   isAuthenticated: false,
   loading: false,
   error: null,
@@ -27,8 +36,12 @@ export const fetchCurrentUser = createAsyncThunk('user/fetchCurrentUser', async 
   try {
     const whoamiResponse = await apiClient.get('/auth/whoami');
     const userId: number = whoamiResponse.data.id;
+    const roles = Array.isArray(whoamiResponse.data.roles) ? (whoamiResponse.data.roles as UserRole[]) : [];
     const userResponse = await apiClient.get(`/users/${userId}`);
-    return userResponse.data as UserDto;
+    return {
+      user: userResponse.data as UserDto,
+      roles,
+    } satisfies FetchCurrentUserResult;
   } catch (error: unknown) {
     if (error && typeof error === 'object' && 'response' in error) {
       const axiosError = error as {
@@ -52,6 +65,7 @@ const userSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.currentUser = null;
+      state.roles = [];
       state.isAuthenticated = false;
       state.error = null;
     },
@@ -67,13 +81,15 @@ const userSlice = createSlice({
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentUser = action.payload;
+        state.currentUser = action.payload.user;
+        state.roles = action.payload.roles;
         state.isAuthenticated = true;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
         state.isAuthenticated = false;
+        state.roles = [];
       });
   },
 });
