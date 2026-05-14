@@ -1,4 +1,5 @@
-import {useTranslation, Trans} from 'react-i18next';
+import {useTranslation} from 'react-i18next';
+import {ChevronDown} from 'lucide-react';
 
 export function FaqPage() {
   const {t} = useTranslation();
@@ -46,14 +47,12 @@ export function FaqPage() {
               key={index}
               className="group rounded-lg border bg-card p-4 transition-colors hover:border-brand open:border-brand"
             >
-              <summary className="cursor-pointer list-none font-medium text-brand">{t(`faq.${faq.question}`)}</summary>
+              <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-brand">
+                {t(`faq.${faq.question}`)}
+                <ChevronDown className="size-5 transition-transform group-open:rotate-180" />
+              </summary>
               <div className="mt-4 text-muted-foreground">
-                <p>
-                  <Trans
-                    i18nKey={`faq.${faq.answer}`}
-                    components={{link: <a href="/dashboard" className="text-brand hover:underline" />}}
-                  />
-                </p>
+                <p>{t(`faq.${faq.answer}`)}</p>
               </div>
             </details>
           ))}
