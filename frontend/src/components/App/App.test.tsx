@@ -27,6 +27,18 @@ vi.mock('../Rewardspage/Rewardspage', () => ({
   RewardsPage: () => <div data-testid="rewards-stub">rewards</div>,
 }));
 
+vi.mock('../HomePage/HomePage', () => ({
+  HomePage: () => <div data-testid="home-stub">home</div>,
+}));
+
+vi.mock('../AboutUs/AboutUs', () => ({
+  AboutPage: () => <div data-testid="about-stub">about</div>,
+}));
+
+vi.mock('../Contact/ContactPage', () => ({
+  ContactPage: () => <div data-testid="contact-stub">contact</div>,
+}));
+
 vi.mock('../Auth/LoginPage', () => ({
   LoginPage: () => <div data-testid="login-stub">login</div>,
 }));
@@ -54,10 +66,20 @@ vi.mock('../Profile/ProfilePage', () => ({
 describe('App', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    window.history.pushState({}, '', '/');
   });
 
-  it('shows the auth layout with login stub when not authenticated', async () => {
+  it('renders the home page on the root route', async () => {
+    window.history.pushState({}, '', '/');
+    renderWithProviders(<App />, {
+      preloadedState: {
+        user: {loading: false, isAuthenticated: false, currentUser: null, error: null},
+      },
+    });
+    expect(await screen.findByTestId('home-stub')).toBeInTheDocument();
+  });
+
+  it('shows the auth layout with login stub when navigating to /login', async () => {
+    window.history.pushState({}, '', '/login');
     renderWithProviders(<App />, {
       preloadedState: {
         user: {loading: false, isAuthenticated: false, currentUser: null, error: null},
@@ -67,6 +89,7 @@ describe('App', () => {
   });
 
   it('shows the dashboard when authenticated', async () => {
+    window.history.pushState({}, '', '/dashboard');
     renderWithProviders(<App />, {
       preloadedState: {
         user: {

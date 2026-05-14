@@ -22,6 +22,8 @@ export const Navigation = () => {
   const points = currentUser?.points ?? 0;
 
   const navLinks = [
+    {to: ROUTES.home, label: t('rootLayout.home')},
+    {to: ROUTES.about, label: t('rootLayout.about')},
     {to: ROUTES.dashboard, label: t('rootLayout.dashboard')},
     {to: ROUTES.track, label: t('rootLayout.track')},
     {to: ROUTES.rewards, label: t('rootLayout.rewards')},
@@ -42,11 +44,37 @@ export const Navigation = () => {
     </button>
   );
 
+  const renderNavLinks = (mobile = false) => {
+    const linksToShow = isAuthenticated
+      ? navLinks
+      : navLinks.filter((link) => link.to === ROUTES.home || link.to === ROUTES.about);
+
+    return linksToShow.map((link) => (
+      <Link
+        key={link.to}
+        to={link.to}
+        className={
+          mobile
+            ? `text-lg hover:text-brand transition-colors ${
+                location.pathname === link.to ? 'text-brand font-semibold' : 'text-muted-foreground'
+              }`
+            : `hover:text-brand transition-colors ${
+                location.pathname === link.to ? 'text-brand' : 'text-muted-foreground'
+              }`
+        }
+        aria-current={location.pathname === link.to ? 'page' : undefined}
+      >
+        {link.label}
+      </Link>
+    ));
+  };
+
   const handleDevLogin = async () => {
     setIsDevLoggingIn(true);
     try {
       await apiClient.post('/auth/dev-login', {username: 'alice'});
       await dispatch(fetchCurrentUser());
+      navigate(ROUTES.dashboard);
     } finally {
       setIsDevLoggingIn(false);
     }
@@ -138,18 +166,7 @@ export const Navigation = () => {
             <span className="text-2xl font-bold text-brand">{t('appName')}</span>
           </Link>
           <div className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`hover:text-brand transition-colors ${
-                  location.pathname === link.to ? 'text-brand' : 'text-muted-foreground'
-                }`}
-                aria-current={location.pathname === link.to ? 'page' : undefined}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {renderNavLinks()}
             {renderThemeButton()}
             <div className="flex items-center gap-3">
               {renderPointsDisplay()}
@@ -170,18 +187,7 @@ export const Navigation = () => {
               </SheetTrigger>
               <SheetContent side="right">
                 <div className="flex flex-col gap-4 mt-13 pl-8">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.to}
-                      to={link.to}
-                      className={`text-lg hover:text-brand transition-colors ${
-                        location.pathname === link.to ? 'text-brand font-semibold' : 'text-muted-foreground'
-                      }`}
-                      aria-current={location.pathname === link.to ? 'page' : undefined}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
+                  {renderNavLinks(true)}
                   <div className="mt-4 flex flex-col gap-3 pr-8">
                     {renderPointsDisplay()}
                     {renderAuthControls('w-full flex-col')}

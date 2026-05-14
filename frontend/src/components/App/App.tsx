@@ -1,6 +1,8 @@
 import {ActionDashboard} from '../ActionDashboard/ActionDashboard';
 import {BrowserRouter, Route, Routes, Navigate} from 'react-router';
 import {RootLayout} from '../RootLayout/RootLayout';
+import {AboutPage} from '../AboutUs/AboutUs';
+import {ContactPage} from '../Contact/ContactPage';
 import {GpsActionDetailPage} from '../ActionDetailPage/GpsActionDetailPage';
 import {MapTrackingPage} from '../MapTrackingPage/MapTrackingPage';
 import {RewardsPage} from '../Rewardspage/Rewardspage';
@@ -15,6 +17,7 @@ import {ProfilePage} from '../Profile/ProfilePage';
 
 import {ROUTES} from '../../routes';
 import {ThemeProvider} from 'next-themes';
+import {HomePage} from '../HomePage/HomePage';
 
 function App() {
   return (
@@ -30,10 +33,17 @@ function App() {
             <Route path={ROUTES.passwordResetConfirm} element={<ResetPasswordPage />} />
           </Route>
 
-          {/* Protected branch — requires authentication */}
+          {/* Public marketing pages — with app nav, no auth required */}
+          <Route path={ROUTES.root} element={<RootLayout />}>
+            <Route index element={<Navigate to={ROUTES.home} replace />} />
+            <Route path={ROUTES.home} element={<HomePage />} />
+            <Route path={ROUTES.about} element={<AboutPage />} />
+            <Route path={ROUTES.contact} element={<ContactPage />} />
+          </Route>
+
+          {/* Protected app pages — auth required */}
           <Route element={<ProtectedRoute />}>
-            <Route path={ROUTES.root} element={<RootLayout />}>
-              <Route index element={<Navigate to={ROUTES.dashboard} replace />} />
+            <Route element={<RootLayout />}>
               <Route path={ROUTES.dashboard} element={<ActionDashboard />} />
               <Route path={ROUTES.track} element={<MapTrackingPage />} />
               <Route path={ROUTES.rewards} element={<RewardsPage />} />

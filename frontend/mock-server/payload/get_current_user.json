@@ -1,7 +1,7 @@
 {
   "id": 1,
-  "username": "max.mustermann",
-  "email": "max.mustermann@example.com",
+  "username": "alice",
+  "email": "alice@example.com",
   "role": "ROLE_USER",
   "emailVerified": true,
   "points": 123,

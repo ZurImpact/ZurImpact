@@ -37,7 +37,7 @@ describe('RootLayout', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockApiGet.mockResolvedValue({
-      data: {id: 1, name: 'Test User', email: 'test@test.com', points: 123},
+      data: {id: 1, username: 'Test User', email: 'test@test.com', points: 123},
     });
     mockApiPost.mockResolvedValue({});
   });
@@ -83,7 +83,7 @@ describe('RootLayout', () => {
     mockApiGet.mockReset();
     mockApiGet
       .mockResolvedValueOnce({data: {id: 1}})
-      .mockResolvedValueOnce({data: {id: 1, name: 'Test User', email: 'test@test.com', points: 123}});
+      .mockResolvedValueOnce({data: {id: 1, username: 'Test User', email: 'test@test.com', points: 123}});
 
     renderWithRouter();
 

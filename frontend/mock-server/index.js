@@ -167,6 +167,10 @@ app.delete(BASE_URL + '/actions/:id', (req, res) => {
 });
 
 app.get(BASE_URL + '/userActionHistory/getUserActions', (req, res) => {
+  const {active} = req.query;
+  if (active === 'true') {
+    return res.json(mockUserActions.filter((a) => a.completionState === 'IN_PROGRESS'));
+  }
   res.json(mockUserActions);
 });
 
@@ -207,6 +211,7 @@ app.get(BASE_URL + '/users/current', (req, res) => {
   res.json(currentUserWithPoints);
 });
 
+// GET user points
 app.get(BASE_URL + '/users/:userId/points', (req, res) => {
   const userId = parseInt(req.params.userId);
   if (mockUserPoints.userId === userId) {
