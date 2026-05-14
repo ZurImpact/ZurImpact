@@ -8,7 +8,7 @@ import {RewardsPage} from '../Rewardspage/Rewardspage';
 import {ROUTES} from '../../routes';
 import {ThemeProvider} from 'next-themes';
 import {HomePage} from '../HomePage/HomePage';
-import { FaqPage } from '../FaqPage/FaqPage';
+import {FaqPage} from '../FaqPage/FaqPage';
 
 function App() {
   return (
