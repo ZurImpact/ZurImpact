@@ -42,13 +42,17 @@ export function FaqPage() {
       <div className="container mx-auto max-w-4xl px-4 py-8">
         <div className="space-y-4">
           {faqs.map((faq, index) => (
-            <details key={index} className="group rounded-lg border bg-card p-4 transition-colors hover:border-brand open:border-brand">
-              <summary className="cursor-pointer list-none font-medium text-brand">
-                {t(`faq.${faq.question}`)}
-              </summary>
-                <div className="mt-4 text-muted-foreground">
+            <details
+              key={index}
+              className="group rounded-lg border bg-card p-4 transition-colors hover:border-brand open:border-brand"
+            >
+              <summary className="cursor-pointer list-none font-medium text-brand">{t(`faq.${faq.question}`)}</summary>
+              <div className="mt-4 text-muted-foreground">
                 <p>
-                  <Trans i18nKey={`faq.${faq.answer}`} components={{link: <a href="/dashboard" className="text-brand hover:underline" />}} />
+                  <Trans
+                    i18nKey={`faq.${faq.answer}`}
+                    components={{link: <a href="/dashboard" className="text-brand hover:underline" />}}
+                  />
                 </p>
               </div>
             </details>
