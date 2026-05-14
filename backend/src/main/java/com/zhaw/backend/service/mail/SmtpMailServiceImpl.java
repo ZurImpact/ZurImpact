@@ -6,15 +6,15 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SmtpMailService implements MailService {
+public class SmtpMailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
     private final String fromAddress;
     private final String appBaseUrl;
 
-    public SmtpMailService(JavaMailSender mailSender,
-                           @Value("${app.mail.from:no-reply@zurimpact.local}") String fromAddress,
-                           @Value("${app.base-url:http://localhost:8080}") String appBaseUrl) {
+    public SmtpMailServiceImpl(JavaMailSender mailSender,
+                               @Value("${app.mail.from:no-reply@zurimpact.local}") String fromAddress,
+                               @Value("${app.base-url:http://localhost:8080}") String appBaseUrl) {
         this.mailSender = mailSender;
         this.fromAddress = fromAddress;
         this.appBaseUrl = appBaseUrl;

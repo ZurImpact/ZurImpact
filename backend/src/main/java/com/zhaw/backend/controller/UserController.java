@@ -4,7 +4,7 @@ import com.zhaw.backend.mappers.UserMapper;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.UserResponseDto;
 import com.zhaw.backend.model.dto.auth.PasswordChangeRequest;
-import com.zhaw.backend.security.AuthService;
+import com.zhaw.backend.service.auth.AuthService;
 import com.zhaw.backend.security.CurrentUserResolver;
 import com.zhaw.backend.service.UserActionHistoryService;
 import com.zhaw.backend.service.UserService;

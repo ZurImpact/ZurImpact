@@ -1,5 +1,6 @@
 package com.zhaw.backend.security;
 
+import com.zhaw.backend.service.session.SessionService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

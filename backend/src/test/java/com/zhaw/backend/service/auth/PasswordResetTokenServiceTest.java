@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 class PasswordResetTokenServiceTest {
 
     private final PasswordResetTokenDao dao = mock(PasswordResetTokenDao.class);
-    private final PasswordResetTokenService service = new PasswordResetTokenService(dao);
+    private final PasswordResetTokenService service = new PasswordResetTokenServiceImpl(dao);
 
     @Test
     @DisplayName("issue stores hashed token and returns the raw value")

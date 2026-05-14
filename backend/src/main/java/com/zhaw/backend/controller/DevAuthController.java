@@ -4,7 +4,7 @@ import com.zhaw.backend.enums.Role;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.dto.auth.DevLoginRequest;
 import com.zhaw.backend.security.AuthCookieFilter;
-import com.zhaw.backend.security.SessionService;
+import com.zhaw.backend.service.session.SessionService;
 import com.zhaw.backend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

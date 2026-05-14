@@ -1,7 +1,7 @@
 package com.zhaw.backend.service.mail;
 
 /**
- * Outbound mail contract. Production wires {@link SmtpMailService}; integration
+ * Outbound mail contract. Production wires {@link SmtpMailServiceImpl}; integration
  * tests wire via the "test" profile.
  */
 public interface MailService {

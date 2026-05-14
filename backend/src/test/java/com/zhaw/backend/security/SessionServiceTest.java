@@ -5,6 +5,8 @@ import com.zhaw.backend.model.dao.AuthSessionDao;
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.entities.AuthSession;
 import com.zhaw.backend.model.entities.User;
+import com.zhaw.backend.service.session.DbSessionServiceImpl;
+import com.zhaw.backend.service.session.SessionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,13 +24,13 @@ class SessionServiceTest {
 
     private AuthSessionDao authSessionDao;
     private UserDao userDao;
-    private DbSessionService service;
+    private DbSessionServiceImpl service;
 
     @BeforeEach
     void setUp() {
         authSessionDao = mock(AuthSessionDao.class);
         userDao = mock(UserDao.class);
-        service = new DbSessionService(authSessionDao, userDao);
+        service = new DbSessionServiceImpl(authSessionDao, userDao);
     }
 
     @Test

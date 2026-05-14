@@ -1,10 +1,11 @@
-package com.zhaw.backend.security;
+package com.zhaw.backend.service.session;
 
 import com.zhaw.backend.enums.Role;
 import com.zhaw.backend.model.dao.AuthSessionDao;
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.entities.AuthSession;
 import com.zhaw.backend.model.entities.User;
+import com.zhaw.backend.security.TokenHashing;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +21,7 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
-public class DbSessionService implements SessionService {
+public class DbSessionServiceImpl implements SessionService {
 
     private static final long SESSION_TTL_SECONDS = 8 * 3600L;
 

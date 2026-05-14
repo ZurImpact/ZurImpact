@@ -1,4 +1,4 @@
-package com.zhaw.backend.security;
+package com.zhaw.backend.service.session;
 
 import com.zhaw.backend.enums.Role;
 

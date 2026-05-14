@@ -1,5 +1,7 @@
 package com.zhaw.backend.security;
 
+import com.zhaw.backend.service.session.DbSessionServiceImpl;
+import com.zhaw.backend.service.session.SessionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +34,7 @@ import java.util.List;
  * origin list, not "*".
  *
  * <p>Authentication uses {@link AuthCookieFilter} reading sessions through
- * {@link DbSessionService}; principals are plain UsernamePasswordAuthenticationToken
+ * {@link DbSessionServiceImpl}; principals are plain UsernamePasswordAuthenticationToken
  * carrying an {@link AuthenticatedUser} principal so a future OAuth filter can
  * slot in beside it without conflict.
  */

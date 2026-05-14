@@ -1,6 +1,7 @@
 package com.zhaw.backend.security;
 
 import com.zhaw.backend.enums.Role;
+import com.zhaw.backend.service.session.SessionService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

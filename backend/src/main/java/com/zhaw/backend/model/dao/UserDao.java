@@ -26,13 +26,13 @@ public class UserDao {
     private final JdbcTemplate jdbc;
 
     private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> {
-        long addressId = rs.getLong("address_id");
+        long addressId = rs.getObject("address_id", Long.class);
         return User.builder()
                 .id(rs.getLong("id"))
                 .username(rs.getString("username"))
                 .passwordHash(rs.getString("password_hash"))
                 .role(rs.getString("role"))
-                .address(rs.wasNull() ? null : addressId)
+                .address(addressId)
                 .email(rs.getString("email"))
                 .points(rs.getInt("points"))
                 .createdAt(rs.getTimestamp("created_at").toLocalDateTime())

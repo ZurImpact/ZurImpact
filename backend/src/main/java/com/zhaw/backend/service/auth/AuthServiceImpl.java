@@ -1,11 +1,10 @@
-package com.zhaw.backend.security;
+package com.zhaw.backend.service.auth;
 
 import com.zhaw.backend.enums.Role;
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.entities.User;
-import com.zhaw.backend.service.auth.EmailVerificationTokenService;
-import com.zhaw.backend.service.auth.PasswordResetTokenService;
 import com.zhaw.backend.service.mail.MailService;
+import com.zhaw.backend.service.session.SessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -18,7 +17,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserDao userDao;
@@ -32,6 +31,7 @@ public class AuthService {
      * Throws {@link BadCredentialsException} for unknown user or wrong password,
      * and {@link DisabledException} when the account exists but the email is not verified yet.
      */
+    @Override
     @Transactional
     public AuthResult authenticate(String username, String rawPassword) {
         Optional<User> userOpt = userDao.findByUsername(username);
@@ -48,8 +48,11 @@ public class AuthService {
             throw new DisabledException("email_not_verified");
         }
 
-        Role role = user.getRole() == null ? Role.ROLE_USER : Role.valueOf(user.getRole());
-        return new AuthResult(user.getId(), user.getUsername(), role);
+        if(user.getRole() == null){
+            throw new DisabledException("No user role assigned");
+        }
+
+        return new AuthResult(user.getId(), user.getUsername(), Role.valueOf(user.getRole()));
     }
 
     /**
@@ -57,6 +60,7 @@ public class AuthService {
      * a new account is only created when both username and email are free; an existing
      * unverified account triggers a fresh verification email.
      */
+    @Override
     @Transactional
     public void register(String username, String email, String rawPassword) {
         Optional<User> existingByUsername = userDao.findByUsername(username);
@@ -89,6 +93,7 @@ public class AuthService {
     }
 
     /** Re-sends a verification email for an existing unverified account. Always silent. */
+    @Override
     @Transactional
     public void resendVerification(String email) {
         Optional<User> userOpt = userDao.findByEmail(email);
@@ -105,6 +110,7 @@ public class AuthService {
     }
 
     /** Consumes a single-use verification token. Returns true on success. */
+    @Override
     @Transactional
     public boolean verifyEmail(String rawToken) {
         return verificationTokenService.lookupValid(rawToken).map(token -> {
@@ -115,6 +121,7 @@ public class AuthService {
     }
 
     /** Sends a password-reset email if the address belongs to a verified account. Always silent. */
+    @Override
     @Transactional
     public void requestPasswordReset(String email) {
         Optional<User> userOpt = userDao.findByEmail(email);
@@ -134,6 +141,7 @@ public class AuthService {
      * Consumes the reset token, sets the new password, and revokes every active
      * session for the user. Returns true on success.
      */
+    @Override
     @Transactional
     public boolean confirmPasswordReset(String rawToken, String newPassword) {
         return resetTokenService.lookupValid(rawToken).map(token -> {
@@ -152,6 +160,7 @@ public class AuthService {
      *
      * @return ChangePasswordResult.SUCCESS / WRONG_CURRENT / USER_NOT_FOUND
      */
+    @Override
     @Transactional
     public ChangePasswordResult changePassword(Long userId,
                                                String currentPassword,
@@ -168,11 +177,5 @@ public class AuthService {
         userDao.setPasswordHash(userId, newHash);
         sessionService.invalidateAllForUser(userId);
         return ChangePasswordResult.SUCCESS;
-    }
-
-    public record AuthResult(Long userId, String username, Role role) {}
-
-    public enum ChangePasswordResult {
-        SUCCESS, WRONG_CURRENT, USER_NOT_FOUND
     }
 }
