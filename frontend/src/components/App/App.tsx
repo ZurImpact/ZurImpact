@@ -1,6 +1,8 @@
 import {ActionDashboard} from '../ActionDashboard/ActionDashboard';
 import {BrowserRouter, Route, Routes, Navigate} from 'react-router';
 import {RootLayout} from '../RootLayout/RootLayout';
+import {AboutPage} from '../AboutUs/AboutUs';
+import {ContactPage} from '../Contact/ContactPage';
 import {GpsActionDetailPage} from '../ActionDetailPage/GpsActionDetailPage';
 import {MapTrackingPage} from '../MapTrackingPage/MapTrackingPage';
 import {RewardsPage} from '../Rewardspage/Rewardspage';
@@ -19,6 +21,8 @@ function App() {
             <Route index element={<Navigate to={ROUTES.home} replace />} />
             <Route path={ROUTES.home} element={<HomePage />} />
             <Route path={ROUTES.dashboard} element={<ActionDashboard />} />
+            <Route path={ROUTES.about} element={<AboutPage />} />
+            <Route path={ROUTES.contact} element={<ContactPage />} />
             <Route path={ROUTES.track} element={<MapTrackingPage />} />
             <Route path={ROUTES.rewards} element={<RewardsPage />} />
             <Route path={ROUTES.actionDetailsPattern} element={<GpsActionDetailPage />} />
