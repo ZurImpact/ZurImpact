@@ -10,7 +10,6 @@ import com.zhaw.backend.model.dto.auth.RegisterRequest;
 import com.zhaw.backend.model.dto.auth.VerifyEmailRequest;
 import com.zhaw.backend.security.AuthenticatedUser;
 import com.zhaw.backend.service.auth.AuthService;
-import com.zhaw.backend.service.auth.AuthServiceImpl;
 import com.zhaw.backend.service.session.SessionService;
 import com.zhaw.backend.service.UserService;
 import jakarta.servlet.http.Cookie;
