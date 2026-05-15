@@ -7,6 +7,7 @@
     "track": "Map",
     "rewards": "Rewards",
     "home": "Home",
+    "faq": "FAQ",
     "switchToLight": "Switch to light mode",
     "switchToDark": "Switch to dark mode",
     "openMenu": "Open menu",
@@ -286,6 +287,22 @@
     "ctaTitle": "Ready to Make an Impact?",
     "ctaSubtitle": "Join thousands of people making Zürich more sustainable while enjoying exclusive rewards and experiences.",
     "ctaButton": "Get Started Now"
+  },
+  "faq": {
+    "header": "Frequently Asked Questions",
+    "subheader": "Find answers to common questions about ZurImpact.",
+    "howItWorksTitle": "How does ZurImpact work?",
+    "howItWorksAnswer": "ZurImpact is a platform that rewards you for making sustainable choices. You can participate in various activities, such as collecting litter, using public transport, or visiting eco-friendly locations. For each completed activity, you earn points which you can later redeem for rewards from our partners.",
+    "whatArePointsTitle": "What are Impact Points?",
+    "whatArePointsAnswer": "Impact Points are what you earn for completing sustainable activities. They are our way of recognizing and rewarding your positive contributions to the environment and community.",
+    "howToEarnPointsTitle": "How do I earn points?",
+    "howToEarnPointsAnswer": "You can earn points by browsing the activities on the Dashboard and completing them. Activities range from GPS-based challenges where you visit specific locations, to simple check-ins or tracking your bike rides.",
+    "howToRedeemRewardsTitle": "How do I redeem rewards?",
+    "howToRedeemRewardsAnswer": "Once you have collected enough points, head over to the 'Rewards' page. There you can browse available vouchers and gifts and redeem them using your points. You will receive a voucher code or instructions on how to claim your reward.",
+    "isAppFreeTitle": "Is ZurImpact free to use?",
+    "isAppFreeAnswer": "Yes, absolutely! ZurImpact is completely free to use. Our mission is to encourage sustainable behavior, not to charge for it.",
+    "howIsImpactMeasuredTitle": "How is my impact measured?",
+    "howIsImpactMeasuredAnswer": "While points are a great incentive, your true impact is measured by the collective effort of our community. On our homepage, we showcase aggregated statistics like the total amount of waste collected and the number of sustainable trips taken. Your actions directly contribute to these numbers!"
   },
   "points": "Points",
   "language": "Language"

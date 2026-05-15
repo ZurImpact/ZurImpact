@@ -7,6 +7,7 @@
     "track": "Karte",
     "rewards": "Belohnungen",
     "home": "Startseite",
+    "faq": "Häufig gestellte Fragen",
     "switchToLight": "Zu hellem Modus wechseln",
     "switchToDark": "Zu dunklem Modus wechseln",
     "openMenu": "Menü öffnen",
@@ -286,6 +287,22 @@
     "ctaTitle": "Bereit, einen Unterschied zu machen?",
     "ctaSubtitle": "Schliesse dich Tausenden von Menschen an, die Zürich nachhaltiger machen, während du exklusive Belohnungen und Erlebnisse geniesst.",
     "ctaButton": "Jetzt loslegen"
+  },
+  "faq": {
+    "header": "Häufig gestellte Fragen",
+    "subheader": "Finde Antworten auf häufige Fragen zu ZurImpact.",
+    "howItWorksTitle": "Wie funktioniert ZurImpact?",
+    "howItWorksAnswer": "ZurImpact ist eine Plattform, die dich für nachhaltige Entscheidungen belohnt. Du kannst an verschiedenen Aktivitäten teilnehmen, wie zum Beispiel Müll sammeln, öffentliche Verkehrsmittel nutzen oder umweltfreundliche Orte besuchen. Für jede abgeschlossene Aktivität erhältst du Punkte, die du später gegen Belohnungen von unseren Partnern einlösen kannst.",
+    "whatArePointsTitle": "Was sind Impact Points?",
+    "whatArePointsAnswer": "Impact Points erhältst du für den Abschluss nachhaltiger Aktivitäten. Sie sind unsere Art, deine positiven Beiträge für die Umwelt und die Gemeinschaft anzuerkennen und zu belohnen.",
+    "howToEarnPointsTitle": "Wie sammle ich Punkte?",
+    "howToEarnPointsAnswer": "Du kannst Punkte sammeln, indem du die Aktivitäten auf dem Dashboard durchsuchst und abschließt. Die Aktivitäten reichen von GPS-basierten Herausforderungen, bei denen du bestimmte Orte besuchst, bis hin zu einfachen Check-ins oder der Aufzeichnung deiner Fahrradtouren.",
+    "howToRedeemRewardsTitle": "Wie löse ich Belohnungen ein?",
+    "howToRedeemRewardsAnswer": "Sobald du genug Punkte gesammelt hast, gehe zur Seite 'Belohnungen'. Dort kannst du verfügbare Gutscheine und Geschenke durchsuchen und sie mit deinen Punkten einlösen. Du erhältst einen Gutscheincode oder Anweisungen, wie du deine Belohnung einfordern kannst.",
+    "isAppFreeTitle": "Ist die ZurImpact-App kostenlos?",
+    "isAppFreeAnswer": "Ja, absolut! Die ZurImpact-App kann komplett kostenlos heruntergeladen und genutzt werden. Unsere Mission ist es, nachhaltiges Verhalten zu fördern, und nicht, Geld dafür zu verlangen.",
+    "howIsImpactMeasuredTitle": "Wie wird mein Impact gemessen?",
+    "howIsImpactMeasuredAnswer": "Obwohl Punkte ein toller Anreiz sind, wird dein wahrer Impact durch die gemeinsame Anstrengung unserer Community gemessen. Auf unserer Startseite zeigen wir zusammengefasste Statistiken wie die Gesamtmenge des gesammelten Mülls und die Anzahl der unternommenen nachhaltigen Fahrten. Deine Aktionen tragen direkt zu diesen Zahlen bei!"
   },
   "points": "Punkte",
   "language": "Sprache"

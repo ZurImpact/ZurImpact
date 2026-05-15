@@ -27,6 +27,7 @@ export const Navigation = () => {
     {to: ROUTES.dashboard, label: t('rootLayout.dashboard')},
     {to: ROUTES.track, label: t('rootLayout.track')},
     {to: ROUTES.rewards, label: t('rootLayout.rewards')},
+    {to: ROUTES.faq, label: t('rootLayout.faq')},
   ];
 
   const renderThemeButton = () => (
@@ -47,7 +48,7 @@ export const Navigation = () => {
   const renderNavLinks = (mobile = false) => {
     const linksToShow = isAuthenticated
       ? navLinks
-      : navLinks.filter((link) => link.to === ROUTES.home || link.to === ROUTES.about);
+      : navLinks.filter((link) => link.to === ROUTES.home || link.to === ROUTES.about || link.to === ROUTES.faq);
 
     return linksToShow.map((link) => (
       <Link

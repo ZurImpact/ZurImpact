@@ -18,6 +18,7 @@ import {ProfilePage} from '../Profile/ProfilePage';
 import {ROUTES} from '../../routes';
 import {ThemeProvider} from 'next-themes';
 import {HomePage} from '../HomePage/HomePage';
+import {FaqPage} from '../FaqPage/FaqPage';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path={ROUTES.root} element={<RootLayout />}>
             <Route index element={<Navigate to={ROUTES.home} replace />} />
             <Route path={ROUTES.home} element={<HomePage />} />
+            <Route path={ROUTES.faq} element={<FaqPage />} />
             <Route path={ROUTES.about} element={<AboutPage />} />
             <Route path={ROUTES.contact} element={<ContactPage />} />
           </Route>

@@ -7,6 +7,7 @@ export const ROUTES = {
   about: '/about',
   contact: '/contact',
   home: '/home',
+  faq: '/faq',
   actionDetailsPattern: '/actions/:id',
   actionDetails: (actionId: number | string) => `/actions/${actionId}`,
   login: '/login',

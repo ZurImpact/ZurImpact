@@ -18,4 +18,5 @@ public class UserDto {
     private String createdAt;
     private Integer points;
     private Role role;
+    private Boolean emailVerified;
 }
