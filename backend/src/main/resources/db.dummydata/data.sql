@@ -80,3 +80,21 @@ INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_o
                                                                                                                  (2, 3, 'COMPLETED',   NOW(), false, NULL),
                                                                                                                  (2, 4, 'IN_PROGRESS', NOW(), true,  '1'),
                                                                                                                  (3, 1, 'IN_PROGRESS', NOW(), false, NULL);
+
+-- 9. HTTP_PERMISSIONS (role-based routing)
+INSERT INTO http_permission (path_pattern, http_method, roles) VALUES
+    ('/api/auth/logout', 'POST', 'ROLE_USER,ROLE_ADMIN,ROLE_PARTNER'),
+    ('/api/auth/whoami', 'GET', 'ROLE_USER,ROLE_ADMIN,ROLE_PARTNER'),
+    ('/api/users/me/password-change', 'POST', 'ROLE_USER,ROLE_ADMIN,ROLE_PARTNER'),
+    ('/api/users/**', 'GET', 'ROLE_USER,ROLE_ADMIN'),
+    ('/api/action', 'GET', ''),
+    ('/api/actions', 'GET', ''),
+    ('/api/actions/**', 'GET', ''),
+    ('/api/actions', 'POST', 'ROLE_ADMIN,ROLE_PARTNER'),
+    ('/api/actions/**', 'PUT', 'ROLE_ADMIN,ROLE_PARTNER'),
+    ('/api/actions/**', 'DELETE', 'ROLE_ADMIN,ROLE_PARTNER'),
+    ('/api/subTasks/**', 'PUT', 'ROLE_ADMIN,ROLE_PARTNER'),
+    ('/api/subTasks/**', 'DELETE', 'ROLE_ADMIN,ROLE_PARTNER'),
+    ('/api/settings/**', '*', 'ROLE_USER,ROLE_ADMIN,ROLE_PARTNER'),
+    ('/api/admin/**', '*', 'ROLE_ADMIN'),
+    ('/api/user/**', '*', 'ROLE_USER,ROLE_ADMIN');
