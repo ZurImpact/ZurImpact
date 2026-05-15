@@ -22,6 +22,7 @@ export const Navigation = () => {
 
   const navLinks = [
     {to: ROUTES.home, label: t('rootLayout.home')},
+    {to: ROUTES.about, label: t('rootLayout.about')},
     {to: ROUTES.dashboard, label: t('rootLayout.dashboard')},
     {to: ROUTES.track, label: t('rootLayout.track')},
     {to: ROUTES.rewards, label: t('rootLayout.rewards')},
@@ -67,7 +68,7 @@ export const Navigation = () => {
   const renderNavLinks = (mobile = false) => {
     const linksToShow = isAuthenticated
       ? navLinks
-      : navLinks.filter((link) => [ROUTES.home, ROUTES.faq].includes(link.to));
+      : navLinks.filter((link) => link.to === ROUTES.home || link.to === ROUTES.about || link.to === ROUTES.faq);
 
     return linksToShow.map((link) => (
       <Link

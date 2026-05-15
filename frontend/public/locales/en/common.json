@@ -12,7 +12,9 @@
     "switchToDark": "Switch to dark mode",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "skipToContent": "Skip to main content"
+    "skipToContent": "Skip to main content",
+    "about": "About",
+    "contact": "Contact"
   },
   "actionDashboard": {
     "header": "Activities",
@@ -89,6 +91,47 @@
     "howRewardsPoint2": "Redeem points for vouchers, gifts, and exclusive offers",
     "howRewardsPoint3": "Receive voucher codes after redemption",
     "howRewardsPoint4": "New rewards are added regularly - check back often!"
+  },
+  "contactPage": {
+    "heroTitle": "Get in Touch",
+    "heroSubtitle": "Whether you're interested in becoming a partner, have questions about our platform, or just want to say hello, we'd love to hear from you!",
+    "formTitle": "Send us a Message",
+    "nameLabel": "Full Name",
+    "emailLabel": "Email",
+    "companyLabel": "Company/Organization",
+    "phoneLabel": "Phone Number",
+    "inquiryTypeLabel": "Inquiry Type",
+    "messageLabel": "Message",
+    "namePlaceholder": "John Doe",
+    "emailPlaceholder": "john@example.com",
+    "companyPlaceholder": "Your Company Name",
+    "phonePlaceholder": "+41 44 123 45 67",
+    "messagePlaceholder": "Tell us more about your inquiry...",
+    "inquiryPlaceholder": "Select an option...",
+    "inquiryOptionPartner": "Become a Partner",
+    "inquiryOptionGeneral": "General Inquiry",
+    "inquiryOptionSupport": "Support",
+    "inquiryOptionPress": "Press & Media",
+    "inquiryOptionOther": "Other",
+    "sendButton": "Send Message",
+    "sendingButton": "Sending...",
+    "required": "*",
+    "toastSuccess": "Thank you! We'll get back to you within 24-48 hours.",
+    "toastError": "Something went wrong. Please try again."
+  },
+  "aboutPage": {
+    "heroTitle": "About Us",
+    "heroSubtitle": "We're on a mission to make sustainable tourism rewarding, accessible, and impactful for everyone in Zürich.",
+    "missionBadge": "Our Mission",
+    "missionTitle": "Transforming Tourism Through Sustainable Action",
+    "missionDescription1": "Inspired by Copenhagen's CopenPay, ZurImpact rewards eco-conscious behavior in Zürich.",
+    "missionDescription2": "By partnering with local businesses and engaging our community, we're creating a tourism ecosystem where sustainable choices are the easiest and most rewarding option.",
+    "teamTitle": "Meet Our Team",
+    "teamSubtitle": "Passionate people working to make Zürich more sustainable",
+    "ctaTitle": "Want to Learn More?",
+    "ctaSubtitle": "Get in touch with our team to learn how you can be part of the sustainable tourism movement in Zürich.",
+    "ctaButton": "Contact Us",
+    "teamRole": "Co-Founder"
   },
   "homePage": {
     "hero": {

@@ -4,6 +4,8 @@ export const ROUTES = {
   dashboard: '/dashboard',
   track: '/track',
   rewards: '/rewards',
+  about: '/about',
+  contact: '/contact',
   home: '/home',
   faq: '/faq',
   actionDetailsPattern: '/actions/:id',
