@@ -1,8 +1,11 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router';
 import {ArrowLeft, Plus, Trash2, MapPin} from 'lucide-react';
 import {toast} from 'sonner';
 import {useTranslation} from 'react-i18next';
+import {MapContainer, Marker, TileLayer, useMap, useMapEvents} from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import apiClient from '../../api/apiClient';
 import {ROUTES} from '../../routes';
 import {useAppSelector} from '../../store/store';
@@ -12,6 +15,20 @@ import {Input} from '../ui/input';
 import {Label} from '../ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '../ui/select';
 import type {DistanceThresholdLevel} from '../../utils/distanceThreshold';
+
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+const DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
+const DEFAULT_CENTER: [number, number] = [47.378177, 8.540192];
 
 type CheckpointFormState = {
   displayName: string;
@@ -42,6 +59,88 @@ type CreateGpsActionRequest = {
   validUntil: string;
   createdOn: string;
 };
+
+function RecenterMap({center}: {center: [number, number]}) {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setView(center, map.getZoom());
+  }, [center, map]);
+
+  return null;
+}
+
+function MapClickHandler({onSelect}: {onSelect: (coords: [number, number]) => void}) {
+  useMapEvents({
+    click: (event) => {
+      onSelect([event.latlng.lat, event.latlng.lng]);
+    },
+  });
+
+  return null;
+}
+
+function CheckpointMapPicker({
+  latitude,
+  longitude,
+  onSelect,
+  checkpointLabel,
+  helperText,
+  selectedCoordinatesLabel,
+}: {
+  latitude: string;
+  longitude: string;
+  onSelect: (coords: [number, number]) => void;
+  checkpointLabel: string;
+  helperText: string;
+  selectedCoordinatesLabel: string;
+}) {
+  const selectedCoordinates = useMemo<[number, number] | null>(() => {
+    if (!latitude.trim() || !longitude.trim()) {
+      return null;
+    }
+
+    const parsedLatitude = Number(latitude);
+    const parsedLongitude = Number(longitude);
+
+    if (!Number.isFinite(parsedLatitude) || !Number.isFinite(parsedLongitude)) {
+      return null;
+    }
+
+    return [parsedLatitude, parsedLongitude];
+  }, [latitude, longitude]);
+
+  const center = selectedCoordinates ?? DEFAULT_CENTER;
+
+  return (
+    <div className="space-y-3">
+      <div className="space-y-1">
+        <Label>{checkpointLabel}</Label>
+        <p className="text-xs text-muted-foreground">{helperText}</p>
+      </div>
+      <div className="overflow-hidden rounded-lg border border-border/70 bg-muted/20">
+        <MapContainer center={center} zoom={14} scrollWheelZoom={false} style={{height: '18rem', width: '100%'}}>
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          <MapClickHandler onSelect={onSelect} />
+          {selectedCoordinates && (
+            <>
+              <Marker position={selectedCoordinates} />
+              <RecenterMap center={selectedCoordinates} />
+            </>
+          )}
+        </MapContainer>
+      </div>
+      {selectedCoordinates ? (
+        <p className="text-xs text-muted-foreground">
+          {selectedCoordinatesLabel}: {selectedCoordinates[0].toFixed(5)}, {selectedCoordinates[1].toFixed(5)}
+        </p>
+      ) : null}
+    </div>
+  );
+}
 
 const createEmptyCheckpoint = (): CheckpointFormState => ({
   displayName: '',
@@ -83,6 +182,18 @@ export function ActionCreatePage() {
     setCheckpoints((current) =>
       current.map((checkpoint, currentIndex) =>
         currentIndex === index ? {...checkpoint, [field]: value} : checkpoint,
+      ),
+    );
+  };
+
+  const updateCheckpointCoordinates = (index: number, coords: [number, number]) => {
+    const [latitude, longitude] = coords;
+
+    setCheckpoints((current) =>
+      current.map((checkpoint, currentIndex) =>
+        currentIndex === index
+          ? {...checkpoint, latitude: latitude.toString(), longitude: longitude.toString()}
+          : checkpoint,
       ),
     );
   };
@@ -322,32 +433,14 @@ export function ActionCreatePage() {
                               className="border-input placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border bg-input-background flex min-h-24 w-full rounded-md px-3 py-2 text-sm transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                             />
                           </div>
-                          <div className="space-y-2">
-                            <Label htmlFor={`checkpoint-latitude-${index}`}>
-                              {t('actionCreatePage.latitudeLabel')}
-                            </Label>
-                            <Input
-                              id={`checkpoint-latitude-${index}`}
-                              type="number"
-                              step="any"
-                              value={checkpoint.latitude}
-                              onChange={(event) => updateCheckpoint(index, 'latitude', event.target.value)}
-                              placeholder="47.3769"
-                              required
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor={`checkpoint-longitude-${index}`}>
-                              {t('actionCreatePage.longitudeLabel')}
-                            </Label>
-                            <Input
-                              id={`checkpoint-longitude-${index}`}
-                              type="number"
-                              step="any"
-                              value={checkpoint.longitude}
-                              onChange={(event) => updateCheckpoint(index, 'longitude', event.target.value)}
-                              placeholder="8.5417"
-                              required
+                          <div className="space-y-2 md:col-span-2">
+                            <CheckpointMapPicker
+                              latitude={checkpoint.latitude}
+                              longitude={checkpoint.longitude}
+                              onSelect={(coords) => updateCheckpointCoordinates(index, coords)}
+                              checkpointLabel={t('actionCreatePage.checkpointLocationLabel')}
+                              helperText={t('actionCreatePage.checkpointLocationHelper')}
+                              selectedCoordinatesLabel={t('actionCreatePage.selectedCoordinatesLabel')}
                             />
                           </div>
                           <div className="space-y-2 md:col-span-2">
@@ -392,9 +485,7 @@ export function ActionCreatePage() {
               <ul className="space-y-2 text-sm">
                 <li>• {t('actionCreatePage.actionNameLabel')}</li>
                 <li>• {t('actionCreatePage.pointsLabel')}</li>
-                <li>
-                  • {t('actionCreatePage.latitudeLabel')} / {t('actionCreatePage.longitudeLabel')}
-                </li>
+                <li>• {t('actionCreatePage.checkpointLocationLabel')}</li>
                 <li>• {t('actionCreatePage.thresholdLabel')}</li>
               </ul>
             </Card>

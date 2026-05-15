@@ -1,5 +1,5 @@
 import {describe, it, expect, vi, beforeEach} from 'vitest';
-import {screen, waitFor} from '@testing-library/react';
+import {screen, waitFor, act} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router';
 import {ActionCreatePage} from './ActionCreatePage';
@@ -7,6 +7,7 @@ import {renderWithProviders} from '../../test/test.utils';
 
 const navigateMock = vi.fn();
 const mockPost = vi.fn();
+let mapClickHandler: ((event: {latlng: {lat: number; lng: number}}) => void) | null = null;
 
 vi.mock('../../api/apiClient', () => ({
   default: {
@@ -23,8 +24,38 @@ vi.mock('react-router', async () => {
   };
 });
 
+vi.mock('react-leaflet', () => ({
+  MapContainer: ({children}: {children: React.ReactNode}) => <div data-testid="checkpoint-map">{children}</div>,
+  TileLayer: () => <div data-testid="tile-layer" />,
+  Marker: ({children}: {children?: React.ReactNode}) => <div data-testid="marker">{children}</div>,
+  useMap: () => ({
+    setView: vi.fn(),
+    getZoom: () => 14,
+  }),
+  useMapEvents: (handlers: {click?: (event: {latlng: {lat: number; lng: number}}) => void}) => {
+    mapClickHandler = handlers.click ?? null;
+    return null;
+  },
+}));
+
+vi.mock('leaflet', () => {
+  const markerConstructor = function Marker() {} as unknown as {prototype: {options: Record<string, unknown>}};
+  markerConstructor.prototype = {options: {}};
+
+  const leaflet = {
+    icon: vi.fn(() => ({})),
+    Marker: markerConstructor,
+  };
+
+  return {
+    default: leaflet,
+    ...leaflet,
+  };
+});
+
 beforeEach(() => {
   vi.clearAllMocks();
+  mapClickHandler = null;
 });
 
 const renderPage = () =>
@@ -51,6 +82,7 @@ describe('ActionCreatePage', () => {
     expect(screen.getByRole('heading', {name: 'actionCreatePage.header', level: 1})).toBeInTheDocument();
     expect(screen.getByText('actionCreatePage.badge', {selector: 'span'})).toBeInTheDocument();
     expect(screen.getByLabelText('actionCreatePage.actionNameLabel')).toBeInTheDocument();
+    expect(screen.getByTestId('checkpoint-map')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'actionCreatePage.submit'})).toBeInTheDocument();
   });
 
@@ -68,8 +100,10 @@ describe('ActionCreatePage', () => {
     await user.type(screen.getByLabelText('actionCreatePage.pointsLabel'), '75');
     await user.type(screen.getByLabelText('actionCreatePage.validUntilLabel'), '2026-05-14');
     await user.type(screen.getByLabelText('actionCreatePage.checkpointNameLabel'), 'Start: Main Square');
-    await user.type(screen.getByLabelText('actionCreatePage.latitudeLabel'), '47.3769');
-    await user.type(screen.getByLabelText('actionCreatePage.longitudeLabel'), '8.5417');
+
+    await act(async () => {
+      mapClickHandler?.({latlng: {lat: 47.3769, lng: 8.5417}});
+    });
 
     await user.click(screen.getByRole('button', {name: 'actionCreatePage.submit'}));
 
