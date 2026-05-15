@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Import;
  * Root ApplicationContext (Parent Context) for Services/Security/Filter etc.
  */
 @Configuration
-@Import(PersistenceConfig.class)
+@Import({PersistenceConfig.class, MailConfig.class})
 @ComponentScan(
         basePackages = "com.zhaw.backend",
         excludeFilters = {

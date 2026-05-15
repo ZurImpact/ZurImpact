@@ -1,6 +1,7 @@
 package com.zhaw.backend.security;
 
 import com.zhaw.backend.enums.Role;
+import com.zhaw.backend.service.session.SessionService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -21,6 +23,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,11 +54,12 @@ class AuthCookieFilterTest {
     class DoFilterInternal {
 
         @Test
-        @DisplayName("sets authentication when auth cookie is valid")
+        @DisplayName("populates AuthenticatedUser principal from a valid session")
         void setsAuthenticationWhenCookieValid() throws Exception {
             AuthCookieFilter filter = new AuthCookieFilter(sessionService);
             when(request.getCookies()).thenReturn(new Cookie[]{new Cookie("AUTH_SESSION", "token-1")});
             SessionService.SessionRecord sessionRecord = new SessionService.SessionRecord(
+                    7L,
                     "alice",
                     Role.ROLE_USER,
                     java.time.Instant.now().plusSeconds(60));
@@ -67,6 +71,9 @@ class AuthCookieFilterTest {
             assertNotNull(authentication);
             assertEquals("alice", authentication.getName());
             assertEquals(1, authentication.getAuthorities().size());
+            Object principal = authentication.getPrincipal();
+            assertSame(AuthenticatedUser.class, principal.getClass());
+            assertEquals(7L, ((AuthenticatedUser) principal).userId());
             verify(filterChain).doFilter(request, response);
         }
 
@@ -101,7 +108,7 @@ class AuthCookieFilterTest {
         @DisplayName("does not revalidate token when authentication already exists")
         void doesNotRevalidateWhenAlreadyAuthenticated() throws Exception {
             AuthCookieFilter filter = new AuthCookieFilter(sessionService);
-            SecurityContextHolder.getContext().setAuthentication(org.springframework.security.authentication.UsernamePasswordAuthenticationToken.authenticated(
+            SecurityContextHolder.getContext().setAuthentication(UsernamePasswordAuthenticationToken.authenticated(
                     "existing",
                     null,
                     Set.of()));
@@ -114,4 +121,3 @@ class AuthCookieFilterTest {
         }
     }
 }
-
