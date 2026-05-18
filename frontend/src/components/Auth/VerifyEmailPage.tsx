@@ -1,5 +1,5 @@
 import {useEffect, useRef} from 'react';
-import {Link, useSearchParams} from 'react-router';
+import {Link, useLocation, useSearchParams} from 'react-router';
 import {CheckCircle2} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {AuthFormCard} from './AuthFormCard';
@@ -13,11 +13,11 @@ export function VerifyEmailPage() {
   const {t} = useTranslation();
   const dispatch = useAppDispatch();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const verifyStatus = useAppSelector((s) => s.auth.verifyEmail.status);
 
   const token = searchParams.get('token');
-  const pending = searchParams.get('pending');
-  const emailParam = searchParams.get('email');
+  const pendingEmail = (location.state as {pendingEmail?: string} | null)?.pendingEmail;
 
   const hasDispatched = useRef(false);
 
@@ -86,7 +86,7 @@ export function VerifyEmailPage() {
   return (
     <AuthFormCard title={t('auth.verifyEmail.titlePending')} description={t('auth.verifyEmail.descriptionPending')}>
       <p className="mb-4 text-sm text-muted-foreground">{t('auth.verifyEmail.resendHint')}</p>
-      <ResendVerificationForm defaultEmail={pending && emailParam ? decodeURIComponent(emailParam) : undefined} />
+      <ResendVerificationForm defaultEmail={pendingEmail} />
     </AuthFormCard>
   );
 }

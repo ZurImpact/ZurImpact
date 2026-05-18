@@ -41,7 +41,7 @@ export function RegisterPage() {
     );
 
     if (registerUser.fulfilled.match(result)) {
-      navigate(`${ROUTES.verifyEmail}?pending=1&email=${encodeURIComponent(submittedEmail)}`, {replace: true});
+      navigate(ROUTES.verifyEmail, {replace: true, state: {pendingEmail: submittedEmail}});
     }
   };
 
