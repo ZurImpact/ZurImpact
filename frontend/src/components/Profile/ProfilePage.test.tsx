@@ -4,6 +4,7 @@ import {MemoryRouter, Route, Routes} from 'react-router';
 import {renderWithProviders} from '../../test/test.utils';
 import {type DeepPartial, type RootState} from '../../store/store';
 import {ProfilePage} from './ProfilePage';
+import {resolveT} from '../../test/setup';
 
 vi.mock('../../api/userApi', () => ({
   changePassword: vi.fn(),
@@ -93,7 +94,7 @@ describe('ProfilePage', () => {
         },
       });
 
-      expect(screen.getByText('Verified')).toBeInTheDocument();
+      expect(screen.getByText(resolveT('profile.verifiedBadge'))).toBeInTheDocument();
     });
 
     it('renders formatted createdAt date', () => {
@@ -122,7 +123,7 @@ describe('ProfilePage', () => {
         },
       });
 
-      expect(screen.getByText('Not verified')).toBeInTheDocument();
+      expect(screen.getByText(resolveT('profile.notVerifiedBadge'))).toBeInTheDocument();
     });
   });
 

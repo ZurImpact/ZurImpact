@@ -3,6 +3,7 @@ import {screen} from '@testing-library/react';
 import {renderWithProviders} from '../../test/test.utils';
 import {BrowserRouter} from 'react-router';
 import {FaqPage} from './FaqPage';
+import {resolveT} from '../../test/setup';
 
 const renderFaqPage = () => {
   return renderWithProviders(
@@ -16,18 +17,18 @@ describe('FaqPage', () => {
   it('renders the header and subheader', async () => {
     renderFaqPage();
 
-    expect(await screen.findByText('Frequently Asked Questions')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('faq.header'))).toBeInTheDocument();
     expect(await screen.findByText(/Find answers to common questions about ZurImpact/)).toBeInTheDocument();
   });
 
   it('renders all FAQ items', async () => {
     renderFaqPage();
 
-    expect(await screen.findByText('How does ZurImpact work?')).toBeInTheDocument();
-    expect(await screen.findByText('What are Impact Points?')).toBeInTheDocument();
-    expect(await screen.findByText('How do I earn points?')).toBeInTheDocument();
-    expect(await screen.findByText('How do I redeem rewards?')).toBeInTheDocument();
-    expect(await screen.findByText('Is ZurImpact free to use?')).toBeInTheDocument();
-    expect(await screen.findByText('How is my impact measured?')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('faq.howItWorksTitle'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('faq.whatArePointsTitle'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('faq.howToEarnPointsTitle'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('faq.howToRedeemRewardsTitle'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('faq.isAppFreeTitle'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('faq.howIsImpactMeasuredTitle'))).toBeInTheDocument();
   });
 });

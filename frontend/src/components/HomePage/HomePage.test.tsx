@@ -3,6 +3,7 @@ import {screen} from '@testing-library/react';
 import {renderWithProviders} from '../../test/test.utils';
 import {BrowserRouter} from 'react-router';
 import {HomePage} from './HomePage';
+import {resolveT} from '../../test/setup';
 
 const renderHomePage = () =>
   renderWithProviders(
@@ -15,7 +16,7 @@ describe('HomePage', () => {
   it('renders the hero badge', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('Sustainable Tourism in Zürich')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.hero.badge'))).toBeInTheDocument();
   });
 
   it('renders the hero title lines', async () => {
@@ -50,27 +51,27 @@ describe('HomePage', () => {
   it('renders all stat labels', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('Active Participants')).toBeInTheDocument();
-    expect(await screen.findByText('Waste Collected')).toBeInTheDocument();
-    expect(await screen.findByText('Partner Venues')).toBeInTheDocument();
-    expect(await screen.findByText('Rewards Redeemed')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.statsParticipants'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.statsWasteCollected'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.statsPartnerVenues'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.statsRewardsRedeemed'))).toBeInTheDocument();
   });
 
   it('renders the how it works section title and subtitle', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('How It Works')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.howItWorksTitle'))).toBeInTheDocument();
     expect(await screen.findByText(/Making a positive impact is simple/)).toBeInTheDocument();
   });
 
   it('renders all three step titles and descriptions', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('Take Sustainable Actions')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.step1Title'))).toBeInTheDocument();
     expect(await screen.findByText(/track your eco-friendly activities/)).toBeInTheDocument();
-    expect(await screen.findByText('Earn Impact Points')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.step2Title'))).toBeInTheDocument();
     expect(await screen.findByText(/Each eco-friendly action earns you points/)).toBeInTheDocument();
-    expect(await screen.findByText('Redeem Rewards')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.step3Title'))).toBeInTheDocument();
     expect(await screen.findByText(/Exchange points for vouchers/)).toBeInTheDocument();
   });
 
@@ -85,24 +86,24 @@ describe('HomePage', () => {
   it('renders the featured activities section title and subtitle', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('Featured Activities')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featuredTitle'))).toBeInTheDocument();
     expect(await screen.findByText(/Choose from various eco-friendly activities/)).toBeInTheDocument();
   });
 
   it('renders all three featured activity point badges', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('+50 points')).toBeInTheDocument();
-    expect(await screen.findByText('+30 points')).toBeInTheDocument();
-    expect(await screen.findByText('+20 points')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featured1Points'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featured2Points'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featured3Points'))).toBeInTheDocument();
   });
 
   it('renders all three featured activity titles', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('Clean-Up Challenge')).toBeInTheDocument();
-    expect(await screen.findByText('Bike to Work')).toBeInTheDocument();
-    expect(await screen.findByText('Walk Around Zürich')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featured1Title'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featured2Title'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featured3Title'))).toBeInTheDocument();
   });
 
   it('renders all three featured activity descriptions', async () => {
@@ -124,7 +125,7 @@ describe('HomePage', () => {
   it('renders the CTA section title and subtitle', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('Ready to Make an Impact?')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.ctaTitle'))).toBeInTheDocument();
     expect(await screen.findByText(/Join thousands of people making Zürich more sustainable/)).toBeInTheDocument();
   });
 });

@@ -99,7 +99,7 @@ describe('RewardsPage', () => {
       },
     });
 
-    expect(screen.getByText('Loading rewards...')).toBeInTheDocument();
+    expect(screen.getByText(resolveT('rewardsPage.loading'))).toBeInTheDocument();
   });
 
   it('renders login prompt for unauthenticated users and retries auth', async () => {
@@ -125,9 +125,9 @@ describe('RewardsPage', () => {
       },
     });
 
-    expect(await screen.findByText('Login Required')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('rewardsPage.loginRequired'))).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'Try Again'}));
+    await user.click(screen.getByRole('button', {name: resolveT('rewardsPage.tryAgain')}));
 
     await waitFor(() => {
       const authCalls = mockGet.mock.calls.filter(([url]) => url === '/auth/whoami');
@@ -191,12 +191,12 @@ describe('RewardsPage', () => {
     const redeemButtons = await screen.findAllByRole('button', {name: 'Redeem'});
     await user.click(redeemButtons[0]);
 
-    expect(screen.getByText('Redeem Reward')).toBeInTheDocument();
+    expect(screen.getByText(resolveT('rewardsPage.redeemReward'))).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'Cancel'}));
+    await user.click(screen.getByRole('button', {name: resolveT('gpsActionDetail.cancel')}));
 
     await waitFor(() => {
-      expect(screen.queryByText('Redeem Reward')).not.toBeInTheDocument();
+      expect(screen.queryByText(resolveT('rewardsPage.redeemReward'))).not.toBeInTheDocument();
     });
   });
 
@@ -224,7 +224,7 @@ describe('RewardsPage', () => {
 
     const redeemButtons = await screen.findAllByRole('button', {name: 'Redeem'});
     await user.click(redeemButtons[0]);
-    await user.click(screen.getByRole('button', {name: 'Confirm Redemption'}));
+    await user.click(screen.getByRole('button', {name: resolveT('rewardsPage.confirmRedemptionBtn')}));
 
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith('/vouchers/r1/redeem');

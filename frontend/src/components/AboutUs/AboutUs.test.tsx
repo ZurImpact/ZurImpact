@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import {renderWithProviders} from '../../test/test.utils';
 import {BrowserRouter, MemoryRouter, Route, Routes} from 'react-router';
 import {AboutPage} from './AboutUs';
+import {resolveT} from '../../test/setup';
 
 const renderAboutPage = () =>
   renderWithProviders(
@@ -17,7 +18,7 @@ describe('AboutPage', () => {
   it('renders hero title', async () => {
     renderAboutPage();
 
-    expect(await screen.findByText('About Us')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('aboutPage.heroTitle'))).toBeInTheDocument();
   });
 
   it('renders hero image with alt text', async () => {
@@ -66,7 +67,7 @@ describe('AboutPage', () => {
       </MemoryRouter>,
     );
 
-    await user.click(await screen.findByText('Contact Us'));
+    await user.click(await screen.findByText(resolveT('aboutPage.ctaButton')));
     expect(await screen.findByText('Contact Page Content')).toBeInTheDocument();
   });
 });

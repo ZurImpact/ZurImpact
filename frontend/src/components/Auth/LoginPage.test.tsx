@@ -32,6 +32,7 @@ vi.mock('../../utility/i18n', () => ({
 }));
 
 import * as authApi from '../../api/authApi';
+import {resolveT} from '../../test/setup';
 
 function renderLoginPage(initialEntries = ['/login'], preloadedState?: DeepPartial<RootState>) {
   return renderWithProviders(
@@ -70,7 +71,7 @@ describe('LoginPage', () => {
       renderLoginPage();
 
       // Use heading role to distinguish from the submit button which also says "Sign in"
-      expect(screen.getByRole('heading', {name: 'Sign in'})).toBeInTheDocument();
+      expect(screen.getByRole('heading', {name: resolveT('rootLayout.signIn')})).toBeInTheDocument();
     });
 
     it('renders a link to /register', () => {

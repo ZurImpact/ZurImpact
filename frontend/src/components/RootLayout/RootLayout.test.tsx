@@ -4,6 +4,7 @@ import {MemoryRouter, Route, Routes} from 'react-router';
 import userEvent from '@testing-library/user-event';
 import {renderWithProviders} from '../../test/test.utils';
 import {RootLayout} from './RootLayout';
+import {resolveT} from '../../test/setup';
 
 const mockApiGet = vi.hoisted(() => vi.fn());
 const mockApiPost = vi.hoisted(() => vi.fn());
@@ -45,13 +46,13 @@ describe('RootLayout', () => {
   it('renders the app name translation key', async () => {
     renderWithRouter();
 
-    expect(await screen.findByText('ZurImpact')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('appName'))).toBeInTheDocument();
   });
 
   it('renders the dashboard navigation link', async () => {
     renderWithRouter();
 
-    expect(await screen.findByText('Dashboard')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('rootLayout.dashboard'))).toBeInTheDocument();
   });
 
   it('renders the Sign out button when authenticated', async () => {
@@ -130,7 +131,7 @@ describe('RootLayout', () => {
   it('highlights dashboard link when on dashboard route', async () => {
     renderWithRouter('/dashboard');
 
-    const dashboardLink = await screen.findByText('Dashboard');
+    const dashboardLink = await screen.findByText(resolveT('rootLayout.dashboard'));
     expect(dashboardLink).toHaveClass('text-brand');
   });
 });

@@ -4,6 +4,7 @@ import {BrowserRouter} from 'react-router';
 import {renderWithProviders} from '../../test/test.utils';
 import {ActionDashboard} from './ActionDashboard';
 import type {ActionDto} from '../../store/slices/ActionSlice';
+import {resolveT} from '../../test/setup';
 
 const mockGet = vi.fn();
 
@@ -64,8 +65,8 @@ describe('ActionDashboard', () => {
     mockGet.mockResolvedValue({data: []});
     renderAuthenticatedDashboard();
 
-    expect(await screen.findByText('Activities')).toBeInTheDocument();
-    expect(await screen.findByText('Log your sustainable activities and earn points')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('actionDashboard.header'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('actionDashboard.subheader'))).toBeInTheDocument();
   });
 
   it('shows loading state while fetching', () => {
@@ -73,7 +74,7 @@ describe('ActionDashboard', () => {
     mockGet.mockReturnValue(new Promise(() => {}));
     renderAuthenticatedDashboard();
 
-    expect(screen.getByText('Loading actions...')).toBeInTheDocument();
+    expect(screen.getByText(resolveT('actionDashboard.loading'))).toBeInTheDocument();
   });
 
   it('shows empty state when API returns no actions', async () => {
@@ -81,9 +82,7 @@ describe('ActionDashboard', () => {
     renderAuthenticatedDashboard();
 
     await waitFor(() => {
-      expect(
-        screen.getByText("You haven't completed any actions yet. Start making an impact today!"),
-      ).toBeInTheDocument();
+      expect(screen.getByText(resolveT('actionDashboard.noActions'))).toBeInTheDocument();
     });
   });
 
@@ -122,7 +121,7 @@ describe('ActionDashboard', () => {
     mockGet.mockResolvedValue({data: []});
     renderAuthenticatedDashboard();
 
-    expect(await screen.findByText('Your Activity History')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('actionDashboard.historyTitle'))).toBeInTheDocument();
   });
 
   it('shows login prompt when user is not authenticated', () => {
@@ -142,6 +141,6 @@ describe('ActionDashboard', () => {
       },
     );
 
-    expect(screen.getByText('Please login first.')).toBeInTheDocument();
+    expect(screen.getByText(resolveT('actionDashboard.loginPrompt'))).toBeInTheDocument();
   });
 });

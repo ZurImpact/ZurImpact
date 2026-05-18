@@ -175,7 +175,7 @@ describe('GpsActionDetailPage', () => {
 
     expect(await screen.findByText('GPS City Walk')).toBeInTheDocument();
     expect(await screen.findByText('Visit all checkpoints')).toBeInTheDocument();
-    expect(await screen.findByRole('button', {name: 'Start Action'})).toBeInTheDocument();
+    expect(await screen.findByRole('button', {name: resolveT('gpsActionDetail.startAction')})).toBeInTheDocument();
     expect(await screen.findByText(/0 \/ 2/)).toBeInTheDocument();
 
     await waitFor(() => {
@@ -204,7 +204,7 @@ describe('GpsActionDetailPage', () => {
     expect(await screen.findByText('Continue where you left off')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.queryByRole('button', {name: 'Start Action'})).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: resolveT('gpsActionDetail.startAction')})).not.toBeInTheDocument();
     });
   });
 
@@ -231,7 +231,7 @@ describe('GpsActionDetailPage', () => {
 
     expect(await screen.findByText('Failed to fetch')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'Back to Dashboard'}));
+    await user.click(screen.getByRole('button', {name: resolveT('gpsActionDetail.back')}));
     expect(navigateMock).toHaveBeenCalledWith('/dashboard');
   });
 
@@ -242,10 +242,10 @@ describe('GpsActionDetailPage', () => {
       actions: createActionState(),
     });
 
-    await user.click(await screen.findByRole('button', {name: 'Start Action'}));
-    expect(screen.getByText('Start this action?')).toBeInTheDocument();
+    await user.click(await screen.findByRole('button', {name: resolveT('gpsActionDetail.startAction')}));
+    expect(screen.getByText(resolveT('gpsActionDetail.startDialogTitle'))).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: "Yes, I'm ready to start"}));
+    await user.click(screen.getByRole('button', {name: resolveT('gpsActionDetail.confirmStart')}));
 
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith('/actions/startAction', null, {
@@ -270,8 +270,8 @@ describe('GpsActionDetailPage', () => {
       actions: createActionState(),
     });
 
-    await user.click(await screen.findByRole('button', {name: 'Start Action'}));
-    await user.click(screen.getByRole('button', {name: "Yes, I'm ready to start"}));
+    await user.click(await screen.findByRole('button', {name: resolveT('gpsActionDetail.startAction')}));
+    await user.click(screen.getByRole('button', {name: resolveT('gpsActionDetail.confirmStart')}));
 
     await waitFor(() => {
       expect(mockToastError).toHaveBeenCalledWith(resolveT('gpsActionDetail.startError'));
@@ -285,8 +285,8 @@ describe('GpsActionDetailPage', () => {
       actions: createActionState(),
     });
 
-    await user.click(await screen.findByRole('button', {name: 'Start Action'}));
-    await user.click(screen.getByRole('button', {name: "Yes, I'm ready to start"}));
+    await user.click(await screen.findByRole('button', {name: resolveT('gpsActionDetail.startAction')}));
+    await user.click(screen.getByRole('button', {name: resolveT('gpsActionDetail.confirmStart')}));
 
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith('/actions/startAction', null, {
@@ -295,7 +295,7 @@ describe('GpsActionDetailPage', () => {
     });
 
     await waitFor(() => {
-      expect(screen.queryByRole('button', {name: 'Start Action'})).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: resolveT('gpsActionDetail.startAction')})).not.toBeInTheDocument();
     });
 
     await act(async () => {
@@ -360,7 +360,7 @@ describe('GpsActionDetailPage', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('All checkpoints reached!')).toBeInTheDocument();
+      expect(screen.getByText(resolveT('gpsActionDetail.allCheckpointsReached'))).toBeInTheDocument();
     });
   }, 30000);
 
@@ -428,8 +428,8 @@ describe('GpsActionDetailPage', () => {
       );
       const user = userEvent.setup();
       renderPage({actions: {...createActionState(), selectedAction: fixture}});
-      await user.click(await screen.findByRole('button', {name: 'Start Action'}));
-      await user.click(screen.getByRole('button', {name: "Yes, I'm ready to start"}));
+      await user.click(await screen.findByRole('button', {name: resolveT('gpsActionDetail.startAction')}));
+      await user.click(screen.getByRole('button', {name: resolveT('gpsActionDetail.confirmStart')}));
       await waitFor(() => {
         expect(mockPost).toHaveBeenCalledWith('/actions/startAction', null, {
           params: {userId: 5, actionId: 1},
@@ -464,8 +464,8 @@ describe('GpsActionDetailPage', () => {
       });
       const user = userEvent.setup();
       renderPage({actions: {...createActionState(), selectedAction: fixture}});
-      await user.click(await screen.findByRole('button', {name: 'Start Action'}));
-      await user.click(screen.getByRole('button', {name: "Yes, I'm ready to start"}));
+      await user.click(await screen.findByRole('button', {name: resolveT('gpsActionDetail.startAction')}));
+      await user.click(screen.getByRole('button', {name: resolveT('gpsActionDetail.confirmStart')}));
       await waitFor(() => {
         expect(mockPost).toHaveBeenCalledWith('/actions/startAction', null, {
           params: {userId: 5, actionId: 1},
@@ -488,8 +488,8 @@ describe('GpsActionDetailPage', () => {
       );
       const user = userEvent.setup();
       renderPage({actions: {...createActionState(), selectedAction: fixture}});
-      await user.click(await screen.findByRole('button', {name: 'Start Action'}));
-      await user.click(screen.getByRole('button', {name: "Yes, I'm ready to start"}));
+      await user.click(await screen.findByRole('button', {name: resolveT('gpsActionDetail.startAction')}));
+      await user.click(screen.getByRole('button', {name: resolveT('gpsActionDetail.confirmStart')}));
       await waitFor(() => {
         expect(mockPost).toHaveBeenCalledWith('/actions/startAction', null, {
           params: {userId: 5, actionId: 1},

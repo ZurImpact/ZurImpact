@@ -66,7 +66,7 @@ describe('MapTrackingPage', () => {
   it('renders header and start tracking button', () => {
     renderWithProviders(<MapTrackingPage />);
 
-    expect(screen.getByText('Track Your Route')).toBeInTheDocument();
+    expect(screen.getByText(resolveT('actionDetail.header'))).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /start tracking/i})).toBeInTheDocument();
     expect(screen.getByTestId('map-container')).toBeInTheDocument();
   });
