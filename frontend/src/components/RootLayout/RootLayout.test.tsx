@@ -1,7 +1,6 @@
 import {describe, it, expect, vi, beforeEach} from 'vitest';
-import {screen, waitFor} from '@testing-library/react';
+import {screen} from '@testing-library/react';
 import {MemoryRouter, Route, Routes} from 'react-router';
-import userEvent from '@testing-library/user-event';
 import {renderWithProviders} from '../../test/test.utils';
 import {RootLayout} from './RootLayout';
 import {resolveT} from '../../test/setup';
@@ -77,23 +76,6 @@ describe('RootLayout', () => {
     });
 
     expect(await screen.findByRole('button', {name: /sign out/i})).toBeInTheDocument();
-  });
-
-  it('calls dev login endpoint via dev login button and fetches current user', async () => {
-    const user = userEvent.setup();
-    mockApiGet.mockReset();
-    mockApiGet
-      .mockResolvedValueOnce({data: {id: 1}})
-      .mockResolvedValueOnce({data: {id: 1, username: 'Test User', email: 'test@test.com', points: 123}});
-
-    renderWithRouter();
-
-    const devLoginButton = await screen.findByRole('button', {name: /dev login/i});
-    await user.click(devLoginButton);
-
-    await waitFor(() => {
-      expect(mockApiPost).toHaveBeenCalledWith('/auth/dev-login', {username: 'alice'});
-    });
   });
 
   it('renders points display', async () => {

@@ -172,36 +172,4 @@ describe('Navigation', () => {
       });
     });
   });
-
-  describe('dev login button', () => {
-    it('dev login button calls dev-login endpoint and dispatches fetchCurrentUser when clicked', async () => {
-      const user = userEvent.setup();
-      mockApiGet.mockResolvedValueOnce({data: {id: 1}}).mockResolvedValueOnce({
-        data: {
-          id: 1,
-          username: 'alice',
-          email: 'alice@example.com',
-          role: 'USER',
-          emailVerified: true,
-          points: 42,
-          address: null,
-          createdAt: null,
-        },
-      });
-
-      renderNavigation(unauthenticatedState);
-
-      const devButton = screen.queryByRole('button', {name: /dev login/i});
-      if (!devButton) {
-        // Dev button is hidden in test env when import.meta.env.DEV is false — skip
-        return;
-      }
-
-      await user.click(devButton);
-
-      await waitFor(() => {
-        expect(mockApiPost).toHaveBeenCalledWith('/auth/dev-login', {username: 'alice'});
-      });
-    });
-  });
 });

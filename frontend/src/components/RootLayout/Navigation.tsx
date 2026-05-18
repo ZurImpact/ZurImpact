@@ -2,11 +2,8 @@ import {Link, useLocation, useNavigate} from 'react-router';
 import {Mountain, Award, Menu, Moon, Sun, LogOut, LogIn, User} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from 'next-themes';
-import {useState} from 'react';
 import {Sheet, SheetContent, SheetTrigger} from '../ui/sheet';
 import {Button} from '../ui/button';
-import apiClient from '../../api/apiClient';
-import {fetchCurrentUser} from '../../store/slices/UserSlice';
 import {logoutUser} from '../../store/slices/AuthSlice';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {ROUTES} from '../../routes';
@@ -17,8 +14,7 @@ export const Navigation = () => {
   const {t} = useTranslation();
   const {theme, setTheme} = useTheme();
   const dispatch = useAppDispatch();
-  const {currentUser, isAuthenticated, loading} = useAppSelector((s) => s.user);
-  const [isDevLoggingIn, setIsDevLoggingIn] = useState(false);
+  const {currentUser, isAuthenticated} = useAppSelector((s) => s.user);
   const points = currentUser?.points ?? 0;
 
   const navLinks = [
@@ -68,17 +64,6 @@ export const Navigation = () => {
         {link.label}
       </Link>
     ));
-  };
-
-  const handleDevLogin = async () => {
-    setIsDevLoggingIn(true);
-    try {
-      await apiClient.post('/auth/dev-login', {username: 'alice'});
-      await dispatch(fetchCurrentUser());
-      navigate(ROUTES.dashboard);
-    } finally {
-      setIsDevLoggingIn(false);
-    }
   };
 
   const handleSignOut = async () => {
@@ -133,21 +118,6 @@ export const Navigation = () => {
     );
   };
 
-  const renderDevLoginButton = () => {
-    if (!import.meta.env.DEV) return null;
-    return (
-      <Button
-        variant="ghost"
-        size="sm"
-        className="text-xs text-muted-foreground"
-        onClick={() => void handleDevLogin()}
-        disabled={loading || isDevLoggingIn}
-      >
-        {t('rootLayout.devLogin')}
-      </Button>
-    );
-  };
-
   const renderPointsDisplay = () => {
     if (!isAuthenticated) return null;
     return (
@@ -172,7 +142,6 @@ export const Navigation = () => {
             <div className="flex items-center gap-3">
               {renderPointsDisplay()}
               {renderAuthControls()}
-              {renderDevLoginButton()}
             </div>
           </div>
           <div className="flex md:hidden items-center gap-4">
@@ -192,7 +161,6 @@ export const Navigation = () => {
                   <div className="mt-4 flex flex-col gap-3 pr-8">
                     {renderPointsDisplay()}
                     {renderAuthControls('w-full flex-col')}
-                    {renderDevLoginButton()}
                   </div>
                 </div>
               </SheetContent>
