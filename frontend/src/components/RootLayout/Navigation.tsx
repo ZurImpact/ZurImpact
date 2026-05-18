@@ -56,10 +56,10 @@ export const Navigation = () => {
         to={link.to}
         className={
           mobile
-            ? `text-lg hover:text-brand transition-colors ${
+            ? `text-lg hover:text-brand transition-colors whitespace-nowrap ${
                 location.pathname === link.to ? 'text-brand font-semibold' : 'text-muted-foreground'
               }`
-            : `hover:text-brand transition-colors ${
+            : `hover:text-brand transition-colors whitespace-nowrap ${
                 location.pathname === link.to ? 'text-brand' : 'text-muted-foreground'
               }`
         }
@@ -90,22 +90,22 @@ export const Navigation = () => {
     if (isAuthenticated) {
       return (
         <div className={`flex items-center gap-2 ${className}`.trim()}>
-          <span className="text-sm font-medium">{currentUser?.username}</span>
+          <span className="text-sm font-medium whitespace-nowrap">{currentUser?.username}</span>
           <Link
             to={ROUTES.profile}
-            className="flex items-center gap-1 text-sm hover:text-brand transition-colors"
+            className="flex items-center gap-1 text-sm hover:text-brand transition-colors whitespace-nowrap"
             aria-label={t('rootLayout.profile')}
           >
-            <User className="h-4 w-4" aria-hidden="true" />
+            <User className="h-4 w-4 shrink-0" aria-hidden="true" />
             {t('rootLayout.profile')}
           </Link>
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center gap-2 bg-card border"
+            className="flex items-center gap-2 bg-card border whitespace-nowrap"
             onClick={() => void handleSignOut()}
           >
-            <LogOut className="h-4 w-4" aria-hidden="true" />
+            <LogOut className="h-4 w-4 shrink-0" aria-hidden="true" />
             {t('rootLayout.signOut')}
           </Button>
         </div>
@@ -116,15 +116,15 @@ export const Navigation = () => {
       <div className={`flex items-center gap-2 ${className}`.trim()}>
         <Link
           to={ROUTES.login}
-          className="flex items-center gap-1 text-sm hover:text-brand transition-colors"
+          className="flex items-center gap-1 text-sm hover:text-brand transition-colors whitespace-nowrap"
           aria-label={t('rootLayout.signIn')}
         >
-          <LogIn className="h-4 w-4" aria-hidden="true" />
+          <LogIn className="h-4 w-4 shrink-0" aria-hidden="true" />
           {t('rootLayout.signIn')}
         </Link>
         <Link
           to={ROUTES.register}
-          className="flex items-center gap-1 text-sm hover:text-brand transition-colors"
+          className="flex items-center gap-1 text-sm hover:text-brand transition-colors whitespace-nowrap"
           aria-label={t('rootLayout.signUp')}
         >
           {t('rootLayout.signUp')}
@@ -151,9 +151,9 @@ export const Navigation = () => {
   const renderPointsDisplay = () => {
     if (!isAuthenticated) return null;
     return (
-      <div className="flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full">
-        <Award className="h-4 w-4 text-on-brand-container" aria-hidden="true" />
-        <span className="font-medium text-on-brand-container">{`${points} ${t('points')}`}</span>
+      <div className="flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full shrink-0 whitespace-nowrap">
+        <Award className="h-4 w-4 text-on-brand-container shrink-0" aria-hidden="true" />
+        <span className="font-medium text-on-brand-container whitespace-nowrap">{`${points} ${t('points')}`}</span>
       </div>
     );
   };
@@ -162,11 +162,11 @@ export const Navigation = () => {
     <nav className="bg-background border-b sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 shrink-0">
             <Mountain className="h-8 w-8 text-brand" />
-            <span className="text-2xl font-bold text-brand">{t('appName')}</span>
+            <span className="text-2xl font-bold text-brand whitespace-nowrap">{t('appName')}</span>
           </Link>
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4 lg:gap-6 ml-6">
             {renderNavLinks()}
             {renderThemeButton()}
             <div className="flex items-center gap-3">
