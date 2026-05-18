@@ -50,15 +50,24 @@ public class UserController {
 
     @GetMapping("/{id}/actions")
     @Operation(summary = "Get user action history", description = "Returns the action history for a user, optionally filtered by completion state.")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.userId")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserActionHistoryDto>> getUserActions(
             @PathVariable("id") Long id,
             @RequestParam(name = "active", required = false, defaultValue = "false") Boolean active) {
-        try {
-            return ResponseEntity.ok(userActionHistoryService.getUserActions(id, active));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        return getActionsForUser(id, active);
+    }
+
+    @GetMapping("/me/actions")
+    @Operation(summary = "Get my action history", description = "Returns the action history for the authenticated user, optionally filtered by completion state.")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<UserActionHistoryDto>> getMyActions(
+            @RequestParam(name = "active", required = false, defaultValue = "false") Boolean active,
+            Authentication authentication) {
+        Long userId = currentUserResolver.userIdOf(authentication);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
+        return getActionsForUser(userId, active);
     }
 
     @PostMapping("/me/password-change")
@@ -76,5 +85,13 @@ public class UserController {
             case WRONG_CURRENT -> ResponseEntity.badRequest().body(Map.of("message", "wrong_current_password"));
             case USER_NOT_FOUND -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Not authenticated"));
         };
+    }
+
+    private ResponseEntity<List<UserActionHistoryDto>> getActionsForUser(Long userId, Boolean active) {
+        try {
+            return ResponseEntity.ok(userActionHistoryService.getUserActions(userId, active));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

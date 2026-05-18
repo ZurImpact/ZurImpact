@@ -20,7 +20,7 @@ public class UserActionHistoryServiceImpl implements UserActionHistoryService{
      * @return all actions done by that user
      */
     @Override
-    public List<UserActionHistoryDto> getUserActions(Long userId, Boolean active){
+    public List<UserActionHistoryDto> getUserActions(Long userId, Boolean active) {
         return UserActionHistoryMapper.toDtoList(userActionHistoryDao.findUserActionHistory(userId, active));
     }
 }
