@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import {RewardsPage} from './Rewardspage';
 import {renderWithProviders} from '../../test/test.utils';
 import type {DeepPartial, RootState} from '../../store/store';
-import {mockToastSuccess, mockToastError} from '../../test/setup';
+import {mockToastSuccess, mockToastError, resolveT} from '../../test/setup';
 const mockGet = vi.fn();
 const mockPost = vi.fn();
 
@@ -254,7 +254,7 @@ describe('RewardsPage', () => {
     });
 
     await waitFor(() => {
-      expect(mockToastSuccess).toHaveBeenCalledWith('Reward redeemed successfully!');
+      expect(mockToastSuccess).toHaveBeenCalledWith(resolveT('rewardsPage.redeemSuccess'));
     });
 
     await waitFor(() => {

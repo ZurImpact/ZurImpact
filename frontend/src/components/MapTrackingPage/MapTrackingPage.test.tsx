@@ -3,7 +3,7 @@ import {screen, act} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MapTrackingPage} from './MapTrackingPage';
 import {renderWithProviders} from '../../test/test.utils';
-import {mockToastSuccess, mockToastError} from '../../test/setup';
+import {mockToastSuccess, mockToastError, resolveT} from '../../test/setup';
 
 const watchPositionMock = vi.fn();
 const clearWatchMock = vi.fn();
@@ -83,7 +83,7 @@ describe('MapTrackingPage', () => {
 
     await user.click(screen.getByRole('button', {name: /start tracking/i}));
 
-    expect(mockToastError).toHaveBeenCalledWith('Geolocation is not supported by your browser');
+    expect(mockToastError).toHaveBeenCalledWith(resolveT('actionDetail.geolocationError'));
   });
 
   it('starts, tracks distance, and stops with saved activity toast', async () => {

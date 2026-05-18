@@ -14,7 +14,15 @@ export const mockToastError = vi.fn();
  *
  * Falls back to returning the key itself when no translation is found (safe
  * for keys not yet in the JSON, and consistent with the previous behaviour).
+ *
+ * Exported as `resolveT` so tests can assert against the translation of a key
+ * (e.g. `expect(toast).toHaveBeenCalledWith(resolveT('action.completed'))`)
+ * instead of hardcoding the English copy.
  */
+export function resolveT(key: string, options?: Record<string, unknown>): string {
+  return resolveKey(key, options);
+}
+
 function resolveKey(key: string, options?: Record<string, unknown>): string {
   const parts = key.split('.');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -5,7 +5,7 @@ import {MemoryRouter} from 'react-router';
 import {GpsActionDetailPage} from './GpsActionDetailPage';
 import {renderWithProviders} from '../../test/test.utils';
 import type {DeepPartial, RootState} from '../../store/store';
-import {mockToastSuccess, mockToastError} from '../../test/setup';
+import {mockToastSuccess, mockToastError, resolveT} from '../../test/setup';
 
 const navigateMock = vi.fn();
 const mockGet = vi.fn();
@@ -253,7 +253,7 @@ describe('GpsActionDetailPage', () => {
       });
     });
 
-    expect(mockToastSuccess).toHaveBeenCalledWith('Action started! Complete all checkpoints to earn points.');
+    expect(mockToastSuccess).toHaveBeenCalledWith(resolveT('gpsActionDetail.actionStarted'));
   });
 
   it('shows error toast when start action fails', async () => {
@@ -274,7 +274,7 @@ describe('GpsActionDetailPage', () => {
     await user.click(screen.getByRole('button', {name: "Yes, I'm ready to start"}));
 
     await waitFor(() => {
-      expect(mockToastError).toHaveBeenCalledWith('Failed to start action. Please try again.');
+      expect(mockToastError).toHaveBeenCalledWith(resolveT('gpsActionDetail.startError'));
     });
   });
 
@@ -356,7 +356,7 @@ describe('GpsActionDetailPage', () => {
 
     // Wrap final assertions in waitFor so we don't race against the React commit that updates the DOM after `completeAction` resolves.
     await waitFor(() => {
-      expect(mockToastSuccess).toHaveBeenCalledWith("Action completed! You've earned points!");
+      expect(mockToastSuccess).toHaveBeenCalledWith(resolveT('gpsActionDetail.actionCompleted'));
     });
 
     await waitFor(() => {
@@ -374,7 +374,7 @@ describe('GpsActionDetailPage', () => {
       actions: createActionState(),
     });
 
-    expect(mockToastError).toHaveBeenCalledWith('Geolocation is not supported by your browser');
+    expect(mockToastError).toHaveBeenCalledWith(resolveT('gpsActionDetail.geolocationError'));
   });
 
   it('handles geolocation watch error callback', async () => {
@@ -389,7 +389,7 @@ describe('GpsActionDetailPage', () => {
       watchErrorCallback?.({message: 'location unavailable'} as GeolocationPositionError);
     });
 
-    expect(mockToastError).toHaveBeenCalledWith('Error getting location');
+    expect(mockToastError).toHaveBeenCalledWith(resolveT('gpsActionDetail.locationError'));
   });
 
   describe('per-checkpoint distance threshold', () => {
