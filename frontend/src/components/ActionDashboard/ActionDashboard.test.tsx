@@ -4,7 +4,8 @@ import {BrowserRouter} from 'react-router';
 import {renderWithProviders} from '../../test/test.utils';
 import {ActionDashboard} from './ActionDashboard';
 import type {ActionDto} from '../../store/slices/ActionSlice';
-import type {UserRole} from '../../store/slices/UserSlice';
+import type {UserDto, UserRole} from '../../store/slices/UserSlice';
+import {resolveT} from '../../test/setup';
 
 const mockGet = vi.fn();
 
@@ -34,6 +35,17 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+const baseUser: UserDto = {
+  id: 1,
+  username: 'testuser',
+  email: 'test@example.com',
+  role: 'USER',
+  emailVerified: true,
+  points: 100,
+  address: null,
+  createdAt: null,
+};
+
 const renderAuthenticatedDashboard = () =>
   renderWithProviders(
     <BrowserRouter>
@@ -42,7 +54,7 @@ const renderAuthenticatedDashboard = () =>
     {
       preloadedState: {
         user: {
-          currentUser: {id: 1, username: 'Test User', email: 'test@example.com', points: 100},
+          currentUser: baseUser,
           roles: [],
           isAuthenticated: true,
           loading: false,
@@ -60,7 +72,7 @@ const renderAuthenticatedDashboardWithRoles = (roles: UserRole[]) =>
     {
       preloadedState: {
         user: {
-          currentUser: {id: 1, username: 'Test User', email: 'test@example.com', points: 100},
+          currentUser: baseUser,
           roles,
           isAuthenticated: true,
           loading: false,
@@ -75,8 +87,8 @@ describe('ActionDashboard', () => {
     mockGet.mockResolvedValue({data: []});
     renderAuthenticatedDashboard();
 
-    expect(await screen.findByText('actionDashboard.header')).toBeInTheDocument();
-    expect(await screen.findByText('actionDashboard.subheader')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('actionDashboard.header'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('actionDashboard.subheader'))).toBeInTheDocument();
   });
 
   it('shows loading state while fetching', () => {
@@ -84,7 +96,7 @@ describe('ActionDashboard', () => {
     mockGet.mockReturnValue(new Promise(() => {}));
     renderAuthenticatedDashboard();
 
-    expect(screen.getByText('actionDashboard.loading')).toBeInTheDocument();
+    expect(screen.getByText(resolveT('actionDashboard.loading'))).toBeInTheDocument();
   });
 
   it('shows empty state when API returns no actions', async () => {
@@ -92,7 +104,7 @@ describe('ActionDashboard', () => {
     renderAuthenticatedDashboard();
 
     await waitFor(() => {
-      expect(screen.getByText('actionDashboard.noActions')).toBeInTheDocument();
+      expect(screen.getByText(resolveT('actionDashboard.noActions'))).toBeInTheDocument();
     });
   });
 
@@ -110,7 +122,7 @@ describe('ActionDashboard', () => {
   it('renders user action history with points', async () => {
     mockGet.mockImplementation((url: string) => {
       if (url === '/actions') return Promise.resolve({data: mockActions});
-      if (url.includes('getUserActions')) return Promise.resolve({data: mockUserActions});
+      if (url.includes('/users/') && url.includes('/actions')) return Promise.resolve({data: mockUserActions});
       return Promise.resolve({data: []});
     });
     renderAuthenticatedDashboard();
@@ -131,21 +143,21 @@ describe('ActionDashboard', () => {
     mockGet.mockResolvedValue({data: []});
     renderAuthenticatedDashboard();
 
-    expect(await screen.findByText('actionDashboard.historyTitle')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('actionDashboard.historyTitle'))).toBeInTheDocument();
   });
 
   it('shows create action button for admin users', async () => {
     mockGet.mockResolvedValue({data: []});
     renderAuthenticatedDashboardWithRoles(['ADMIN']);
 
-    expect(await screen.findByRole('button', {name: 'actionDashboard.createAction'})).toBeInTheDocument();
+    expect(await screen.findByRole('button', {name: resolveT('actionDashboard.createAction')})).toBeInTheDocument();
   });
 
   it('hides create action button for regular users', async () => {
     mockGet.mockResolvedValue({data: []});
     renderAuthenticatedDashboardWithRoles(['ROLE_USER']);
 
-    expect(screen.queryByRole('button', {name: 'actionDashboard.createAction'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: resolveT('actionDashboard.createAction')})).not.toBeInTheDocument();
   });
 
   it('shows login prompt when user is not authenticated', () => {
@@ -157,6 +169,7 @@ describe('ActionDashboard', () => {
         preloadedState: {
           user: {
             currentUser: null,
+            roles: [],
             isAuthenticated: false,
             loading: false,
             error: null,
@@ -165,6 +178,6 @@ describe('ActionDashboard', () => {
       },
     );
 
-    expect(screen.getByText('actionDashboard.loginPrompt')).toBeInTheDocument();
+    expect(screen.getByText(resolveT('actionDashboard.loginPrompt'))).toBeInTheDocument();
   });
 });

@@ -3,7 +3,7 @@ import {screen, act} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MapTrackingPage} from './MapTrackingPage';
 import {renderWithProviders} from '../../test/test.utils';
-import {mockToastSuccess, mockToastError} from '../../test/setup';
+import {mockToastSuccess, mockToastError, resolveT} from '../../test/setup';
 
 const watchPositionMock = vi.fn();
 const clearWatchMock = vi.fn();
@@ -66,8 +66,8 @@ describe('MapTrackingPage', () => {
   it('renders header and start tracking button', () => {
     renderWithProviders(<MapTrackingPage />);
 
-    expect(screen.getByText('actionDetail.header')).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: /actionDetail.startTracking/})).toBeInTheDocument();
+    expect(screen.getByText(resolveT('actionDetail.header'))).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /start tracking/i})).toBeInTheDocument();
     expect(screen.getByTestId('map-container')).toBeInTheDocument();
   });
 
@@ -81,9 +81,9 @@ describe('MapTrackingPage', () => {
 
     renderWithProviders(<MapTrackingPage />);
 
-    await user.click(screen.getByRole('button', {name: /actionDetail.startTracking/}));
+    await user.click(screen.getByRole('button', {name: /start tracking/i}));
 
-    expect(mockToastError).toHaveBeenCalledWith('actionDetail.geolocationError');
+    expect(mockToastError).toHaveBeenCalledWith(resolveT('actionDetail.geolocationError'));
   });
 
   it('starts, tracks distance, and stops with saved activity toast', async () => {
@@ -91,7 +91,7 @@ describe('MapTrackingPage', () => {
 
     renderWithProviders(<MapTrackingPage />);
 
-    await user.click(screen.getByRole('button', {name: /actionDetail.startTracking/}));
+    await user.click(screen.getByRole('button', {name: /start tracking/i}));
 
     expect(watchPositionMock).toHaveBeenCalledTimes(1);
     expect(screen.getByText('Currently Tracking')).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe('MapTrackingPage', () => {
 
     renderWithProviders(<MapTrackingPage />);
 
-    await user.click(screen.getByRole('button', {name: /actionDetail.startTracking/}));
+    await user.click(screen.getByRole('button', {name: /start tracking/i}));
 
     await act(async () => {
       watchErrorCallback?.({message: 'Permission denied'} as GeolocationPositionError);

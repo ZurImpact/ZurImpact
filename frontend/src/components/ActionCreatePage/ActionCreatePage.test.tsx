@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router';
 import {ActionCreatePage} from './ActionCreatePage';
 import {renderWithProviders} from '../../test/test.utils';
+import {resolveT} from '../../test/setup';
 
 const navigateMock = vi.fn();
 const mockPost = vi.fn();
@@ -66,7 +67,17 @@ const renderPage = () =>
     {
       preloadedState: {
         user: {
-          currentUser: {id: 1, username: 'Test User', email: 'test@example.com', points: 100},
+          currentUser: {
+            id: 1,
+            username: 'Test User',
+            email: 'test@example.com',
+            role: 'USER',
+            emailVerified: true,
+            points: 100,
+            address: null,
+            createdAt: null,
+          },
+          roles: [],
           isAuthenticated: true,
           loading: false,
           error: null,
@@ -79,11 +90,11 @@ describe('ActionCreatePage', () => {
   it('renders the GPS action creation form', () => {
     renderPage();
 
-    expect(screen.getByRole('heading', {name: 'actionCreatePage.header', level: 1})).toBeInTheDocument();
-    expect(screen.getByText('actionCreatePage.badge', {selector: 'span'})).toBeInTheDocument();
-    expect(screen.getByLabelText('actionCreatePage.actionNameLabel')).toBeInTheDocument();
+    expect(screen.getByRole('heading', {name: resolveT('actionCreatePage.header'), level: 1})).toBeInTheDocument();
+    expect(screen.getByText(resolveT('actionCreatePage.badge'), {selector: 'span'})).toBeInTheDocument();
+    expect(screen.getByLabelText(resolveT('actionCreatePage.actionNameLabel'))).toBeInTheDocument();
     expect(screen.getByTestId('checkpoint-map')).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'actionCreatePage.submit'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: resolveT('actionCreatePage.submit')})).toBeInTheDocument();
   });
 
   it('submits a GPS-only action payload and navigates to the created action', async () => {
@@ -92,20 +103,20 @@ describe('ActionCreatePage', () => {
 
     renderPage();
 
-    await user.type(screen.getByLabelText('actionCreatePage.actionNameLabel'), 'Walk to the Museum');
+    await user.type(screen.getByLabelText(resolveT('actionCreatePage.actionNameLabel')), 'Walk to the Museum');
     await user.type(
-      screen.getByLabelText('actionCreatePage.descriptionLabel'),
+      screen.getByLabelText(resolveT('actionCreatePage.descriptionLabel')),
       'Visit checkpoints around the old town',
     );
-    await user.type(screen.getByLabelText('actionCreatePage.pointsLabel'), '75');
-    await user.type(screen.getByLabelText('actionCreatePage.validUntilLabel'), '2026-05-14');
-    await user.type(screen.getByLabelText('actionCreatePage.checkpointNameLabel'), 'Start: Main Square');
+    await user.type(screen.getByLabelText(resolveT('actionCreatePage.pointsLabel')), '75');
+    await user.type(screen.getByLabelText(resolveT('actionCreatePage.validUntilLabel')), '2026-05-14');
+    await user.type(screen.getByLabelText(resolveT('actionCreatePage.checkpointNameLabel')), 'Start: Main Square');
 
     await act(async () => {
       mapClickHandler?.({latlng: {lat: 47.3769, lng: 8.5417}});
     });
 
-    await user.click(screen.getByRole('button', {name: 'actionCreatePage.submit'}));
+    await user.click(screen.getByRole('button', {name: resolveT('actionCreatePage.submit')}));
 
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith(

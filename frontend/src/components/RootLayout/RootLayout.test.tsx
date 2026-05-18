@@ -1,9 +1,9 @@
 import {describe, it, expect, vi, beforeEach} from 'vitest';
-import {screen, waitFor} from '@testing-library/react';
+import {screen} from '@testing-library/react';
 import {MemoryRouter, Route, Routes} from 'react-router';
-import userEvent from '@testing-library/user-event';
 import {renderWithProviders} from '../../test/test.utils';
 import {RootLayout} from './RootLayout';
+import {resolveT} from '../../test/setup';
 
 const mockApiGet = vi.hoisted(() => vi.fn());
 const mockApiPost = vi.hoisted(() => vi.fn());
@@ -45,20 +45,29 @@ describe('RootLayout', () => {
   it('renders the app name translation key', async () => {
     renderWithRouter();
 
-    expect(await screen.findByText('appName')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('appName'))).toBeInTheDocument();
   });
 
   it('renders the dashboard navigation link', async () => {
     renderWithRouter();
 
-    expect(await screen.findByText('rootLayout.dashboard')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('rootLayout.dashboard'))).toBeInTheDocument();
   });
 
-  it('renders the logout button when authenticated', async () => {
+  it('renders the Sign out button when authenticated', async () => {
     renderWithRouter('/', {
       preloadedState: {
         user: {
-          currentUser: {id: 1, points: 123, username: 'Test User', email: 'test@test.com'},
+          currentUser: {
+            id: 1,
+            points: 123,
+            username: 'testuser',
+            email: 'test@test.com',
+            role: 'USER',
+            emailVerified: true,
+            address: null,
+            createdAt: null,
+          },
           isAuthenticated: true,
           loading: false,
           error: null,
@@ -66,33 +75,23 @@ describe('RootLayout', () => {
       },
     });
 
-    expect(await screen.findByText('rootLayout.logout')).toBeInTheDocument();
-  });
-
-  it('calls dev login endpoint and switches button to logout after login', async () => {
-    const user = userEvent.setup();
-    mockApiGet.mockReset();
-    mockApiGet
-      .mockRejectedValueOnce({response: {status: 401, data: {error: 'not authenticated'}}})
-      .mockResolvedValueOnce({data: {id: 1}})
-      .mockResolvedValueOnce({data: {id: 1, username: 'Test User', email: 'test@test.com', points: 123}});
-
-    renderWithRouter();
-
-    const loginButton = await screen.findByRole('button', {name: 'rootLayout.login'});
-    await user.click(loginButton);
-
-    await waitFor(() => {
-      expect(mockApiPost).toHaveBeenCalledWith('/auth/dev-login', {username: 'alice'});
-    });
-    expect(await screen.findByRole('button', {name: 'rootLayout.logout'})).toBeInTheDocument();
+    expect(await screen.findByRole('button', {name: /sign out/i})).toBeInTheDocument();
   });
 
   it('renders points display', async () => {
     renderWithRouter('/', {
       preloadedState: {
         user: {
-          currentUser: {id: 1, points: 123, username: 'Test User', email: 'test@test.com'},
+          currentUser: {
+            id: 1,
+            points: 123,
+            username: 'testuser',
+            email: 'test@test.com',
+            role: 'USER',
+            emailVerified: true,
+            address: null,
+            createdAt: null,
+          },
           isAuthenticated: true,
           loading: false,
           error: null,
@@ -102,7 +101,7 @@ describe('RootLayout', () => {
 
     // "123 points" is combined in a single span
     expect(await screen.findByText(/123/)).toBeInTheDocument();
-    expect(await screen.findByText(/points/)).toBeInTheDocument();
+    expect(await screen.findByText(/points/i)).toBeInTheDocument();
   });
 
   it('renders the child route via Outlet', async () => {
@@ -114,7 +113,7 @@ describe('RootLayout', () => {
   it('highlights dashboard link when on dashboard route', async () => {
     renderWithRouter('/dashboard');
 
-    const dashboardLink = await screen.findByText('rootLayout.dashboard');
+    const dashboardLink = await screen.findByText(resolveT('rootLayout.dashboard'));
     expect(dashboardLink).toHaveClass('text-brand');
   });
 });

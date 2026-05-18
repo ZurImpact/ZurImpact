@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import actionReducer from './slices/ActionSlice';
 import rewardReducer from './slices/RewardSlice';
 import userReducer from './slices/UserSlice';
+import authReducer from './slices/AuthSlice';
 
 export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   actions: actionReducer,
   rewards: rewardReducer,
   user: userReducer,
+  auth: authReducer,
 });
 
 export const setupStore = (preloadedState?: DeepPartial<RootState>) =>

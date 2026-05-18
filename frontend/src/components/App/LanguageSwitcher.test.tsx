@@ -8,7 +8,7 @@ describe('LanguageSwitcher', () => {
   it('renders the language label', () => {
     render(<LanguageSwitcher />);
 
-    expect(screen.getByText(/language/)).toBeInTheDocument();
+    expect(screen.getByText(/language/i)).toBeInTheDocument();
   });
 
   it('renders EN and DE buttons', () => {

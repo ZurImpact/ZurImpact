@@ -3,6 +3,7 @@ import {screen} from '@testing-library/react';
 import {renderWithProviders} from '../../test/test.utils';
 import {BrowserRouter} from 'react-router';
 import {HomePage} from './HomePage';
+import {resolveT} from '../../test/setup';
 
 const renderHomePage = () =>
   renderWithProviders(
@@ -12,23 +13,23 @@ const renderHomePage = () =>
   );
 
 describe('HomePage', () => {
-  it('renders the hero badge translation key', async () => {
+  it('renders the hero badge', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('homePage.hero.badge')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.hero.badge'))).toBeInTheDocument();
   });
 
-  it('renders the hero title translation keys', async () => {
+  it('renders the hero title lines', async () => {
     renderHomePage();
 
-    expect(await screen.findByText(/homePage\.hero\.titleLine1/)).toBeInTheDocument();
-    expect(await screen.findByText(/homePage\.hero\.titleLine2/)).toBeInTheDocument();
+    expect(await screen.findByText(/Explore Zürich\./)).toBeInTheDocument();
+    expect(await screen.findByText(/Make an Impact\./)).toBeInTheDocument();
   });
 
-  it('renders the hero subtitle translation key', async () => {
+  it('renders the hero subtitle', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('homePage.hero.subtitle')).toBeInTheDocument();
+    expect(await screen.findByText(/Get rewarded for making sustainable choices/)).toBeInTheDocument();
   });
 
   it('renders the hero image', async () => {
@@ -50,28 +51,28 @@ describe('HomePage', () => {
   it('renders all stat labels', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('homePage.statsParticipants')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.statsWasteCollected')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.statsPartnerVenues')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.statsRewardsRedeemed')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.statsParticipants'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.statsWasteCollected'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.statsPartnerVenues'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.statsRewardsRedeemed'))).toBeInTheDocument();
   });
 
   it('renders the how it works section title and subtitle', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('homePage.howItWorksTitle')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.howItWorksSubtitle')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.howItWorksTitle'))).toBeInTheDocument();
+    expect(await screen.findByText(/Making a positive impact is simple/)).toBeInTheDocument();
   });
 
   it('renders all three step titles and descriptions', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('homePage.step1Title')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.step1Desc')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.step2Title')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.step2Desc')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.step3Title')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.step3Desc')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.step1Title'))).toBeInTheDocument();
+    expect(await screen.findByText(/track your eco-friendly activities/)).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.step2Title'))).toBeInTheDocument();
+    expect(await screen.findByText(/Each eco-friendly action earns you points/)).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.step3Title'))).toBeInTheDocument();
+    expect(await screen.findByText(/Exchange points for vouchers/)).toBeInTheDocument();
   });
 
   it('renders step numbers', async () => {
@@ -85,32 +86,32 @@ describe('HomePage', () => {
   it('renders the featured activities section title and subtitle', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('homePage.featuredTitle')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.featuredSubtitle')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featuredTitle'))).toBeInTheDocument();
+    expect(await screen.findByText(/Choose from various eco-friendly activities/)).toBeInTheDocument();
   });
 
   it('renders all three featured activity point badges', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('homePage.featured1Points')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.featured2Points')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.featured3Points')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featured1Points'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featured2Points'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featured3Points'))).toBeInTheDocument();
   });
 
   it('renders all three featured activity titles', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('homePage.featured1Title')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.featured2Title')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.featured3Title')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featured1Title'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featured2Title'))).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.featured3Title'))).toBeInTheDocument();
   });
 
   it('renders all three featured activity descriptions', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('homePage.featured1Desc')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.featured2Desc')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.featured3Desc')).toBeInTheDocument();
+    expect(await screen.findByText(/Collect litter around the city/)).toBeInTheDocument();
+    expect(await screen.findByText(/Track your cycling routes/)).toBeInTheDocument();
+    expect(await screen.findByText(/Log your walking distances/)).toBeInTheDocument();
   });
 
   it('renders featured activity images', async () => {
@@ -124,7 +125,7 @@ describe('HomePage', () => {
   it('renders the CTA section title and subtitle', async () => {
     renderHomePage();
 
-    expect(await screen.findByText('homePage.ctaTitle')).toBeInTheDocument();
-    expect(await screen.findByText('homePage.ctaSubtitle')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('homePage.ctaTitle'))).toBeInTheDocument();
+    expect(await screen.findByText(/Join thousands of people making Zürich more sustainable/)).toBeInTheDocument();
   });
 });

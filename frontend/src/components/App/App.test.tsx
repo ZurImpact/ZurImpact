@@ -3,31 +3,112 @@ import {screen} from '@testing-library/react';
 import App from './App';
 import {renderWithProviders} from '../../test/test.utils';
 
-const mockApiGet = vi.hoisted(() => vi.fn());
-
 vi.mock('../../api/apiClient', () => ({
   default: {
-    get: (...args: unknown[]) => mockApiGet(...args),
-    post: vi.fn(),
+    get: vi.fn().mockResolvedValue({data: {}}),
+    post: vi.fn().mockResolvedValue({data: {}}),
   },
+}));
+
+// Stub heavy page components to keep App routing tests fast
+vi.mock('../ActionDashboard/ActionDashboard', () => ({
+  ActionDashboard: () => <div data-testid="action-dashboard-stub">dashboard</div>,
+}));
+
+vi.mock('../MapTrackingPage/MapTrackingPage', () => ({
+  MapTrackingPage: () => <div data-testid="map-stub">map</div>,
+}));
+
+vi.mock('../ActionDetailPage/GpsActionDetailPage', () => ({
+  GpsActionDetailPage: () => <div data-testid="action-detail-stub">action</div>,
+}));
+
+vi.mock('../Rewardspage/Rewardspage', () => ({
+  RewardsPage: () => <div data-testid="rewards-stub">rewards</div>,
+}));
+
+vi.mock('../HomePage/HomePage', () => ({
+  HomePage: () => <div data-testid="home-stub">home</div>,
+}));
+
+vi.mock('../AboutUs/AboutUs', () => ({
+  AboutPage: () => <div data-testid="about-stub">about</div>,
+}));
+
+vi.mock('../Contact/ContactPage', () => ({
+  ContactPage: () => <div data-testid="contact-stub">contact</div>,
+}));
+
+vi.mock('../Auth/LoginPage', () => ({
+  LoginPage: () => <div data-testid="login-stub">login</div>,
+}));
+
+vi.mock('../Auth/RegisterPage', () => ({
+  RegisterPage: () => <div data-testid="register-stub">register</div>,
+}));
+
+vi.mock('../Auth/VerifyEmailPage', () => ({
+  VerifyEmailPage: () => <div data-testid="verify-email-stub">verify-email</div>,
+}));
+
+vi.mock('../Auth/ForgotPasswordPage', () => ({
+  ForgotPasswordPage: () => <div data-testid="forgot-password-stub">forgot-password</div>,
+}));
+
+vi.mock('../Auth/ResetPasswordPage', () => ({
+  ResetPasswordPage: () => <div data-testid="reset-password-stub">reset-password</div>,
+}));
+
+vi.mock('../Profile/ProfilePage', () => ({
+  ProfilePage: () => <div data-testid="profile-stub">profile</div>,
 }));
 
 describe('App', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockApiGet.mockImplementation((url: string) => {
-      if (url === '/users/current') {
-        return Promise.resolve({data: {id: 1, username: 'Test User', email: 'test@test.com', points: 123}});
-      }
-      if (url === '/actions' || url.includes('getUserActions')) {
-        return Promise.resolve({data: []});
-      }
-      return Promise.resolve({data: {}});
-    });
   });
 
-  it('renders without crashing', async () => {
-    renderWithProviders(<App />);
-    expect(await screen.findByText('homePage.hero.badge')).toBeInTheDocument();
+  it('renders the home page on the root route', async () => {
+    window.history.pushState({}, '', '/');
+    renderWithProviders(<App />, {
+      preloadedState: {
+        user: {loading: false, isAuthenticated: false, currentUser: null, error: null},
+      },
+    });
+    expect(await screen.findByTestId('home-stub')).toBeInTheDocument();
+  });
+
+  it('shows the auth layout with login stub when navigating to /login', async () => {
+    window.history.pushState({}, '', '/login');
+    renderWithProviders(<App />, {
+      preloadedState: {
+        user: {loading: false, isAuthenticated: false, currentUser: null, error: null},
+      },
+    });
+    expect(await screen.findByTestId('login-stub')).toBeInTheDocument();
+  });
+
+  it('shows the dashboard when authenticated', async () => {
+    window.history.pushState({}, '', '/dashboard');
+    renderWithProviders(<App />, {
+      preloadedState: {
+        user: {
+          loading: false,
+          isAuthenticated: true,
+          currentUser: {
+            id: 1,
+            username: 'testuser',
+            email: 'test@test.com',
+            role: 'USER',
+            emailVerified: true,
+            points: 0,
+            address: null,
+            createdAt: null,
+          },
+          error: null,
+        },
+      },
+    });
+    expect(await screen.findByTestId('action-dashboard-stub')).toBeInTheDocument();
   });
 });

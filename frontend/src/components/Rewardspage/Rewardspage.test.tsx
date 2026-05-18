@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import {RewardsPage} from './Rewardspage';
 import {renderWithProviders} from '../../test/test.utils';
 import type {DeepPartial, RootState} from '../../store/store';
-import {mockToastSuccess, mockToastError} from '../../test/setup';
+import {mockToastSuccess, mockToastError, resolveT} from '../../test/setup';
 const mockGet = vi.fn();
 const mockPost = vi.fn();
 
@@ -47,7 +47,18 @@ describe('RewardsPage', () => {
     mockGet.mockImplementation((url: string) => {
       if (url === '/auth/whoami') return Promise.resolve({data: {id: 1}});
       if (url.startsWith('/users/'))
-        return Promise.resolve({data: {id: 1, username: 'User', email: 'user@example.com', points: 300}});
+        return Promise.resolve({
+          data: {
+            id: 1,
+            username: 'testuser',
+            email: 'user@example.com',
+            role: 'USER',
+            emailVerified: true,
+            points: 300,
+            address: null,
+            createdAt: null,
+          },
+        });
       if (url === '/vouchers') return Promise.resolve({data: baseRewards});
       return Promise.resolve({data: {}});
     });
@@ -61,7 +72,16 @@ describe('RewardsPage', () => {
         rewards: baseRewards,
       },
       user: {
-        currentUser: {id: 1, username: 'User', email: 'user@example.com', points: 300},
+        currentUser: {
+          id: 1,
+          username: 'testuser',
+          email: 'user@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 300,
+          address: null,
+          createdAt: null,
+        },
         isAuthenticated: true,
       },
     });
@@ -79,7 +99,7 @@ describe('RewardsPage', () => {
       },
     });
 
-    expect(screen.getByText('rewardsPage.loading')).toBeInTheDocument();
+    expect(screen.getByText(resolveT('rewardsPage.loading'))).toBeInTheDocument();
   });
 
   it('renders login prompt for unauthenticated users and retries auth', async () => {
@@ -105,9 +125,9 @@ describe('RewardsPage', () => {
       },
     });
 
-    expect(await screen.findByText('rewardsPage.loginRequired')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('rewardsPage.loginRequired'))).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'rewardsPage.tryAgain'}));
+    await user.click(screen.getByRole('button', {name: resolveT('rewardsPage.tryAgain')}));
 
     await waitFor(() => {
       const authCalls = mockGet.mock.calls.filter(([url]) => url === '/auth/whoami');
@@ -123,7 +143,16 @@ describe('RewardsPage', () => {
         rewards: baseRewards,
       },
       user: {
-        currentUser: {id: 1, username: 'User', email: 'user@example.com', points: 300},
+        currentUser: {
+          id: 1,
+          username: 'testuser',
+          email: 'user@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 300,
+          address: null,
+          createdAt: null,
+        },
         isAuthenticated: true,
       },
     });
@@ -145,20 +174,29 @@ describe('RewardsPage', () => {
         rewards: baseRewards,
       },
       user: {
-        currentUser: {id: 1, username: 'User', email: 'user@example.com', points: 300},
+        currentUser: {
+          id: 1,
+          username: 'testuser',
+          email: 'user@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 300,
+          address: null,
+          createdAt: null,
+        },
         isAuthenticated: true,
       },
     });
 
-    const redeemButtons = await screen.findAllByRole('button', {name: 'rewardsPage.redeem'});
+    const redeemButtons = await screen.findAllByRole('button', {name: 'Redeem'});
     await user.click(redeemButtons[0]);
 
-    expect(screen.getByText('rewardsPage.redeemReward')).toBeInTheDocument();
+    expect(screen.getByText(resolveT('rewardsPage.redeemReward'))).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'rewardsPage.cancel'}));
+    await user.click(screen.getByRole('button', {name: resolveT('gpsActionDetail.cancel')}));
 
     await waitFor(() => {
-      expect(screen.queryByText('rewardsPage.redeemReward')).not.toBeInTheDocument();
+      expect(screen.queryByText(resolveT('rewardsPage.redeemReward'))).not.toBeInTheDocument();
     });
   });
 
@@ -170,14 +208,23 @@ describe('RewardsPage', () => {
         rewards: baseRewards,
       },
       user: {
-        currentUser: {id: 1, username: 'User', email: 'user@example.com', points: 300},
+        currentUser: {
+          id: 1,
+          username: 'testuser',
+          email: 'user@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 300,
+          address: null,
+          createdAt: null,
+        },
         isAuthenticated: true,
       },
     });
 
-    const redeemButtons = await screen.findAllByRole('button', {name: 'rewardsPage.redeem'});
+    const redeemButtons = await screen.findAllByRole('button', {name: 'Redeem'});
     await user.click(redeemButtons[0]);
-    await user.click(screen.getByRole('button', {name: 'rewardsPage.confirmRedemptionBtn'}));
+    await user.click(screen.getByRole('button', {name: resolveT('rewardsPage.confirmRedemptionBtn')}));
 
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith('/vouchers/r1/redeem');
@@ -192,13 +239,22 @@ describe('RewardsPage', () => {
         redemptionError: null,
       },
       user: {
-        currentUser: {id: 1, username: 'User', email: 'user@example.com', points: 300},
+        currentUser: {
+          id: 1,
+          username: 'testuser',
+          email: 'user@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 300,
+          address: null,
+          createdAt: null,
+        },
         isAuthenticated: true,
       },
     });
 
     await waitFor(() => {
-      expect(mockToastSuccess).toHaveBeenCalledWith('rewardsPage.redeemSuccess');
+      expect(mockToastSuccess).toHaveBeenCalledWith(resolveT('rewardsPage.redeemSuccess'));
     });
 
     await waitFor(() => {
@@ -215,7 +271,16 @@ describe('RewardsPage', () => {
         redemptionError: 'Voucher unavailable',
       },
       user: {
-        currentUser: {id: 1, username: 'User', email: 'user@example.com', points: 300},
+        currentUser: {
+          id: 1,
+          username: 'testuser',
+          email: 'user@example.com',
+          role: 'USER',
+          emailVerified: true,
+          points: 300,
+          address: null,
+          createdAt: null,
+        },
         isAuthenticated: true,
       },
     });

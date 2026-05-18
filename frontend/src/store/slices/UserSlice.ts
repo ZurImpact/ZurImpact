@@ -1,12 +1,16 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import apiClient from '../../api/apiClient';
+import {logoutUser} from './AuthSlice';
 
 export interface UserDto {
   id: number;
   username: string;
   email: string;
+  role: string;
+  emailVerified: boolean;
   points: number;
-  createdAt?: string;
+  address: number | null;
+  createdAt: string | null;
 }
 
 export type UserRole = 'ADMIN' | 'PARTNER' | 'ROLE_ADMIN' | 'ROLE_PARTNER' | 'ROLE_USER';
@@ -90,6 +94,12 @@ const userSlice = createSlice({
         state.error = action.payload as string;
         state.isAuthenticated = false;
         state.roles = [];
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.currentUser = null;
+        state.roles = [];
+        state.isAuthenticated = false;
+        state.error = null;
       });
   },
 });

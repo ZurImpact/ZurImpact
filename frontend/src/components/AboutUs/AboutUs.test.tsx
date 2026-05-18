@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import {renderWithProviders} from '../../test/test.utils';
 import {BrowserRouter, MemoryRouter, Route, Routes} from 'react-router';
 import {AboutPage} from './AboutUs';
+import {resolveT} from '../../test/setup';
 
 const renderAboutPage = () =>
   renderWithProviders(
@@ -14,10 +15,10 @@ const renderAboutPage = () =>
 
 describe('AboutPage', () => {
   /* Hero Section */
-  it('renders hero title translation key', async () => {
+  it('renders hero title', async () => {
     renderAboutPage();
 
-    expect(await screen.findByText('aboutPage.heroTitle')).toBeInTheDocument();
+    expect(await screen.findByText(resolveT('aboutPage.heroTitle'))).toBeInTheDocument();
   });
 
   it('renders hero image with alt text', async () => {
@@ -27,11 +28,11 @@ describe('AboutPage', () => {
   });
 
   /* Mission Section */
-  it('renders both mission description translation keys', async () => {
+  it('renders both mission descriptions', async () => {
     renderAboutPage();
 
-    expect(await screen.findByText('aboutPage.missionDescription1')).toBeInTheDocument();
-    expect(await screen.findByText('aboutPage.missionDescription2')).toBeInTheDocument();
+    expect(await screen.findByText(/Inspired by Copenhagen's CopenPay/)).toBeInTheDocument();
+    expect(await screen.findByText(/By partnering with local businesses/)).toBeInTheDocument();
   });
 
   /* Pitch Deck Download */
@@ -66,7 +67,7 @@ describe('AboutPage', () => {
       </MemoryRouter>,
     );
 
-    await user.click(await screen.findByText('aboutPage.ctaButton'));
+    await user.click(await screen.findByText(resolveT('aboutPage.ctaButton')));
     expect(await screen.findByText('Contact Page Content')).toBeInTheDocument();
   });
 });

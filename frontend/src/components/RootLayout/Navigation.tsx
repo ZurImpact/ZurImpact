@@ -1,12 +1,10 @@
 import {Link, useLocation, useNavigate} from 'react-router';
-import {Mountain, Award, Menu, Moon, Sun, LogOut, LogIn} from 'lucide-react';
+import {Mountain, Award, Menu, Moon, Sun, LogOut, LogIn, User} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from 'next-themes';
-import {useState} from 'react';
 import {Sheet, SheetContent, SheetTrigger} from '../ui/sheet';
 import {Button} from '../ui/button';
-import apiClient from '../../api/apiClient';
-import {logout, fetchCurrentUser} from '../../store/slices/UserSlice';
+import {logoutUser} from '../../store/slices/AuthSlice';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {ROUTES} from '../../routes';
 
@@ -16,8 +14,7 @@ export const Navigation = () => {
   const {t} = useTranslation();
   const {theme, setTheme} = useTheme();
   const dispatch = useAppDispatch();
-  const {currentUser, isAuthenticated, loading} = useAppSelector((s) => s.user);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const {currentUser, isAuthenticated} = useAppSelector((s) => s.user);
   const points = currentUser?.points ?? 0;
 
   const navLinks = [
@@ -28,27 +25,6 @@ export const Navigation = () => {
     {to: ROUTES.rewards, label: t('rootLayout.rewards')},
     {to: ROUTES.faq, label: t('rootLayout.faq')},
   ];
-
-  /**
-   * const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'de' : 'en';
-    i18n.changeLanguage(newLang);
-  };
-   */
-
-  const renderLanguageButton = () => (
-    <></>
-    /**
-     * <button
-     *   onClick={toggleLanguage}
-     *   className="p-2 rounded-md hover:bg-surface-container-high"
-     *   aria-label={t('rootLayout.switchLanguage')}
-     * >
-     *   <Languages className="h-5 w-5" aria-hidden="true" />
-     *   <span className="text-xs font-medium">{i18n.language.toUpperCase()}</span>
-     * </button>
-     */
-  );
 
   const renderThemeButton = () => (
     <button
@@ -76,10 +52,10 @@ export const Navigation = () => {
         to={link.to}
         className={
           mobile
-            ? `text-lg hover:text-brand transition-colors ${
+            ? `text-lg hover:text-brand transition-colors whitespace-nowrap ${
                 location.pathname === link.to ? 'text-brand font-semibold' : 'text-muted-foreground'
               }`
-            : `hover:text-brand transition-colors ${
+            : `hover:text-brand transition-colors whitespace-nowrap ${
                 location.pathname === link.to ? 'text-brand' : 'text-muted-foreground'
               }`
         }
@@ -90,75 +66,86 @@ export const Navigation = () => {
     ));
   };
 
-  const renderPoints = () => {
-    if (!isAuthenticated) return null;
+  const handleSignOut = async () => {
+    await dispatch(logoutUser());
+    navigate(ROUTES.login);
+  };
+
+  const renderAuthControls = (className = '') => {
+    if (isAuthenticated) {
+      return (
+        <div className={`flex items-center gap-2 ${className}`.trim()}>
+          <span className="text-sm font-medium whitespace-nowrap">{currentUser?.username}</span>
+          <Link
+            to={ROUTES.profile}
+            className="flex items-center gap-1 text-sm hover:text-brand transition-colors whitespace-nowrap"
+            aria-label={t('rootLayout.profile')}
+          >
+            <User className="h-4 w-4 shrink-0" aria-hidden="true" />
+            {t('rootLayout.profile')}
+          </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2 bg-card border whitespace-nowrap"
+            onClick={() => void handleSignOut()}
+          >
+            <LogOut className="h-4 w-4 shrink-0" aria-hidden="true" />
+            {t('rootLayout.signOut')}
+          </Button>
+        </div>
+      );
+    }
 
     return (
-      <div className="flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full">
-        <Award className="h-4 w-4 text-on-brand-container" aria-hidden="true" />
-        <span className="font-medium text-on-brand-container">{`${points} ${t('points')}`}</span>
+      <div className={`flex items-center gap-2 ${className}`.trim()}>
+        <Link
+          to={ROUTES.login}
+          className="flex items-center gap-1 text-sm hover:text-brand transition-colors whitespace-nowrap"
+          aria-label={t('rootLayout.signIn')}
+        >
+          <LogIn className="h-4 w-4 shrink-0" aria-hidden="true" />
+          {t('rootLayout.signIn')}
+        </Link>
+        <Link
+          to={ROUTES.register}
+          className="flex items-center gap-1 text-sm hover:text-brand transition-colors whitespace-nowrap"
+          aria-label={t('rootLayout.signUp')}
+        >
+          {t('rootLayout.signUp')}
+        </Link>
       </div>
     );
   };
 
-  const handleLogin = async () => {
-    setIsAuthenticating(true);
-    try {
-      await apiClient.post('/auth/dev-login', {username: 'alice'});
-      await dispatch(fetchCurrentUser());
-      navigate(ROUTES.dashboard);
-    } finally {
-      setIsAuthenticating(false);
-    }
+  const renderPointsDisplay = () => {
+    if (!isAuthenticated) return null;
+    return (
+      <div className="flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full shrink-0 whitespace-nowrap">
+        <Award className="h-4 w-4 text-on-brand-container shrink-0" aria-hidden="true" />
+        <span className="font-medium text-on-brand-container whitespace-nowrap">{`${points} ${t('points')}`}</span>
+      </div>
+    );
   };
-
-  const handleAuthAction = () => {
-    if (isAuthenticated) {
-      dispatch(logout());
-      navigate(ROUTES.home);
-      return;
-    }
-
-    void handleLogin();
-  };
-
-  const renderAuthButton = (className = '') => (
-    <Button
-      variant="outline"
-      size="sm"
-      className={`flex items-center gap-2 bg-card border ${className}`.trim()}
-      onClick={handleAuthAction}
-      disabled={!isAuthenticated && (loading || isAuthenticating)}
-    >
-      {isAuthenticated ? (
-        <LogOut className="h-4 w-4" aria-hidden="true" />
-      ) : (
-        <LogIn className="h-4 w-4" aria-hidden="true" />
-      )}
-      {isAuthenticated ? t('rootLayout.logout') : t('rootLayout.login')}
-    </Button>
-  );
 
   return (
     <nav className="bg-background border-b sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 shrink-0">
             <Mountain className="h-8 w-8 text-brand" />
-            <span className="text-2xl font-bold text-brand">{t('appName')}</span>
+            <span className="text-2xl font-bold text-brand whitespace-nowrap">{t('appName')}</span>
           </Link>
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4 lg:gap-6 ml-6">
             {renderNavLinks()}
             {renderThemeButton()}
-            {renderLanguageButton()}
             <div className="flex items-center gap-3">
-              {renderPoints()}
-              {renderAuthButton()}
+              {renderPointsDisplay()}
+              {renderAuthControls()}
             </div>
           </div>
           <div className="flex md:hidden items-center gap-4">
             {renderThemeButton()}
-            {renderLanguageButton()}
             <Sheet>
               <SheetTrigger asChild>
                 <button
@@ -172,8 +159,8 @@ export const Navigation = () => {
                 <div className="flex flex-col gap-4 mt-13 pl-8">
                   {renderNavLinks(true)}
                   <div className="mt-4 flex flex-col gap-3 pr-8">
-                    {renderPoints()}
-                    {renderAuthButton('w-full justify-center')}
+                    {renderPointsDisplay()}
+                    {renderAuthControls('w-full flex-col')}
                   </div>
                 </div>
               </SheetContent>
