@@ -4,6 +4,7 @@ import {BrowserRouter} from 'react-router';
 import {renderWithProviders} from '../../test/test.utils';
 import {ActionDashboard} from './ActionDashboard';
 import type {ActionDto} from '../../store/slices/ActionSlice';
+import type {UserDto, UserRole} from '../../store/slices/UserSlice';
 import {resolveT} from '../../test/setup';
 
 const mockGet = vi.fn();
@@ -34,6 +35,17 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+const baseUser: UserDto = {
+  id: 1,
+  username: 'testuser',
+  email: 'test@example.com',
+  role: 'USER',
+  emailVerified: true,
+  points: 100,
+  address: null,
+  createdAt: null,
+};
+
 const renderAuthenticatedDashboard = () =>
   renderWithProviders(
     <BrowserRouter>
@@ -42,16 +54,26 @@ const renderAuthenticatedDashboard = () =>
     {
       preloadedState: {
         user: {
-          currentUser: {
-            id: 1,
-            username: 'testuser',
-            email: 'test@example.com',
-            role: 'USER',
-            emailVerified: true,
-            points: 100,
-            address: null,
-            createdAt: null,
-          },
+          currentUser: baseUser,
+          roles: [],
+          isAuthenticated: true,
+          loading: false,
+          error: null,
+        },
+      },
+    },
+  );
+
+const renderAuthenticatedDashboardWithRoles = (roles: UserRole[]) =>
+  renderWithProviders(
+    <BrowserRouter>
+      <ActionDashboard />
+    </BrowserRouter>,
+    {
+      preloadedState: {
+        user: {
+          currentUser: baseUser,
+          roles,
           isAuthenticated: true,
           loading: false,
           error: null,
@@ -124,6 +146,20 @@ describe('ActionDashboard', () => {
     expect(await screen.findByText(resolveT('actionDashboard.historyTitle'))).toBeInTheDocument();
   });
 
+  it('shows create action button for admin users', async () => {
+    mockGet.mockResolvedValue({data: []});
+    renderAuthenticatedDashboardWithRoles(['ADMIN']);
+
+    expect(await screen.findByRole('button', {name: resolveT('actionDashboard.createAction')})).toBeInTheDocument();
+  });
+
+  it('hides create action button for regular users', async () => {
+    mockGet.mockResolvedValue({data: []});
+    renderAuthenticatedDashboardWithRoles(['ROLE_USER']);
+
+    expect(screen.queryByRole('button', {name: resolveT('actionDashboard.createAction')})).not.toBeInTheDocument();
+  });
+
   it('shows login prompt when user is not authenticated', () => {
     renderWithProviders(
       <BrowserRouter>
@@ -133,6 +169,7 @@ describe('ActionDashboard', () => {
         preloadedState: {
           user: {
             currentUser: null,
+            roles: [],
             isAuthenticated: false,
             loading: false,
             error: null,

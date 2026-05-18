@@ -1,16 +1,20 @@
 import {useEffect, useState} from 'react';
-import {Award} from 'lucide-react';
+import {Award, Plus} from 'lucide-react';
+import {useNavigate} from 'react-router';
 import {Card} from '../ui/card';
+import {Button} from '../ui/button';
 import {useAppSelector, useAppDispatch} from '../../store/store';
 import {fetchActions, fetchUserActions} from '../../store/slices/ActionSlice';
 import {useTranslation} from 'react-i18next';
 import {ActionCard} from './ActionCard/ActionCard';
+import {ROUTES} from '../../routes';
 
 export function ActionDashboard() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const {t} = useTranslation();
 
-  const {isAuthenticated, currentUser} = useAppSelector((state) => state.user);
+  const {isAuthenticated, currentUser, roles = []} = useAppSelector((state) => state.user);
   const {actions, loading, error, userActions} = useAppSelector((state) => state.actions);
 
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
@@ -20,6 +24,10 @@ export function ActionDashboard() {
     setFeedbackMessage(`Action ${actionId} clicked`);
     setTimeout(() => setFeedbackMessage(null), 3000);
   };
+
+  const canCreateActions = roles.some(
+    (role) => role === 'ADMIN' || role === 'PARTNER' || role === 'ROLE_ADMIN' || role === 'ROLE_PARTNER',
+  );
 
   // Fetch actions on component mount
   useEffect(() => {
@@ -49,6 +57,12 @@ export function ActionDashboard() {
           <h1 className="text-4xl font-bold text-foreground mb-2">{t('actionDashboard.header')}</h1>
           <p className="text-muted-foreground">{t('actionDashboard.subheader')}</p>
         </div>
+        {canCreateActions && (
+          <Button className="shrink-0" onClick={() => navigate(ROUTES.actionCreate)}>
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            {t('actionDashboard.createAction')}
+          </Button>
+        )}
       </div>
 
       {/* Feedback message */}

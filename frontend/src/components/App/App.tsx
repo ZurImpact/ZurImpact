@@ -4,6 +4,7 @@ import {RootLayout} from '../RootLayout/RootLayout';
 import {AboutPage} from '../AboutUs/AboutUs';
 import {ContactPage} from '../Contact/ContactPage';
 import {GpsActionDetailPage} from '../ActionDetailPage/GpsActionDetailPage';
+import {ActionCreatePage} from '../ActionCreatePage/ActionCreatePage';
 import {MapTrackingPage} from '../MapTrackingPage/MapTrackingPage';
 import {RewardsPage} from '../Rewardspage/Rewardspage';
 import {AuthLayout} from '../Auth/AuthLayout';
@@ -47,6 +48,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<RootLayout />}>
               <Route path={ROUTES.dashboard} element={<ActionDashboard />} />
+              <Route path={ROUTES.actionCreate} element={<ActionCreatePage />} />
               <Route path={ROUTES.track} element={<MapTrackingPage />} />
               <Route path={ROUTES.rewards} element={<RewardsPage />} />
               <Route path={ROUTES.actionDetailsPattern} element={<GpsActionDetailPage />} />

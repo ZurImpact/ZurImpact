@@ -26,7 +26,7 @@ public class UserDao {
     private final JdbcTemplate jdbc;
 
     private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> {
-        long addressId = rs.getObject("address_id", Long.class);
+        Long addressId = rs.getObject("address_id", Long.class);
         return User.builder()
                 .id(rs.getLong("id"))
                 .username(rs.getString("username"))
