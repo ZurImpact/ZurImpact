@@ -4,6 +4,7 @@ import {RootLayout} from '../RootLayout/RootLayout';
 import {AboutPage} from '../AboutUs/AboutUs';
 import {ContactPage} from '../Contact/ContactPage';
 import {GpsActionDetailPage} from '../ActionDetailPage/GpsActionDetailPage';
+import {ActionCreatePage} from '../ActionCreatePage/ActionCreatePage';
 import {MapTrackingPage} from '../MapTrackingPage/MapTrackingPage';
 import {RewardsPage} from '../Rewardspage/Rewardspage';
 
@@ -23,6 +24,7 @@ function App() {
             <Route path={ROUTES.home} element={<HomePage />} />
             <Route path={ROUTES.faq} element={<FaqPage />} />
             <Route path={ROUTES.dashboard} element={<ActionDashboard />} />
+            <Route path={ROUTES.actionCreate} element={<ActionCreatePage />} />
             <Route path={ROUTES.about} element={<AboutPage />} />
             <Route path={ROUTES.contact} element={<ContactPage />} />
             <Route path={ROUTES.track} element={<MapTrackingPage />} />

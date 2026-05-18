@@ -2,6 +2,7 @@
 export const ROUTES = {
   root: '/',
   dashboard: '/dashboard',
+  actionCreate: '/actions/new',
   track: '/track',
   rewards: '/rewards',
   about: '/about',

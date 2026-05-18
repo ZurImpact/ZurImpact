@@ -4,6 +4,7 @@ import {BrowserRouter} from 'react-router';
 import {renderWithProviders} from '../../test/test.utils';
 import {ActionDashboard} from './ActionDashboard';
 import type {ActionDto} from '../../store/slices/ActionSlice';
+import type {UserRole} from '../../store/slices/UserSlice';
 
 const mockGet = vi.fn();
 
@@ -42,6 +43,25 @@ const renderAuthenticatedDashboard = () =>
       preloadedState: {
         user: {
           currentUser: {id: 1, username: 'Test User', email: 'test@example.com', points: 100},
+          roles: [],
+          isAuthenticated: true,
+          loading: false,
+          error: null,
+        },
+      },
+    },
+  );
+
+const renderAuthenticatedDashboardWithRoles = (roles: UserRole[]) =>
+  renderWithProviders(
+    <BrowserRouter>
+      <ActionDashboard />
+    </BrowserRouter>,
+    {
+      preloadedState: {
+        user: {
+          currentUser: {id: 1, username: 'Test User', email: 'test@example.com', points: 100},
+          roles,
           isAuthenticated: true,
           loading: false,
           error: null,
@@ -112,6 +132,20 @@ describe('ActionDashboard', () => {
     renderAuthenticatedDashboard();
 
     expect(await screen.findByText('actionDashboard.historyTitle')).toBeInTheDocument();
+  });
+
+  it('shows create action button for admin users', async () => {
+    mockGet.mockResolvedValue({data: []});
+    renderAuthenticatedDashboardWithRoles(['ADMIN']);
+
+    expect(await screen.findByRole('button', {name: 'actionDashboard.createAction'})).toBeInTheDocument();
+  });
+
+  it('hides create action button for regular users', async () => {
+    mockGet.mockResolvedValue({data: []});
+    renderAuthenticatedDashboardWithRoles(['ROLE_USER']);
+
+    expect(screen.queryByRole('button', {name: 'actionDashboard.createAction'})).not.toBeInTheDocument();
   });
 
   it('shows login prompt when user is not authenticated', () => {
