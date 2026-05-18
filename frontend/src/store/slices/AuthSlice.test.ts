@@ -137,6 +137,14 @@ describe('AuthSlice', () => {
       expect(store.getState().auth.register.status).toBe('rejected');
       expect(store.getState().auth.register.error).toBe('register_failed');
     });
+
+    it('does not surface login-specific codes on 401 (scoped error mapping)', async () => {
+      const store = createTestStore();
+      vi.mocked(authApi.register).mockRejectedValueOnce({response: {status: 401}});
+      await store.dispatch(registerUser({username: 'alice', email: 'alice@example.com', password: 'Password1!'}));
+
+      expect(store.getState().auth.register.error).toBe('register_failed');
+    });
   });
 
   describe('logoutUser', () => {
@@ -250,6 +258,24 @@ describe('AuthSlice', () => {
       await store.dispatch(changePassword({currentPassword: 'OldPass1!', newPassword: 'NewPass1!'}));
 
       expect(store.getState().auth.changePassword.status).toBe('rejected');
+      expect(store.getState().auth.changePassword.error).toBe('change_password_failed');
+    });
+
+    it('sets error "wrong_current_password" on 400 with that message', async () => {
+      const store = createTestStore();
+      vi.mocked(userApi.changePassword).mockRejectedValueOnce({
+        response: {status: 400, data: {message: 'wrong_current_password'}},
+      });
+      await store.dispatch(changePassword({currentPassword: 'wrong', newPassword: 'NewPass1!'}));
+
+      expect(store.getState().auth.changePassword.error).toBe('wrong_current_password');
+    });
+
+    it('does not surface login-specific codes on 401 (scoped error mapping)', async () => {
+      const store = createTestStore();
+      vi.mocked(userApi.changePassword).mockRejectedValueOnce({response: {status: 401}});
+      await store.dispatch(changePassword({currentPassword: 'OldPass1!', newPassword: 'NewPass1!'}));
+
       expect(store.getState().auth.changePassword.error).toBe('change_password_failed');
     });
   });

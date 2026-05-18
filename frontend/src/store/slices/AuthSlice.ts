@@ -33,14 +33,35 @@ const initialState: AuthState = {
   changePassword: makeIdleOp(),
 };
 
-function extractErrorCode(error: unknown, fallback: string): string {
+interface AxiosErrorContext {
+  status?: number;
+  message?: string;
+}
+
+function extractAxiosErrorContext(error: unknown): AxiosErrorContext | null {
   if (error && typeof error === 'object' && 'response' in error) {
     const axiosError = error as {response?: {status?: number; data?: {message?: string}}};
-    const status = axiosError.response?.status;
-    const message = axiosError.response?.data?.message;
-    if (status === 401) return 'invalid_credentials';
-    if (status === 403 && message === 'email_not_verified') return 'email_not_verified';
-    if (status === 400 && message === 'wrong_current_password') return 'wrong_current_password';
+    return {
+      status: axiosError.response?.status,
+      message: axiosError.response?.data?.message,
+    };
+  }
+  return null;
+}
+
+function mapLoginError(error: unknown, fallback: string): string {
+  const ctx = extractAxiosErrorContext(error);
+  if (ctx) {
+    if (ctx.status === 403 && ctx.message === 'email_not_verified') return 'email_not_verified';
+    if (ctx.status === 401) return 'invalid_credentials';
+  }
+  return fallback;
+}
+
+function mapChangePasswordError(error: unknown, fallback: string): string {
+  const ctx = extractAxiosErrorContext(error);
+  if (ctx && ctx.status === 400 && ctx.message === 'wrong_current_password') {
+    return 'wrong_current_password';
   }
   return fallback;
 }
@@ -49,7 +70,7 @@ export const loginUser = createAsyncThunk('auth/login', async (req: authApi.Logi
   try {
     return await authApi.login(req);
   } catch (error: unknown) {
-    return rejectWithValue(extractErrorCode(error, 'login_failed'));
+    return rejectWithValue(mapLoginError(error, 'login_failed'));
   }
 });
 
@@ -58,8 +79,8 @@ export const registerUser = createAsyncThunk(
   async (req: authApi.RegisterRequest, {rejectWithValue}) => {
     try {
       return await authApi.register(req);
-    } catch (error: unknown) {
-      return rejectWithValue(extractErrorCode(error, 'register_failed'));
+    } catch {
+      return rejectWithValue('register_failed');
     }
   },
 );
@@ -67,8 +88,8 @@ export const registerUser = createAsyncThunk(
 export const logoutUser = createAsyncThunk('auth/logout', async (_, {rejectWithValue}) => {
   try {
     return await authApi.logout();
-  } catch (error: unknown) {
-    return rejectWithValue(extractErrorCode(error, 'logout_failed'));
+  } catch {
+    return rejectWithValue('logout_failed');
   }
 });
 
@@ -77,8 +98,8 @@ export const verifyEmailToken = createAsyncThunk(
   async (req: {token: string}, {rejectWithValue}) => {
     try {
       return await authApi.verifyEmail(req);
-    } catch (error: unknown) {
-      return rejectWithValue(extractErrorCode(error, 'verify_email_failed'));
+    } catch {
+      return rejectWithValue('verify_email_failed');
     }
   },
 );
@@ -88,8 +109,8 @@ export const resendVerification = createAsyncThunk(
   async (req: {email: string}, {rejectWithValue}) => {
     try {
       return await authApi.resendVerification(req);
-    } catch (error: unknown) {
-      return rejectWithValue(extractErrorCode(error, 'resend_verification_failed'));
+    } catch {
+      return rejectWithValue('resend_verification_failed');
     }
   },
 );
@@ -99,8 +120,8 @@ export const requestPasswordReset = createAsyncThunk(
   async (req: {email: string}, {rejectWithValue}) => {
     try {
       return await authApi.requestPasswordReset(req);
-    } catch (error: unknown) {
-      return rejectWithValue(extractErrorCode(error, 'request_password_reset_failed'));
+    } catch {
+      return rejectWithValue('request_password_reset_failed');
     }
   },
 );
@@ -110,8 +131,8 @@ export const confirmPasswordReset = createAsyncThunk(
   async (req: {token: string; newPassword: string}, {rejectWithValue}) => {
     try {
       return await authApi.confirmPasswordReset(req);
-    } catch (error: unknown) {
-      return rejectWithValue(extractErrorCode(error, 'confirm_password_reset_failed'));
+    } catch {
+      return rejectWithValue('confirm_password_reset_failed');
     }
   },
 );
@@ -122,7 +143,7 @@ export const changePassword = createAsyncThunk(
     try {
       return await userApi.changePassword(req);
     } catch (error: unknown) {
-      return rejectWithValue(extractErrorCode(error, 'change_password_failed'));
+      return rejectWithValue(mapChangePasswordError(error, 'change_password_failed'));
     }
   },
 );
