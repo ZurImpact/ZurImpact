@@ -184,7 +184,7 @@ app.delete(BASE_URL + '/actions/:id', (req, res) => {
   }
 });
 
-app.get(BASE_URL + '/userActionHistory/getUserActions', (req, res) => {
+app.get(BASE_URL + '/users/:userId/actions', (req, res) => {
   const {active} = req.query;
   if (active === 'true') {
     return res.json(mockUserActions.filter((a) => a.completionState === 'IN_PROGRESS'));

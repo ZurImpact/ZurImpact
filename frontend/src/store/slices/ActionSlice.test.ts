@@ -168,7 +168,7 @@ describe('ActionSlice', () => {
       const state = store.getState().actions;
       expect(state.userActions).toEqual([mockUserAction]);
       expect(state.loading).toBe(false);
-      expect(mockedGet).toHaveBeenCalledWith('/userActionHistory/getUserActions?userId=123');
+      expect(mockedGet).toHaveBeenCalledWith('/users/123/actions');
     });
 
     it('sets error on failure', async () => {
@@ -195,7 +195,7 @@ describe('ActionSlice', () => {
 
       await store.dispatch(fetchUserActions({userId: 123, active: true}));
 
-      expect(mockedGet).toHaveBeenCalledWith('/userActionHistory/getUserActions?userId=123&active=true');
+      expect(mockedGet).toHaveBeenCalledWith('/users/123/actions?active=true');
     });
   });
 

@@ -117,13 +117,13 @@ export const fetchUserActions = createAsyncThunk(
   'action/fetchUserActions',
   async (params: FetchUserActionsParams, {rejectWithValue}) => {
     try {
-      const searchParams = new URLSearchParams({userId: String(params.userId)});
-
+      const searchParams = new URLSearchParams();
       if (params.active !== undefined) {
         searchParams.append('active', String(params.active));
       }
-
-      const response = await apiClient.get(`/userActionHistory/getUserActions?${searchParams.toString()}`);
+      const query = searchParams.toString();
+      const url = `/users/${params.userId}/actions${query ? `?${query}` : ''}`;
+      const response = await apiClient.get(url);
       return response.data;
     } catch (error: unknown) {
       if (error instanceof Error) {

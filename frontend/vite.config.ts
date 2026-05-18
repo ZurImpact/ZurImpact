@@ -15,6 +15,10 @@ export default defineConfig({
       '/backend_war_exploded/api': {
         target: API_TARGET,
         changeOrigin: true,
+        // The Docker backend deploys as ROOT.war (paths under /api), matching
+        // the production nginx rewrite. The IntelliJ war:exploded layout serves
+        // under /backend_war_exploded — strip the prefix so both work.
+        rewrite: (path) => path.replace(/^\/backend_war_exploded/, ''),
       },
     },
   },
