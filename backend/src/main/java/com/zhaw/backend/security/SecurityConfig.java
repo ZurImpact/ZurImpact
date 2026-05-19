@@ -74,7 +74,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthCookieFilter authCookieFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   AuthCookieFilter authCookieFilter,
+                                                   HttpPermissionService httpPermissionService) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -95,20 +97,8 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/api/auth/password-reset/request", HttpMethod.POST.name())).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/auth/password-reset/confirm", HttpMethod.POST.name())).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/auth/dev-login", HttpMethod.POST.name())).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/auth/logout", HttpMethod.POST.name())).authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("/api/auth/whoami", HttpMethod.GET.name())).authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("/api/users/me/password-change", HttpMethod.POST.name())).authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("/api/users/**", HttpMethod.GET.name())).hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(new AntPathRequestMatcher("/api/action", HttpMethod.GET.name())).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/actions", HttpMethod.POST.name())).hasAnyRole("ADMIN", "PARTNER")
-                        .requestMatchers(new AntPathRequestMatcher("/api/actions/**", HttpMethod.PUT.name())).hasAnyRole("ADMIN", "PARTNER")
-                        .requestMatchers(new AntPathRequestMatcher("/api/actions/**", HttpMethod.DELETE.name())).hasAnyRole("ADMIN", "PARTNER")
-                        .requestMatchers(new AntPathRequestMatcher("/api/subTasks/**", HttpMethod.PUT.name())).hasAnyRole("ADMIN", "PARTNER")
-                        .requestMatchers(new AntPathRequestMatcher("/api/subTasks/**", HttpMethod.DELETE.name())).hasAnyRole("ADMIN", "PARTNER")
-                        .requestMatchers(new AntPathRequestMatcher("/api/settings/**")).authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasRole("ADMIN")
-                        .requestMatchers(new AntPathRequestMatcher("/api/user/**")).hasAnyRole("USER", "ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().access((authentication, context) ->
+                                httpPermissionService.authorize(authentication.get(), context.getRequest()))
                 )
                 .addFilterBefore(authCookieFilter, UsernamePasswordAuthenticationFilter.class);
 
