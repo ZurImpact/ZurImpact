@@ -25,6 +25,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmailVerificationTokenService verificationTokenService;
     private final PasswordResetTokenService resetTokenService;
     private final MailService mailService;
+    private final EmailChangeTokenService emailChangeTokenService;
 
     /**
      * Authenticates a username/password and returns the authenticated user.
@@ -177,5 +178,34 @@ public class AuthServiceImpl implements AuthService {
         userDao.setPasswordHash(userId, newHash);
         sessionService.invalidateAllForUser(userId);
         return ChangePasswordResult.SUCCESS;
+    }
+
+    @Override
+    @Transactional
+    public void requestEmailChange(Long userId, String newEmail) {
+        Optional<User> userOpt = userDao.findById(userId);
+        if (userOpt.isEmpty()) {
+            throw new IllegalStateException("user_not_found");
+        }
+
+        // Prevent duplicate email
+        if (userDao.findByEmail(newEmail).isPresent()) {
+            throw new IllegalArgumentException("email_in_use");
+        }
+
+        emailChangeTokenService.invalidateAllForUser(userId);
+        String token = emailChangeTokenService.issue(userId, newEmail);
+        mailService.sendEmailChangeVerificationEmail(newEmail, userOpt.get().getUsername(), token);
+    }
+
+    @Override
+    @Transactional
+    public boolean confirmEmailChange(String rawToken) {
+        return emailChangeTokenService.lookupValid(rawToken).map(token -> {
+            userDao.updateEmail(token.getUserId(), token.getNewEmail());
+            userDao.markEmailVerified(token.getUserId());
+            emailChangeTokenService.markConsumed(rawToken);
+            return Boolean.TRUE;
+        }).orElse(Boolean.FALSE);
     }
 }

@@ -86,6 +86,18 @@ public class UserDao {
                 newHash, userId);
     }
 
+    public void updateEmail(Long userId, String newEmail) {
+        jdbc.update(
+                "UPDATE users SET email = ? WHERE id = ?",
+                newEmail, userId);
+    }
+
+    public void updateUsername(Long userId, String newUsername){
+        jdbc.update(
+                "UPDATE users SET username = ? WHERE id = ?",
+                newUsername, userId);
+    }
+
     private User insert(User user) {
         if (user.getCreatedAt() == null) {
             user.setCreatedAt(LocalDateTime.now());

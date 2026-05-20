@@ -21,4 +21,8 @@ public interface AuthService {
     enum ChangePasswordResult {
         SUCCESS, WRONG_CURRENT, USER_NOT_FOUND
     }
+
+    void requestEmailChange(Long userId, String newEmail);
+
+    boolean confirmEmailChange(String rawToken);
 }
