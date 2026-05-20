@@ -159,4 +159,12 @@ public class AuthController {
     }
 
     public record LoginResponse(String username, String role) {}
+
+    @PostMapping("/verify-email-change")
+    public ResponseEntity<?> verifyEmailChange(@Valid @RequestBody VerifyEmailRequest request) {
+        if (!authService.confirmEmailChange(request.token())) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Invalid or expired token"));
+        }
+        return ResponseEntity.noContent().build();
+    }
 }

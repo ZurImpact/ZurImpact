@@ -83,4 +83,30 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    @Override
+    @Transactional
+    public boolean changeUsername(Long userId, String newUsername) {
+        if (newUsername == null) {
+            return false;
+        }
+        String normalized = newUsername.trim();
+        if(normalized.length() < 3 || normalized.length() > 50) {
+            throw new IllegalArgumentException("Username must be between 3 and 50 characters");
+        }
+        Optional<User> userOptional = userDao.findById(userId);
+        if(userOptional.isEmpty()){
+            throw new IllegalArgumentException("User with id " + userId + " not found");
+        }
+        userOptional = userDao.findByUsername(normalized);
+        if(userOptional.isPresent() && !userOptional.get().getId().equals(userId)){
+            throw new IllegalArgumentException("Username " + normalized + " is already taken");
+        }
+
+        try {
+            userDao.updateUsername(userId, normalized);
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update username for user with id " + userId, e);
+        }
+    }
 }

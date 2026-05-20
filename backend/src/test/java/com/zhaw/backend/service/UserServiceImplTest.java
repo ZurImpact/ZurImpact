@@ -1,5 +1,6 @@
 package com.zhaw.backend.service;
 
+import com.zhaw.backend.enums.Role;
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -51,6 +52,16 @@ class UserServiceImplTest {
         sampleUser.setEmail("test@example.com");
         sampleUser.setPasswordHash("hashed_pw");
         sampleUser.setCreatedAt(LocalDateTime.of(2025, 1, 1, 12, 0));
+    }
+
+    private User user(String username, String rawPassword, Role role, boolean verified){
+        return User.builder().id(11L)
+                .username(username)
+                .email(username + "@example.com")
+                .passwordHash("hased_" + rawPassword)
+                .role(role.name())
+                .emailVerified(verified)
+                .build();
     }
 
     // ── findUserById ────────────────────────────────────────────────────
@@ -280,5 +291,88 @@ class UserServiceImplTest {
             assertFalse(result);
             verify(userDao, never()).save(any(User.class));
         }
+    }
+
+    @Test
+    @DisplayName("changeUsername successfully updates username for valid input")
+    void changeUsernameSuccess() {
+        User u = User.builder().build();
+        user("alice", "secret", Role.ROLE_USER, true);
+        when(userDao.findById(11L)).thenReturn(Optional.of(u));
+        when(userDao.findByUsername("newusername")).thenReturn(Optional.empty());
+
+        boolean result = userService.changeUsername(11L, "newusername");
+
+        assertTrue(result);
+        verify(userDao).updateUsername(11L, "newusername");
+    }
+
+    @Test
+    @DisplayName("changeUsername trims whitespace from username")
+    void changeUsernameTrimmed() {
+        User u = user("alice", "secret", Role.ROLE_USER, true);
+        when(userDao.findById(11L)).thenReturn(Optional.of(u));
+        when(userDao.findByUsername("trimmed")).thenReturn(Optional.empty());
+
+        boolean result = userService.changeUsername(11L, "  trimmed  ");
+
+        assertTrue(result);
+        verify(userDao).updateUsername(11L, "trimmed");
+    }
+
+    @Test
+    @DisplayName("changeUsername throws when username already taken by another user")
+    void changeUsernameDuplicateThrows() {
+        User u = user("alice", "secret", Role.ROLE_USER, true);
+        User other = user("existing", "secret", Role.ROLE_USER, true);
+        other.setId(22L);
+
+        when(userDao.findById(11L)).thenReturn(Optional.of(u));
+        when(userDao.findByUsername("existing")).thenReturn(Optional.of(other));
+
+        assertThrows(IllegalArgumentException.class,
+            () -> userService.changeUsername(11L, "existing"));
+
+        verify(userDao, never()).updateUsername(anyLong(), anyString());
+    }
+
+    @Test
+    @DisplayName("changeUsername allows same username for same user (idempotent)")
+    void changeUsernameSameUserAllowed() {
+        User u = user("alice", "secret", Role.ROLE_USER, true);
+        when(userDao.findById(11L)).thenReturn(Optional.of(u));
+        when(userDao.findByUsername("alice")).thenReturn(Optional.of(u));
+
+        boolean result = userService.changeUsername(11L, "alice");
+
+        assertTrue(result);
+        verify(userDao).updateUsername(11L, "alice");
+    }
+
+    @Test
+    @DisplayName("changeUsername handles minimum valid length (3 chars)")
+    void changeUsernameMinValidLength() {
+        User u = user("alice", "secret", Role.ROLE_USER, true);
+        when(userDao.findById(11L)).thenReturn(Optional.of(u));
+        when(userDao.findByUsername("abc")).thenReturn(Optional.empty());
+
+        boolean result = userService.changeUsername(11L, "abc");
+
+        assertTrue(result);
+        verify(userDao).updateUsername(11L, "abc");
+    }
+
+    @Test
+    @DisplayName("changeUsername handles maximum valid length (50 chars)")
+    void changeUsernameMaxValidLength() {
+        String maxLength = "a".repeat(50);
+        User u = user("alice", "secret", Role.ROLE_USER, true);
+        when(userDao.findById(11L)).thenReturn(Optional.of(u));
+        when(userDao.findByUsername(maxLength)).thenReturn(Optional.empty());
+
+        boolean result = userService.changeUsername(11L, maxLength);
+
+        assertTrue(result);
+        verify(userDao).updateUsername(11L, maxLength);
     }
 }

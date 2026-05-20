@@ -24,4 +24,6 @@ public interface UserService {
     boolean addPointsToUser(Long userId, Integer points);
 
     boolean deductPointsFromUser(Long userId, Integer points);
+
+    boolean changeUsername(Long userId, String newUsername);
 }

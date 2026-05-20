@@ -85,6 +85,8 @@ INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_o
 INSERT INTO http_permission (path_pattern, http_method, roles) VALUES
     ('/api/auth/logout', 'POST', 'ROLE_USER,ROLE_ADMIN,ROLE_PARTNER'),
     ('/api/auth/whoami', 'GET', 'ROLE_USER,ROLE_ADMIN,ROLE_PARTNER'),
+    ('/api/auth/verify-email', 'POST', ''),
+    ('/api/auth/verify-email-change', 'POST', ''),
     ('/api/users/me/password-change', 'POST', 'ROLE_USER,ROLE_ADMIN,ROLE_PARTNER'),
     ('/api/users/**', 'GET', 'ROLE_USER,ROLE_ADMIN'),
     ('/api/action', 'GET', ''),

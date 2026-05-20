@@ -45,4 +45,17 @@ public class SmtpMailServiceImpl implements MailService {
                 + "This link expires in 30 minutes. If you did not request a reset, ignore this message.\n");
         mailSender.send(message);
     }
+
+    @Override
+    public void sendEmailChangeVerificationEmail(String toEmail, String username, String verificationToken) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromAddress);
+        message.setTo(toEmail);
+        message.setSubject("Confirm your new ZurImpact email address");
+        message.setText("Hello " + username + ",\n\n"
+                + "Confirm your new email by visiting:\n"
+                + appBaseUrl + "/verify-email-change?token=" + verificationToken + "\n\n"
+                + "If you did not request this change, ignore this message.\n");
+        mailSender.send(message);
+    }
 }
