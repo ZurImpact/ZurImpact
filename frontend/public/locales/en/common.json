@@ -235,6 +235,34 @@
     "memberSinceLabel": "Member since",
     "addressLabel": "Address",
     "addressFormat": "Address #{{id}}",
+    "updateName": {
+      "title": "Change profile name",
+      "description": "Update the name shown on your profile.",
+      "nameLabel": "Profile name",
+      "namePlaceholder": "Your profile name",
+      "submit": "Save name",
+      "submitPending": "Saving name...",
+      "success": "Your profile name has been updated.",
+      "errorGeneric": "Couldn't update your profile name, please try again."
+    },
+    "updateEmail": {
+      "title": "Change email",
+      "description": "Update the email address used for your account.",
+      "emailLabel": "New email address",
+      "emailPlaceholder": "name@example.com",
+      "submit": "Save email",
+      "submitPending": "Saving email...",
+      "success": "Your email address has been updated.",
+      "errorGeneric": "Couldn't update your email, please try again."
+    },
+    "deleteProfile": {
+      "title": "Delete profile",
+      "description": "This permanently deletes your account and signs you out.",
+      "button": "Delete profile",
+      "buttonPending": "Deleting profile...",
+      "confirmMessage": "Delete your profile? This cannot be undone.",
+      "errorGeneric": "Couldn't delete your profile, please try again."
+    },
     "changePassword": {
       "title": "Change password",
       "description": "Changing your password will sign you out of all devices.",

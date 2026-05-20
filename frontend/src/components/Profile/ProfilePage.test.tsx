@@ -1,14 +1,19 @@
-import {describe, it, expect, vi} from 'vitest';
+import {describe, it, expect, vi, beforeEach, afterEach} from 'vitest';
 import {screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {MemoryRouter, Route, Routes} from 'react-router';
 import {renderWithProviders} from '../../test/test.utils';
 import {type DeepPartial, type RootState} from '../../store/store';
 import {ProfilePage} from './ProfilePage';
 import {resolveT} from '../../test/setup';
+import * as userApi from '../../api/userApi';
 
 vi.mock('../../api/userApi', () => ({
   changePassword: vi.fn(),
   getUserById: vi.fn(),
+  updateCurrentUserName: vi.fn(),
+  updateCurrentUserEmail: vi.fn(),
+  deleteCurrentUser: vi.fn(),
 }));
 
 vi.mock('../../api/authApi', () => ({
@@ -25,6 +30,7 @@ vi.mock('../../api/apiClient', () => ({
   default: {
     get: vi.fn().mockResolvedValue({data: {}}),
     post: vi.fn().mockResolvedValue({data: {}}),
+    delete: vi.fn().mockResolvedValue({data: {}}),
   },
 }));
 
@@ -66,6 +72,14 @@ function renderProfilePage(preloadedState?: DeepPartial<RootState>) {
 }
 
 describe('ProfilePage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   describe('with fully populated currentUser', () => {
     it('renders username, email, role, and points', () => {
       renderProfilePage({
@@ -109,6 +123,80 @@ describe('ProfilePage', () => {
 
       // The date 2024-03-15 should appear in some human-readable format
       expect(screen.getByText(/march.*2024|2024.*march|mar.*2024|15.*2024/i)).toBeInTheDocument();
+    });
+
+    it('allows changing the profile name', async () => {
+      const user = userEvent.setup();
+      vi.mocked(userApi.updateCurrentUserName).mockResolvedValueOnce({
+        ...fullyPopulatedUser,
+        username: 'alice2',
+      });
+
+      renderProfilePage({
+        user: {
+          loading: false,
+          isAuthenticated: true,
+          currentUser: fullyPopulatedUser,
+          error: null,
+        },
+      });
+
+      await user.clear(screen.getByLabelText(/profile name/i));
+      await user.type(screen.getByLabelText(/profile name/i), 'alice2');
+      await user.click(screen.getByRole('button', {name: /save name/i}));
+
+      expect(vi.mocked(userApi.updateCurrentUserName)).toHaveBeenCalledWith({username: 'alice2'});
+      expect(await screen.findByDisplayValue('alice2')).toBeInTheDocument();
+      expect(screen.getByText(/profile name has been updated/i)).toBeInTheDocument();
+    });
+
+    it('allows changing the email address', async () => {
+      const user = userEvent.setup();
+      vi.mocked(userApi.updateCurrentUserEmail).mockResolvedValueOnce({
+        ...fullyPopulatedUser,
+        email: 'new@example.com',
+      });
+
+      renderProfilePage({
+        user: {
+          loading: false,
+          isAuthenticated: true,
+          currentUser: fullyPopulatedUser,
+          error: null,
+        },
+      });
+
+      await user.clear(screen.getByLabelText(/new email address/i));
+      await user.type(screen.getByLabelText(/new email address/i), 'new@example.com');
+      await user.click(screen.getByRole('button', {name: /save email/i}));
+
+      expect(vi.mocked(userApi.updateCurrentUserEmail)).toHaveBeenCalledWith({email: 'new@example.com'});
+      expect(await screen.findByDisplayValue('new@example.com')).toBeInTheDocument();
+      expect(screen.getByText(/email address has been updated/i)).toBeInTheDocument();
+    });
+
+    it('deletes the profile after confirmation', async () => {
+      const user = userEvent.setup();
+      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      vi.mocked(userApi.deleteCurrentUser).mockResolvedValueOnce(undefined);
+
+      const {store} = renderProfilePage({
+        user: {
+          loading: false,
+          isAuthenticated: true,
+          currentUser: fullyPopulatedUser,
+          error: null,
+        },
+      });
+
+      await user.click(screen.getByRole('button', {name: /delete profile/i}));
+
+      expect(vi.mocked(userApi.deleteCurrentUser)).toHaveBeenCalled();
+      expect(mockNavigate).toHaveBeenCalledWith('/login', {
+        replace: true,
+        state: {reason: 'account_deleted'},
+      });
+      expect(store.getState().user.currentUser).toBeNull();
     });
   });
 

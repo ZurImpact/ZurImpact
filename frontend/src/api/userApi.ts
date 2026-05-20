@@ -16,6 +16,20 @@ export async function getUserById(id: number): Promise<UserDto> {
   return response.data;
 }
 
+export async function updateCurrentUserName(req: {username: string}): Promise<UserDto> {
+  const response = await apiClient.post<UserDto>('/users/me/username-change', req);
+  return response.data;
+}
+
+export async function updateCurrentUserEmail(req: {email: string}): Promise<UserDto> {
+  const response = await apiClient.post<UserDto>('/users/me/email-change', req);
+  return response.data;
+}
+
 export async function changePassword(req: {currentPassword: string; newPassword: string}): Promise<void> {
   await apiClient.post('/users/me/password-change', req);
+}
+
+export async function deleteCurrentUser(): Promise<void> {
+  await apiClient.delete('/users/me');
 }
