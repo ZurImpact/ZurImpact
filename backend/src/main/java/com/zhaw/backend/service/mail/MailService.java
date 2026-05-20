@@ -9,4 +9,6 @@ public interface MailService {
     void sendVerificationEmail(String toEmail, String username, String verificationToken);
 
     void sendPasswordResetEmail(String toEmail, String username, String resetToken);
+
+    void sendEmailChangeVerificationEmail(String toEmail, String username, String verificationToken);
 }
