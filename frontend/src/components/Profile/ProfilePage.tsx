@@ -80,7 +80,7 @@ export function ProfilePage() {
     setNameUpdateMessage(null);
 
     try {
-      const updatedUser = await updateCurrentUserName({username: values.username});
+      const updatedUser = await updateCurrentUserName({newUsername: values.username});
       dispatch(updateCurrentUser(updatedUser));
       setNameUpdateMessage(t('profile.updateName.success'));
     } catch {
@@ -93,7 +93,7 @@ export function ProfilePage() {
     setEmailUpdateMessage(null);
 
     try {
-      const updatedUser = await updateCurrentUserEmail({email: values.email});
+      const updatedUser = await updateCurrentUserEmail({newEmail: values.email});
       dispatch(updateCurrentUser(updatedUser));
       setEmailUpdateMessage(t('profile.updateEmail.success'));
     } catch {
