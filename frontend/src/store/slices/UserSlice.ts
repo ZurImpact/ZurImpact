@@ -1,4 +1,4 @@
-import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import {createSlice, createAsyncThunk, type PayloadAction} from '@reduxjs/toolkit';
 import apiClient from '../../api/apiClient';
 import {logoutUser} from './AuthSlice';
 
@@ -73,6 +73,10 @@ const userSlice = createSlice({
       state.isAuthenticated = false;
       state.error = null;
     },
+    updateCurrentUser: (state, action: PayloadAction<UserDto>) => {
+      state.currentUser = action.payload;
+      state.isAuthenticated = true;
+    },
     clearUserError: (state) => {
       state.error = null;
     },
@@ -104,5 +108,5 @@ const userSlice = createSlice({
   },
 });
 
-export const {logout, clearUserError} = userSlice.actions;
+export const {logout, updateCurrentUser, clearUserError} = userSlice.actions;
 export default userSlice.reducer;

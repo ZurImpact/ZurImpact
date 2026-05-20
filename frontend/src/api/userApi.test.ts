@@ -8,7 +8,7 @@ vi.mock('./apiClient', () => ({
 }));
 
 import apiClient from './apiClient';
-import {getUserById, changePassword} from './userApi';
+import {getUserById, updateCurrentUserName, updateCurrentUserEmail, changePassword, deleteCurrentUser} from './userApi';
 
 const mockedGet = vi.mocked(apiClient.get);
 const mockedPost = vi.mocked(apiClient.post);
@@ -42,5 +42,51 @@ describe('userApi', () => {
       currentPassword: 'OldPass1!',
       newPassword: 'NewPass1!',
     });
+  });
+
+  it('updateCurrentUserName posts to /users/me/name-change with body and returns UserDto', async () => {
+    const payload = {
+      id: 1,
+      username: 'alice',
+      email: 'alice@example.com',
+      role: 'USER',
+      emailVerified: true,
+      points: 50,
+      address: null,
+      createdAt: '2024-01-01T00:00:00Z',
+    };
+    mockedPost.mockResolvedValueOnce({data: payload});
+
+    const result = await updateCurrentUserName({newUsername: 'alice2'});
+
+    expect(mockedPost).toHaveBeenCalledWith('/users/me/name-change', {newUsername: 'alice2'});
+    expect(result).toEqual(payload);
+  });
+
+  it('updateCurrentUserEmail posts to /users/me/email-change with body and returns UserDto', async () => {
+    const payload = {
+      id: 1,
+      username: 'alice',
+      email: 'new@example.com',
+      role: 'USER',
+      emailVerified: false,
+      points: 50,
+      address: null,
+      createdAt: '2024-01-01T00:00:00Z',
+    };
+    mockedPost.mockResolvedValueOnce({data: payload});
+
+    const result = await updateCurrentUserEmail({newEmail: 'new@example.com'});
+
+    expect(mockedPost).toHaveBeenCalledWith('/users/me/email-change', {newEmail: 'new@example.com'});
+    expect(result).toEqual(payload);
+  });
+
+  it('deleteCurrentUser posts to /users/me/delete-account', async () => {
+    mockedPost.mockResolvedValueOnce({data: {}});
+
+    await deleteCurrentUser();
+
+    expect(mockedPost).toHaveBeenCalledWith('/users/me/delete-account');
   });
 });

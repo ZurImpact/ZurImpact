@@ -235,6 +235,34 @@
     "memberSinceLabel": "Mitglied seit",
     "addressLabel": "Adresse",
     "addressFormat": "Adresse #{{id}}",
+    "updateName": {
+      "title": "Profilname ändern",
+      "description": "Aktualisiere deinen Profilnamen.",
+      "nameLabel": "Profilname",
+      "namePlaceholder": "Dein Profilname",
+      "submit": "Name speichern",
+      "submitPending": "Name wird gespeichert...",
+      "success": "Dein Profilname wurde aktualisiert.",
+      "errorGeneric": "Der Profilname konnte nicht aktualisiert werden. Bitte versuche es erneut."
+    },
+    "updateEmail": {
+      "title": "E-Mail ändern",
+      "description": "Aktualisiere die E-Mail-Adresse für dein Konto.",
+      "emailLabel": "Neue E-Mail-Adresse",
+      "emailPlaceholder": "name@example.com",
+      "submit": "E-Mail speichern",
+      "submitPending": "E-Mail wird gespeichert...",
+      "success": "Deine E-Mail-Adresse wurde aktualisiert.",
+      "errorGeneric": "Die E-Mail konnte nicht aktualisiert werden. Bitte versuche es erneut."
+    },
+    "deleteProfile": {
+      "title": "Profil löschen",
+      "description": "Dadurch wird dein Konto dauerhaft gelöscht und du wirst abgemeldet.",
+      "button": "Profil löschen",
+      "buttonPending": "Profil wird gelöscht...",
+      "confirmMessage": "Profil löschen? Das kann nicht rückgängig gemacht werden.",
+      "errorGeneric": "Das Profil konnte nicht gelöscht werden. Bitte versuche es erneut."
+    },
     "changePassword": {
       "title": "Passwort ändern",
       "description": "Das Ändern Ihres Passworts meldet Sie auf allen Geräten ab.",

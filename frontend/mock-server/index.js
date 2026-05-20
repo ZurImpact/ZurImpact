@@ -252,6 +252,62 @@ app.get(BASE_URL + '/users/:id', (req, res) => {
   res.status(404).json({error: 'User not found'});
 });
 
+// POST /users/me/username-change — updates the current user's username
+app.post(BASE_URL + '/users/me/username-change', (req, res) => {
+  const ctx = currentUserFromReq(req);
+  if (!ctx) return res.status(401).json({message: 'Not authenticated'});
+
+  const {username} = req.body ?? {};
+  if (!username) {
+    return res.status(400).json({message: 'invalid_request'});
+  }
+
+  if (ctx.user.username === username) {
+    const {password: _pw, ...rest} = ctx.user;
+    return res.json({...rest, points: mockUserPoints.points});
+  }
+
+  if (users.has(username)) {
+    return res.status(409).json({message: 'username_taken'});
+  }
+
+  const oldUsername = ctx.user.username;
+  ctx.user.username = username;
+  users.delete(oldUsername);
+  users.set(username, ctx.user);
+
+  const {password: _pw, ...rest} = ctx.user;
+  res.json({...rest, points: mockUserPoints.points});
+});
+
+// POST /users/me/email-change — updates the current user's email
+app.post(BASE_URL + '/users/me/email-change', (req, res) => {
+  const ctx = currentUserFromReq(req);
+  if (!ctx) return res.status(401).json({message: 'Not authenticated'});
+
+  const {email} = req.body ?? {};
+  if (!email) {
+    return res.status(400).json({message: 'invalid_request'});
+  }
+
+  if (ctx.user.email === email) {
+    const {password: _pw, ...rest} = ctx.user;
+    return res.json({...rest, points: mockUserPoints.points});
+  }
+
+  for (const u of users.values()) {
+    if (u.email === email && u.id !== ctx.user.id) {
+      return res.status(409).json({message: 'email_taken'});
+    }
+  }
+
+  ctx.user.email = email;
+  ctx.user.emailVerified = false;
+
+  const {password: _pw, ...rest} = ctx.user;
+  res.json({...rest, points: mockUserPoints.points});
+});
+
 // POST /users/me/password-change — revokes ALL sessions (incl. caller's)
 app.post(BASE_URL + '/users/me/password-change', (req, res) => {
   const ctx = currentUserFromReq(req);
@@ -271,6 +327,20 @@ app.post(BASE_URL + '/users/me/password-change', (req, res) => {
   for (const [sid, s] of sessions.entries()) {
     if (s.userId === ctx.user.id) sessions.delete(sid);
   }
+  clearSessionCookie(res);
+  res.status(204).end();
+});
+
+// DELETE /users/me — deletes the current user's profile and revokes all sessions
+app.delete(BASE_URL + '/users/me', (req, res) => {
+  const ctx = currentUserFromReq(req);
+  if (!ctx) return res.status(401).json({message: 'Not authenticated'});
+
+  for (const [sid, s] of sessions.entries()) {
+    if (s.userId === ctx.user.id) sessions.delete(sid);
+  }
+
+  users.delete(ctx.user.username);
   clearSessionCookie(res);
   res.status(204).end();
 });
