@@ -5,10 +5,7 @@ import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.entities.EmailVerificationToken;
 import com.zhaw.backend.model.entities.PasswordResetToken;
 import com.zhaw.backend.model.entities.User;
-import com.zhaw.backend.service.auth.AuthService;
-import com.zhaw.backend.service.auth.AuthServiceImpl;
-import com.zhaw.backend.service.auth.EmailVerificationTokenService;
-import com.zhaw.backend.service.auth.PasswordResetTokenService;
+import com.zhaw.backend.service.auth.*;
 import com.zhaw.backend.service.mail.MailService;
 import com.zhaw.backend.service.session.SessionService;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +34,7 @@ class AuthServiceTest {
     private PasswordResetTokenService resetTokenService;
     private MailService mailService;
     private AuthService authService;
+    private EmailChangeTokenService emailChangeTokenService;
 
     @BeforeEach
     void setUp() {
@@ -46,7 +44,7 @@ class AuthServiceTest {
         resetTokenService = mock(PasswordResetTokenService.class);
         mailService = mock(MailService.class);
         authService = new AuthServiceImpl(encoder, userDao, sessionService,
-                verificationTokenService, resetTokenService, mailService);
+                verificationTokenService, resetTokenService, mailService, emailChangeTokenService);
     }
 
     private User user(String username, String rawPassword, Role role, boolean verified) {

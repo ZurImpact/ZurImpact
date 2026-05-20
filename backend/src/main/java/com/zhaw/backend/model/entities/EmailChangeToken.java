@@ -17,7 +17,7 @@ public class EmailChangeToken {
     private String tokenHash;
     private Long userId;
     private String newEmail;
-    private LocalDateTime cretedAt;
-    private LocalDateTime expiredAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime expiresAt;
     private LocalDateTime consumedAt;
 }
