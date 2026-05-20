@@ -145,7 +145,7 @@ describe('ProfilePage', () => {
       await user.type(screen.getByLabelText(/profile name/i), 'alice2');
       await user.click(screen.getByRole('button', {name: /save name/i}));
 
-      expect(vi.mocked(userApi.updateCurrentUserName)).toHaveBeenCalledWith({username: 'alice2'});
+      expect(vi.mocked(userApi.updateCurrentUserName)).toHaveBeenCalledWith({newUsername: 'alice2'});
       expect(await screen.findByDisplayValue('alice2')).toBeInTheDocument();
       expect(screen.getByText(/profile name has been updated/i)).toBeInTheDocument();
     });
@@ -170,7 +170,7 @@ describe('ProfilePage', () => {
       await user.type(screen.getByLabelText(/new email address/i), 'new@example.com');
       await user.click(screen.getByRole('button', {name: /save email/i}));
 
-      expect(vi.mocked(userApi.updateCurrentUserEmail)).toHaveBeenCalledWith({email: 'new@example.com'});
+      expect(vi.mocked(userApi.updateCurrentUserEmail)).toHaveBeenCalledWith({newEmail: 'new@example.com'});
       expect(await screen.findByDisplayValue('new@example.com')).toBeInTheDocument();
       expect(screen.getByText(/email address has been updated/i)).toBeInTheDocument();
     });
@@ -226,7 +226,7 @@ describe('ProfilePage', () => {
         },
       });
 
-      expect(screen.queryByText(/address/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(resolveT('profile.addressLabel'))).not.toBeInTheDocument();
     });
 
     it('renders address row when address is a number', () => {
@@ -239,7 +239,7 @@ describe('ProfilePage', () => {
         },
       });
 
-      expect(screen.getByText(/address.*42|#42/i)).toBeInTheDocument();
+      expect(screen.getByText(resolveT('profile.addressFormat', {id: 42}))).toBeInTheDocument();
     });
   });
 

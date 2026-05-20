@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 
+import {Fragment, createElement} from 'react';
 import {vi} from 'vitest';
 import enCommon from '../../public/locales/en/common.json';
 
@@ -60,6 +61,18 @@ vi.mock('sonner', () => ({
   },
 }));
 
+const mockSetTheme = vi.fn();
+
+vi.mock('next-themes', () => ({
+  ThemeProvider: ({children}: {children: React.ReactNode}) => createElement(Fragment, null, children),
+  useTheme: () => ({
+    theme: 'light',
+    resolvedTheme: 'light',
+    systemTheme: 'light',
+    setTheme: mockSetTheme,
+  }),
+}));
+
 if (!Element.prototype.hasPointerCapture) {
   Element.prototype.hasPointerCapture = vi.fn(() => false);
 }
@@ -103,9 +116,3 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 });
-vi.mock('next-themes', () => ({
-  useTheme: () => ({
-    resolvedTheme: "light",
-    setTheme: vi.fn(),
-  }),
-}));
