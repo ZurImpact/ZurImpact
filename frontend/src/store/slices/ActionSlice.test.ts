@@ -3,7 +3,7 @@ import {configureStore} from '@reduxjs/toolkit';
 import actionReducer, {
   fetchActions,
   fetchActionById,
-  fetchUserActions,
+  fetchMyActions,
   startAction,
   completeAction,
   clearSelectedAction,
@@ -158,24 +158,24 @@ describe('ActionSlice', () => {
     });
   });
 
-  describe('fetchUserActions', () => {
+  describe('fetchMyActions', () => {
     it('stores userActions on success', async () => {
       const store = createTestStore();
       mockedGet.mockResolvedValueOnce({data: [mockUserAction]});
 
-      await store.dispatch(fetchUserActions({userId: 123}));
+      await store.dispatch(fetchMyActions({}));
 
       const state = store.getState().actions;
       expect(state.userActions).toEqual([mockUserAction]);
       expect(state.loading).toBe(false);
-      expect(mockedGet).toHaveBeenCalledWith('/users/123/actions');
+      expect(mockedGet).toHaveBeenCalledWith('/users/me/actions');
     });
 
     it('sets error on failure', async () => {
       const store = createTestStore();
       mockedGet.mockRejectedValueOnce(new Error('Unauthorized'));
 
-      await store.dispatch(fetchUserActions({userId: 123}));
+      await store.dispatch(fetchMyActions({}));
 
       expect(store.getState().actions.error).toBe('Unauthorized');
     });
@@ -184,7 +184,7 @@ describe('ActionSlice', () => {
       const store = createTestStore();
       mockedGet.mockRejectedValueOnce(null);
 
-      await store.dispatch(fetchUserActions({userId: 123}));
+      await store.dispatch(fetchMyActions({}));
 
       expect(store.getState().actions.error).toBe('Failed to fetch user actions');
     });
@@ -193,9 +193,9 @@ describe('ActionSlice', () => {
       const store = createTestStore();
       mockedGet.mockResolvedValueOnce({data: [mockUserAction]});
 
-      await store.dispatch(fetchUserActions({userId: 123, active: true}));
+      await store.dispatch(fetchMyActions({active: true}));
 
-      expect(mockedGet).toHaveBeenCalledWith('/users/123/actions?active=true');
+      expect(mockedGet).toHaveBeenCalledWith('/users/me/actions?active=true');
     });
   });
 

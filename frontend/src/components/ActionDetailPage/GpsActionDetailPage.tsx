@@ -9,7 +9,7 @@ import {Badge} from '../ui/badge';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {
   fetchActionById,
-  fetchUserActions,
+  fetchMyActions,
   clearSelectedAction,
   completeAction,
   startAction,
@@ -278,7 +278,7 @@ export function GpsActionDetailPage() {
 
       const userId = currentUser?.id;
       if (userId !== undefined && userId > 0) {
-        dispatch(fetchUserActions({userId, active: true}))
+        dispatch(fetchMyActions({active: true}))
           .unwrap()
           .then((userActions: UserActionHistoryDto[]) => {
             if (!isMounted) {

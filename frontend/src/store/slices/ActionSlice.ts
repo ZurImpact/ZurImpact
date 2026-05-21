@@ -107,22 +107,22 @@ export const fetchActionById = createAsyncThunk(
   },
 );
 
-// Async thunk for fetching user's action history
-type FetchUserActionsParams = {
-  userId: number;
+// Async thunk for fetching the authenticated user's action history.
+// Backed by GET /users/me/actions — see backend UserController#getMyActions.
+type FetchMyActionsParams = {
   active?: boolean;
 };
 
-export const fetchUserActions = createAsyncThunk(
-  'action/fetchUserActions',
-  async (params: FetchUserActionsParams, {rejectWithValue}) => {
+export const fetchMyActions = createAsyncThunk(
+  'action/fetchMyActions',
+  async (params: FetchMyActionsParams, {rejectWithValue}) => {
     try {
       const searchParams = new URLSearchParams();
       if (params.active !== undefined) {
         searchParams.append('active', String(params.active));
       }
       const query = searchParams.toString();
-      const url = `/users/${params.userId}/actions${query ? `?${query}` : ''}`;
+      const url = `/users/me/actions${query ? `?${query}` : ''}`;
       const response = await apiClient.get(url);
       return response.data;
     } catch (error: unknown) {
@@ -235,17 +235,17 @@ const actionSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // fetchUserActions cases
+    // fetchMyActions cases
     builder
-      .addCase(fetchUserActions.pending, (state) => {
+      .addCase(fetchMyActions.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchUserActions.fulfilled, (state, action) => {
+      .addCase(fetchMyActions.fulfilled, (state, action) => {
         state.loading = false;
         state.userActions = action.payload;
       })
-      .addCase(fetchUserActions.rejected, (state, action) => {
+      .addCase(fetchMyActions.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

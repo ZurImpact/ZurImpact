@@ -151,7 +151,7 @@ describe('GpsActionDetailPage', () => {
     });
 
     mockGet.mockImplementation((url: string) => {
-      if (url === '/users/5/actions?active=true') return Promise.resolve({data: []});
+      if (url === '/users/me/actions?active=true') return Promise.resolve({data: []});
       if (url === '/actions/1') return Promise.resolve({data: actionFixture});
       if (url === '/auth/whoami') return Promise.resolve({data: {id: 5}});
       if (url === '/users/5') return Promise.resolve({data: defaultUserState.currentUser});
@@ -183,13 +183,13 @@ describe('GpsActionDetailPage', () => {
     });
 
     await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith('/users/5/actions?active=true');
+      expect(mockGet).toHaveBeenCalledWith('/users/me/actions?active=true');
     });
   });
 
   it('loads matched active user history action from url id into state', async () => {
     mockGet.mockImplementation((url: string) => {
-      if (url === '/users/5/actions?active=true') {
+      if (url === '/users/me/actions?active=true') {
         return Promise.resolve({data: [activeHistoryActionFixture]});
       }
       if (url === '/actions/1') return Promise.resolve({data: actionFixture});
@@ -459,7 +459,7 @@ describe('GpsActionDetailPage', () => {
       const fixture = makeFixture('HARD');
       mockGet.mockImplementation((url: string) => {
         if (url === '/actions/1') return Promise.resolve({data: fixture});
-        if (url === '/users/5/actions?active=true') return Promise.resolve({data: []});
+        if (url === '/users/me/actions?active=true') return Promise.resolve({data: []});
         return Promise.resolve({data: {}});
       });
       const user = userEvent.setup();
