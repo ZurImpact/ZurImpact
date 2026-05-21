@@ -181,7 +181,7 @@ describe('RegisterPage', () => {
       resolveRegister(undefined);
     });
 
-    it('navigates to /verify-email?pending=1&email=<encoded> with replace on fulfilled', async () => {
+    it('navigates to /verify-email with replace on fulfilled', async () => {
       const user = userEvent.setup();
       vi.mocked(authApi.register).mockResolvedValueOnce(undefined);
 

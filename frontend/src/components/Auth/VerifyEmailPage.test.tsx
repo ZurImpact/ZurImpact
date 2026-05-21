@@ -29,9 +29,12 @@ vi.mock('../../utility/i18n', () => ({
 
 import * as authApi from '../../api/authApi';
 
-function renderVerifyEmailPage(url: string, preloadedState?: DeepPartial<RootState>) {
+function renderVerifyEmailPage(
+  entry: string | {pathname: string; search?: string; state?: unknown},
+  preloadedState?: DeepPartial<RootState>,
+) {
   return renderWithProviders(
-    <MemoryRouter initialEntries={[url]}>
+    <MemoryRouter initialEntries={[entry]}>
       <Routes>
         <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/login" element={<div data-testid="login-page">Login</div>} />
@@ -59,8 +62,8 @@ describe('VerifyEmailPage', () => {
       expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     });
 
-    it('passes email from URL to ResendVerificationForm as defaultEmail', () => {
-      renderVerifyEmailPage('/verify-email?pending=1&email=foo%40bar.com');
+    it('passes pendingEmail from location.state to ResendVerificationForm as defaultEmail', () => {
+      renderVerifyEmailPage({pathname: '/verify-email', state: {pendingEmail: 'foo@bar.com'}});
 
       expect(screen.getByLabelText(/email/i)).toHaveValue('foo@bar.com');
     });

@@ -1,17 +1,9 @@
 import {createSlice, createAsyncThunk, type PayloadAction} from '@reduxjs/toolkit';
 import apiClient from '../../api/apiClient';
+import type {UserDto} from '../../api/userApi';
 import {logoutUser} from './AuthSlice';
 
-export interface UserDto {
-  id: number;
-  username: string;
-  email: string;
-  role: string;
-  emailVerified: boolean;
-  points: number;
-  address: number | null;
-  createdAt: string | null;
-}
+export type {UserDto};
 
 export type UserRole = 'ADMIN' | 'PARTNER' | 'ROLE_ADMIN' | 'ROLE_PARTNER' | 'ROLE_USER';
 
