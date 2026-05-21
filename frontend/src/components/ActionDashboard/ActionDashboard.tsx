@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router';
 import {Card} from '../ui/card';
 import {Button} from '../ui/button';
 import {useAppSelector, useAppDispatch} from '../../store/store';
-import {fetchActions, fetchUserActions} from '../../store/slices/ActionSlice';
+import {fetchActions, fetchMyActions} from '../../store/slices/ActionSlice';
 import {useTranslation} from 'react-i18next';
 import {ActionCard} from './ActionCard/ActionCard';
 import {ROUTES} from '../../routes';
@@ -36,7 +36,7 @@ export function ActionDashboard() {
     }
 
     dispatch(fetchActions({}));
-    dispatch(fetchUserActions({userId: currentUser?.id || 1}));
+    dispatch(fetchMyActions({}));
   }, [dispatch, isAuthenticated, currentUser?.id]);
 
   if (!isAuthenticated) {

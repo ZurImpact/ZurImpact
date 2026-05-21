@@ -184,6 +184,17 @@ app.delete(BASE_URL + '/actions/:id', (req, res) => {
   }
 });
 
+// GET /users/me/actions — authenticated user's history (preferred FE path)
+app.get(BASE_URL + '/users/me/actions', (req, res) => {
+  const ctx = currentUserFromReq(req);
+  if (!ctx) return res.status(401).json({message: 'Not authenticated'});
+  const {active} = req.query;
+  if (active === 'true') {
+    return res.json(mockUserActions.filter((a) => a.completionState === 'IN_PROGRESS'));
+  }
+  res.json(mockUserActions);
+});
+
 app.get(BASE_URL + '/users/:userId/actions', (req, res) => {
   const {active} = req.query;
   if (active === 'true') {

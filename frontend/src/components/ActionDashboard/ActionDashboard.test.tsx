@@ -122,7 +122,8 @@ describe('ActionDashboard', () => {
   it('renders user action history with points', async () => {
     mockGet.mockImplementation((url: string) => {
       if (url === '/actions') return Promise.resolve({data: mockActions});
-      if (url.includes('/users/') && url.includes('/actions')) return Promise.resolve({data: mockUserActions});
+      if (url === '/users/me/actions' || url.startsWith('/users/me/actions?'))
+        return Promise.resolve({data: mockUserActions});
       return Promise.resolve({data: []});
     });
     renderAuthenticatedDashboard();
