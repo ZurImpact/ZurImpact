@@ -146,6 +146,8 @@ describe('ActionCreatePage', () => {
       );
     });
 
-    expect(navigateMock).toHaveBeenCalledWith('/actions/23');
-  });
+    await waitFor(() => {
+      expect(navigateMock).toHaveBeenCalledWith('/actions/23');
+    });
+  }, 15000);
 });

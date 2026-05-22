@@ -47,6 +47,15 @@ const mockUserAction = {
   mappingCreatedOn: '2026-03-01',
 };
 
+const mockActiveUserAction = {
+  actionId: 1,
+  displayName: 'Clean Park',
+  points: 50,
+  completionState: 'IN_PROGRESS',
+  completedSubtaskIds: [101, 102],
+  mappingCreatedOn: '2026-03-01',
+};
+
 describe('ActionSlice', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -197,6 +206,15 @@ describe('ActionSlice', () => {
 
       expect(mockedGet).toHaveBeenCalledWith('/users/me/actions?active=true');
     });
+
+    it('preserves completedSubtaskIds from the active history response', async () => {
+      const store = createTestStore();
+      mockedGet.mockResolvedValueOnce({data: [mockActiveUserAction]});
+
+      await store.dispatch(fetchMyActions({active: true}));
+
+      expect(store.getState().actions.userActions).toEqual([mockActiveUserAction]);
+    });
   });
 
   describe('startAction', () => {
@@ -243,7 +261,9 @@ describe('ActionSlice', () => {
       const state = store.getState().actions;
       expect(state.loading).toBe(false);
       expect(state.error).toBeNull();
-      expect(mockedPost).toHaveBeenCalledWith('/actions/completeAction', {userId: 123, actionId: 1});
+      expect(mockedPost).toHaveBeenCalledWith('/actions/completeAction', null, {
+        params: {userId: 123, actionId: 1},
+      });
     });
 
     it('sets error on failure', async () => {

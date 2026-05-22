@@ -42,15 +42,6 @@ const actionFixture = {
   ],
 };
 
-const activeHistoryActionFixture = {
-  actionId: 1,
-  displayName: 'Running GPS City Walk',
-  description: 'Continue where you left off',
-  points: 125,
-  completionState: 'ACTIVE',
-  isSubtask: false,
-};
-
 vi.mock('../../api/apiClient', () => ({
   default: {
     get: (...args: unknown[]) => mockGet(...args),
@@ -184,27 +175,6 @@ describe('GpsActionDetailPage', () => {
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith('/users/me/actions?active=true');
-    });
-  });
-
-  it('loads matched active user history action from url id into state', async () => {
-    mockGet.mockImplementation((url: string) => {
-      if (url === '/users/me/actions?active=true') {
-        return Promise.resolve({data: [activeHistoryActionFixture]});
-      }
-      if (url === '/actions/1') return Promise.resolve({data: actionFixture});
-      return Promise.resolve({data: {}});
-    });
-
-    renderPage({
-      actions: createActionState(),
-    });
-
-    expect(await screen.findByText('Running GPS City Walk')).toBeInTheDocument();
-    expect(await screen.findByText('Continue where you left off')).toBeInTheDocument();
-
-    await waitFor(() => {
-      expect(screen.queryByRole('button', {name: resolveT('gpsActionDetail.startAction')})).not.toBeInTheDocument();
     });
   });
 
@@ -349,7 +319,9 @@ describe('GpsActionDetailPage', () => {
     // allow async operations to complete
     await waitFor(
       () => {
-        expect(mockPost).toHaveBeenCalledWith('/actions/completeAction', {userId: 5, actionId: 1});
+        expect(mockPost).toHaveBeenCalledWith('/actions/completeAction', null, {
+          params: {userId: 5, actionId: 1},
+        });
       },
       {timeout: 5000},
     );

@@ -241,7 +241,12 @@ export function GpsActionDetailPage() {
                   actionType: 'GPS',
                   additionalData: {latitude, longitude},
                 }),
-              );
+              )
+                .unwrap()
+                .then(() => {
+                  //reload entire page
+                  window.location.reload();
+                });
             }
           }
 
@@ -299,10 +304,13 @@ export function GpsActionDetailPage() {
             setActiveUserHistoryAction(matchedAction);
             setHasStartedAction(true);
 
-            const completedSubtaskIds = matchingActionEntries
-              .filter((userAction) => userAction.isSubtask)
-              .map((userAction) => Number(userAction.subtaskId ?? userAction.subactionId))
-              .filter((subtaskId) => Number.isInteger(subtaskId) && subtaskId > 0);
+            const completedSubtaskIds =
+              Array.isArray(matchedAction.completedSubtaskIds) && matchedAction.completedSubtaskIds.length > 0
+                ? matchedAction.completedSubtaskIds
+                : matchingActionEntries
+                    .filter((userAction) => userAction.isSubtask)
+                    .map((userAction) => Number(userAction.subtaskId ?? userAction.subactionId))
+                    .filter((subtaskId) => Number.isInteger(subtaskId) && subtaskId > 0);
             const completedSubtaskSet = new Set(completedSubtaskIds);
 
             setCheckedInCheckpointIds(completedSubtaskSet);
