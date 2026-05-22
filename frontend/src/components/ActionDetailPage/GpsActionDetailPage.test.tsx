@@ -329,7 +329,9 @@ describe('GpsActionDetailPage', () => {
     // allow async operations to complete
     await waitFor(
       () => {
-        expect(mockPost).toHaveBeenCalledWith('/actions/completeAction', {userId: 5, actionId: 1});
+        expect(mockPost).toHaveBeenCalledWith('/actions/completeAction', null, {
+          params: {userId: 5, actionId: 1},
+        });
       },
       {timeout: 5000},
     );
