@@ -1,6 +1,7 @@
-import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import {createSlice, createAsyncThunk, type PayloadAction} from '@reduxjs/toolkit';
 import apiClient from '../../api/apiClient';
 import type {DistanceThresholdLevel} from '../../utils/distanceThreshold';
+import {fetchCurrentUser} from './UserSlice';
 export type {DistanceThresholdLevel};
 
 export interface ActionDto {
@@ -51,17 +52,108 @@ interface ActionState {
   actions: ActionDto[];
   selectedAction: ActionDto | null;
   userActions: UserActionHistoryDto[];
+  gpsActionDetail: GpsActionDetailState;
   loading: boolean;
   error: string | null;
 }
+
+interface GpsActionDetailState {
+  activeUserHistoryAction: UserActionHistoryDto | null;
+  completedSubtaskIds: number[];
+  hasStartedAction: boolean;
+  loading: boolean;
+  startLoading: boolean;
+  checkpointLoading: boolean;
+  completionLoading: boolean;
+  error: string | null;
+}
+
+type LoadGpsActionDetailResult = {
+  activeUserHistoryAction: UserActionHistoryDto | null;
+  completedSubtaskIds: number[];
+  userActions?: UserActionHistoryDto[];
+};
+
+const initialGpsActionDetailState: GpsActionDetailState = {
+  activeUserHistoryAction: null,
+  completedSubtaskIds: [],
+  hasStartedAction: false,
+  loading: false,
+  startLoading: false,
+  checkpointLoading: false,
+  completionLoading: false,
+  error: null,
+};
 
 const initialState: ActionState = {
   actions: [],
   selectedAction: null,
   userActions: [],
+  gpsActionDetail: initialGpsActionDetailState,
   loading: false,
   error: null,
 };
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (error && typeof error === 'object' && 'response' in error) {
+    const axiosError = error as {response?: {data?: {error?: string}}};
+    return axiosError.response?.data?.error ?? fallback;
+  }
+
+  return fallback;
+}
+
+function mergeUserActions(...actionGroups: UserActionHistoryDto[][]): UserActionHistoryDto[] {
+  const seen = new Set<string>();
+  const mergedActions: UserActionHistoryDto[] = [];
+
+  actionGroups.flat().forEach((userAction) => {
+    const key = [
+      userAction.actionId,
+      userAction.completionState ?? '',
+      userAction.isSubtask ? 'subtask' : 'action',
+      userAction.subtaskId ?? '',
+      userAction.subactionId ?? '',
+      userAction.mappingCreatedOn ?? '',
+    ].join('|');
+
+    if (seen.has(key)) {
+      return;
+    }
+
+    seen.add(key);
+    mergedActions.push(userAction);
+  });
+
+  return mergedActions;
+}
+
+function deriveGpsActionHistory(actionId: number, userActions: UserActionHistoryDto[]) {
+  const matchingActionEntries = userActions.filter((userAction) => userAction.actionId === actionId);
+  const activeUserHistoryAction =
+    matchingActionEntries.find((userAction) => !userAction.isSubtask && userAction.completionState !== 'COMPLETED') ??
+    matchingActionEntries.find((userAction) => !userAction.isSubtask) ??
+    null;
+
+  const completedSubtaskIds =
+    activeUserHistoryAction && Array.isArray(activeUserHistoryAction.completedSubtaskIds)
+      ? activeUserHistoryAction.completedSubtaskIds.filter((subtaskId): subtaskId is number =>
+          Number.isInteger(subtaskId),
+        )
+      : matchingActionEntries
+          .filter((userAction) => userAction.isSubtask)
+          .map((userAction) => Number(userAction.subtaskId ?? userAction.subactionId))
+          .filter((subtaskId) => Number.isInteger(subtaskId) && subtaskId > 0);
+
+  return {
+    activeUserHistoryAction,
+    completedSubtaskIds,
+  };
+}
 
 export const fetchActions = createAsyncThunk(
   'action/fetchActions',
@@ -100,10 +192,7 @@ export const fetchActionById = createAsyncThunk(
       const response = await apiClient.get(`/actions/${actionId}`);
       return response.data;
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue('Failed to fetch action details');
+      return rejectWithValue(getErrorMessage(error, 'Failed to fetch action details'));
     }
   },
 );
@@ -127,13 +216,38 @@ export const fetchMyActions = createAsyncThunk(
       const response = await apiClient.get(url);
       return response.data;
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue('Failed to fetch user actions');
+      return rejectWithValue(getErrorMessage(error, 'Failed to fetch user actions'));
     }
   },
 );
+
+export const loadGpsActionDetail = createAsyncThunk<
+  LoadGpsActionDetailResult,
+  {actionId: number; userId?: number},
+  {rejectValue: string}
+>('action/loadGpsActionDetail', async ({actionId, userId}, {dispatch, rejectWithValue}) => {
+  try {
+    const actionRequest = dispatch(fetchActionById(actionId)).unwrap();
+    const activeHistoryRequest = userId
+      ? dispatch(fetchMyActions({active: true})).unwrap()
+      : Promise.resolve([] as UserActionHistoryDto[]);
+    const fullHistoryRequest = userId
+      ? dispatch(fetchMyActions({})).unwrap()
+      : Promise.resolve([] as UserActionHistoryDto[]);
+    const [, activeHistory, fullHistory] = await Promise.all([actionRequest, activeHistoryRequest, fullHistoryRequest]);
+    const userActions = userId ? mergeUserActions(activeHistory, fullHistory) : [];
+
+    const {activeUserHistoryAction, completedSubtaskIds} = deriveGpsActionHistory(actionId, userActions);
+
+    return {
+      activeUserHistoryAction,
+      completedSubtaskIds,
+      userActions: userId ? userActions : undefined,
+    };
+  } catch (error: unknown) {
+    return rejectWithValue(getErrorMessage(error, 'Failed to load GPS action details'));
+  }
+});
 
 // Async thunk for starting an action
 export const startAction = createAsyncThunk(
@@ -145,10 +259,19 @@ export const startAction = createAsyncThunk(
       });
       return response.data;
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue('Failed to start action');
+      return rejectWithValue(getErrorMessage(error, 'Failed to start action'));
+    }
+  },
+);
+
+export const startGpsAction = createAsyncThunk(
+  'action/startGpsAction',
+  async ({userId, actionId}: {userId: number; actionId: number}, {dispatch, rejectWithValue}) => {
+    try {
+      await dispatch(startAction({userId, actionId})).unwrap();
+      return {userId, actionId};
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Failed to start action'));
     }
   },
 );
@@ -163,10 +286,20 @@ export const completeAction = createAsyncThunk(
       });
       return response.data;
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue('Failed to complete action');
+      return rejectWithValue(getErrorMessage(error, 'Failed to complete action'));
+    }
+  },
+);
+
+export const finishGpsAction = createAsyncThunk(
+  'action/finishGpsAction',
+  async ({userId, actionId}: {userId: number; actionId: number}, {dispatch, rejectWithValue}) => {
+    try {
+      await dispatch(completeAction({userId, actionId})).unwrap();
+      await dispatch(fetchCurrentUser()).unwrap();
+      return {userId, actionId};
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Failed to complete action'));
     }
   },
 );
@@ -188,10 +321,28 @@ export const completeSubTask = createAsyncThunk(
       const response = await apiClient.post('/subTasks/completeSubTask', request);
       return response.data;
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue('Failed to complete subtask');
+      return rejectWithValue(getErrorMessage(error, 'Failed to complete subtask'));
+    }
+  },
+);
+
+export const completeGpsCheckpoint = createAsyncThunk(
+  'action/completeGpsCheckpoint',
+  async (
+    request: {
+      userId: number;
+      actionId: number;
+      subTaskId: number;
+      actionType: string;
+      additionalData?: Record<string, unknown>;
+    },
+    {dispatch, rejectWithValue},
+  ) => {
+    try {
+      await dispatch(completeSubTask(request)).unwrap();
+      return {subTaskId: request.subTaskId};
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Failed to complete subtask'));
     }
   },
 );
@@ -205,6 +356,16 @@ const actionSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+      state.gpsActionDetail.error = null;
+    },
+    clearGpsActionDetail: (state) => {
+      state.gpsActionDetail = {...initialGpsActionDetailState};
+    },
+    markGpsCheckpointCheckedIn: (state, action: PayloadAction<number>) => {
+      if (!state.gpsActionDetail.completedSubtaskIds.includes(action.payload)) {
+        state.gpsActionDetail.completedSubtaskIds.push(action.payload);
+      }
+      state.gpsActionDetail.hasStartedAction = true;
     },
   },
   extraReducers: (builder) => {
@@ -253,6 +414,76 @@ const actionSlice = createSlice({
         state.error = action.payload as string;
       });
 
+    builder
+      .addCase(loadGpsActionDetail.pending, (state) => {
+        state.gpsActionDetail.loading = true;
+        state.gpsActionDetail.error = null;
+      })
+      .addCase(loadGpsActionDetail.fulfilled, (state, action) => {
+        state.gpsActionDetail.loading = false;
+        state.gpsActionDetail.error = null;
+        state.gpsActionDetail.activeUserHistoryAction =
+          action.payload.activeUserHistoryAction ?? state.gpsActionDetail.activeUserHistoryAction;
+        state.gpsActionDetail.hasStartedAction =
+          state.gpsActionDetail.hasStartedAction || Boolean(action.payload.activeUserHistoryAction);
+
+        const mergedSubtaskIds = new Set<number>(state.gpsActionDetail.completedSubtaskIds);
+        action.payload.completedSubtaskIds.forEach((subtaskId) => mergedSubtaskIds.add(subtaskId));
+        state.gpsActionDetail.completedSubtaskIds = [...mergedSubtaskIds];
+
+        if (action.payload.userActions) {
+          state.userActions = action.payload.userActions;
+        }
+      })
+      .addCase(loadGpsActionDetail.rejected, (state, action) => {
+        state.gpsActionDetail.loading = false;
+        state.gpsActionDetail.error = action.payload as string;
+      });
+
+    builder
+      .addCase(startGpsAction.pending, (state) => {
+        state.gpsActionDetail.startLoading = true;
+        state.gpsActionDetail.error = null;
+      })
+      .addCase(startGpsAction.fulfilled, (state) => {
+        state.gpsActionDetail.startLoading = false;
+        state.gpsActionDetail.hasStartedAction = true;
+      })
+      .addCase(startGpsAction.rejected, (state, action) => {
+        state.gpsActionDetail.startLoading = false;
+        state.gpsActionDetail.error = action.payload as string;
+      });
+
+    builder
+      .addCase(completeGpsCheckpoint.pending, (state) => {
+        state.gpsActionDetail.checkpointLoading = true;
+        state.gpsActionDetail.error = null;
+      })
+      .addCase(completeGpsCheckpoint.fulfilled, (state, action) => {
+        state.gpsActionDetail.checkpointLoading = false;
+        if (!state.gpsActionDetail.completedSubtaskIds.includes(action.payload.subTaskId)) {
+          state.gpsActionDetail.completedSubtaskIds.push(action.payload.subTaskId);
+        }
+        state.gpsActionDetail.hasStartedAction = true;
+      })
+      .addCase(completeGpsCheckpoint.rejected, (state, action) => {
+        state.gpsActionDetail.checkpointLoading = false;
+        state.gpsActionDetail.error = action.payload as string;
+      });
+
+    builder
+      .addCase(finishGpsAction.pending, (state) => {
+        state.gpsActionDetail.completionLoading = true;
+        state.gpsActionDetail.error = null;
+      })
+      .addCase(finishGpsAction.fulfilled, (state) => {
+        state.gpsActionDetail.completionLoading = false;
+      })
+      .addCase(finishGpsAction.rejected, (state, action) => {
+        state.gpsActionDetail.completionLoading = false;
+        state.gpsActionDetail.error = action.payload as string;
+      });
+
     // startAction cases
     builder
       .addCase(startAction.pending, (state) => {
@@ -297,5 +528,5 @@ const actionSlice = createSlice({
   },
 });
 
-export const {clearSelectedAction, clearError} = actionSlice.actions;
+export const {clearSelectedAction, clearError, clearGpsActionDetail, markGpsCheckpointCheckedIn} = actionSlice.actions;
 export default actionSlice.reducer;

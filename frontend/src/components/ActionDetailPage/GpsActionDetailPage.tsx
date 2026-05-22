@@ -8,16 +8,14 @@ import {Button} from '../ui/button';
 import {Badge} from '../ui/badge';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {
-  fetchActionById,
-  fetchMyActions,
+  loadGpsActionDetail,
   clearSelectedAction,
-  completeAction,
-  startAction,
-  completeSubTask,
+  clearGpsActionDetail,
+  finishGpsAction,
+  startGpsAction,
+  completeGpsCheckpoint,
   type ActionDto,
-  type UserActionHistoryDto,
 } from '../../store/slices/ActionSlice';
-import {fetchCurrentUser} from '../../store/slices/UserSlice';
 import {useTranslation} from 'react-i18next';
 import {toast} from 'sonner';
 import {MapPin, Navigation, CheckCircle2, Circle, ArrowLeft, Award, Target, X} from 'lucide-react';
@@ -130,6 +128,20 @@ export function GpsActionDetailPage() {
     tRef.current = t;
   }, [t]);
 
+  const {selectedAction, error, gpsActionDetail: gpsActionDetailState} = useAppSelector((state) => state.actions);
+  const currentUser = useAppSelector((state) => state.user.currentUser);
+
+  const gpsActionDetail = gpsActionDetailState ?? {
+    activeUserHistoryAction: null,
+    completedSubtaskIds: [],
+    hasStartedAction: false,
+    loading: false,
+    startLoading: false,
+    checkpointLoading: false,
+    completionLoading: false,
+    error: null,
+  };
+
   const isDevMode = useMemo(() => {
     try {
       return new URLSearchParams(window.location.search).get('dev') === 'true';
@@ -151,49 +163,26 @@ export function GpsActionDetailPage() {
     return parsedId;
   }, [id]);
 
-  const [hasStartedAction, setHasStartedAction] = useState(false);
   const [showStartDialog, setShowStartDialog] = useState(false);
-  const [isStartingAction, setIsStartingAction] = useState(false);
-  const [activeUserHistoryAction, setActiveUserHistoryAction] = useState<UserActionHistoryDto | null>(null);
-  const completedSubtasksRef = useRef<Set<number>>(new Set());
-  const {selectedAction, loading, error} = useAppSelector((state) => state.actions);
-  const currentUser = useAppSelector((state) => state.user.currentUser);
-
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
-  const [checkedInCheckpointIds, setCheckedInCheckpointIds] = useState<Set<number>>(new Set());
-  const checkedInCheckpointIdsRef = useRef(checkedInCheckpointIds);
-  useEffect(() => {
-    checkedInCheckpointIdsRef.current = checkedInCheckpointIds;
-  }, [checkedInCheckpointIds]);
   const [isTrackingLocation, setIsTrackingLocation] = useState(false);
-
   const [devLatInput, setDevLatInput] = useState('');
   const [devLngInput, setDevLngInput] = useState('');
 
   const watchIdRef = useRef<number | null>(null);
   const hasCalledCompleteAction = useRef(false);
+  const checkpointsRef = useRef<Checkpoint[]>([]);
+  const completedCheckpointIdsRef = useRef<Set<number>>(new Set());
+  const pendingCheckpointIdsRef = useRef<Set<number>>(new Set());
+  const hasStartedActionRef = useRef(false);
+  const currentUserIdRef = useRef<number | undefined>(currentUser?.id);
+  const actionIdRef = useRef<number | null>(actionIdFromRoute);
 
-  const handleStartAction = async () => {
-    const userId = currentUser?.id;
-
-    if (!userId || actionIdFromRoute === null) {
-      toast.error(t('gpsActionDetail.actionNotFound'));
-      return;
-    }
-
-    setIsStartingAction(true);
-    try {
-      await dispatch(startAction({userId, actionId: actionIdFromRoute})).unwrap();
-      setHasStartedAction(true);
-      setShowStartDialog(false);
-      toast.success(t('gpsActionDetail.actionStarted'));
-    } catch (error) {
-      console.error('Error starting action:', error);
-      toast.error(t('gpsActionDetail.startError'));
-    } finally {
-      setIsStartingAction(false);
-    }
-  };
+  const activeUserHistoryAction = gpsActionDetail.activeUserHistoryAction;
+  const hasStartedAction = gpsActionDetail.hasStartedAction;
+  const hasCompletedActionBefore = activeUserHistoryAction?.completionState === 'COMPLETED';
+  const isStartActionDisabled = hasStartedAction || hasCompletedActionBefore;
+  const displayedAction = activeUserHistoryAction ?? selectedAction;
 
   const initialCheckpoints = useMemo(() => {
     if (!selectedAction) {
@@ -202,14 +191,47 @@ export function GpsActionDetailPage() {
     return processCheckpointsFromAction(selectedAction);
   }, [selectedAction]);
 
+  const checkpoints = useMemo(() => {
+    return initialCheckpoints.map((cp) => ({
+      ...cp,
+      isCheckedIn: gpsActionDetail.completedSubtaskIds.includes(cp.id),
+    }));
+  }, [initialCheckpoints, gpsActionDetail.completedSubtaskIds]);
+
   const mapCenter = useMemo((): [number, number] => {
     if (initialCheckpoints.length === 0) {
       return [47.3769, 8.5417];
     }
+
     const avgLat = initialCheckpoints.reduce((sum, cp) => sum + cp.position[0], 0) / initialCheckpoints.length;
     const avgLng = initialCheckpoints.reduce((sum, cp) => sum + cp.position[1], 0) / initialCheckpoints.length;
     return [avgLat, avgLng];
   }, [initialCheckpoints]);
+
+  const checkedInCount = checkpoints.filter((cp) => cp.isCheckedIn).length;
+  const allCheckpointsCheckedIn = checkpoints.length > 0 && checkpoints.every((cp) => cp.isCheckedIn);
+  const isDetailLoading = gpsActionDetail.loading || (actionIdFromRoute !== null && !selectedAction && !error);
+  const actionPoints = displayedAction?.points ?? 0;
+
+  useEffect(() => {
+    checkpointsRef.current = initialCheckpoints;
+  }, [initialCheckpoints]);
+
+  useEffect(() => {
+    completedCheckpointIdsRef.current = new Set(gpsActionDetail.completedSubtaskIds);
+  }, [gpsActionDetail.completedSubtaskIds]);
+
+  useEffect(() => {
+    hasStartedActionRef.current = gpsActionDetail.hasStartedAction;
+  }, [gpsActionDetail.hasStartedAction]);
+
+  useEffect(() => {
+    currentUserIdRef.current = currentUser?.id;
+  }, [currentUser?.id]);
+
+  useEffect(() => {
+    actionIdRef.current = actionIdFromRoute;
+  }, [actionIdFromRoute]);
 
   const applyLocalLocation = useCallback(
     (latitude: number, longitude: number) => {
@@ -218,123 +240,91 @@ export function GpsActionDetailPage() {
       setDevLatInput(latitude.toString());
       setDevLngInput(longitude.toString());
 
-      initialCheckpoints.forEach((cp) => {
-        if (checkedInCheckpointIdsRef.current.has(cp.id)) return;
+      checkpointsRef.current.forEach((cp) => {
+        if (completedCheckpointIdsRef.current.has(cp.id) || pendingCheckpointIdsRef.current.has(cp.id)) {
+          return;
+        }
 
         const distance = calculateDistance(latitude, longitude, cp.position[0], cp.position[1]);
-        if (distance <= thresholdToMeters(cp.distanceThresholdLevel) && hasStartedAction) {
-          setCheckedInCheckpointIds((prev) => {
-            if (prev.has(cp.id)) return prev;
-            const next = new Set(prev);
-            next.add(cp.id);
-            return next;
-          });
-
-          if (!completedSubtasksRef.current.has(cp.id)) {
-            completedSubtasksRef.current.add(cp.id);
-            if (currentUser?.id && actionIdFromRoute !== null) {
-              dispatch(
-                completeSubTask({
-                  userId: currentUser.id,
-                  actionId: actionIdFromRoute,
-                  subTaskId: cp.id,
-                  actionType: 'GPS',
-                  additionalData: {latitude, longitude},
-                }),
-              )
-                .unwrap()
-                .then(() => {
-                  //reload entire page
-                  window.location.reload();
-                });
-            }
-          }
-
-          toast.success(
-            tRef.current('gpsActionDetail.checkpointReached', {
-              checkpoint: cp.index,
-              name: cp.displayName,
-            }),
-          );
+        if (distance > thresholdToMeters(cp.distanceThresholdLevel) || !hasStartedActionRef.current) {
+          return;
         }
+
+        const userId = currentUserIdRef.current;
+        const routeActionId = actionIdRef.current;
+
+        if (!userId || routeActionId === null) {
+          return;
+        }
+
+        pendingCheckpointIdsRef.current.add(cp.id);
+
+        dispatch(
+          completeGpsCheckpoint({
+            userId,
+            actionId: routeActionId,
+            subTaskId: cp.id,
+            actionType: 'GPS',
+            additionalData: {latitude, longitude},
+          }),
+        )
+          .unwrap()
+          .then(() => {
+            pendingCheckpointIdsRef.current.delete(cp.id);
+            completedCheckpointIdsRef.current.add(cp.id);
+            toast.success(
+              tRef.current('gpsActionDetail.checkpointReached', {
+                checkpoint: cp.index,
+                name: cp.displayName,
+              }),
+            );
+          })
+          .catch((requestError) => {
+            pendingCheckpointIdsRef.current.delete(cp.id);
+            console.error('Error completing GPS checkpoint:', requestError);
+          });
       });
     },
-    [actionIdFromRoute, dispatch, hasStartedAction, initialCheckpoints, currentUser],
+    [dispatch],
   );
 
-  const checkpoints = useMemo(() => {
-    return initialCheckpoints.map((cp) => ({
-      ...cp,
-      isCheckedIn: checkedInCheckpointIds.has(cp.id),
-    }));
-  }, [initialCheckpoints, checkedInCheckpointIds]);
+  const handleStartAction = async () => {
+    const userId = currentUserIdRef.current;
+
+    if (!userId || actionIdFromRoute === null || isStartActionDisabled) {
+      return;
+    }
+
+    try {
+      await dispatch(startGpsAction({userId, actionId: actionIdFromRoute})).unwrap();
+      setShowStartDialog(false);
+      toast.success(t('gpsActionDetail.actionStarted'));
+    } catch (requestError) {
+      console.error('Error starting action:', requestError);
+      toast.error(t('gpsActionDetail.startError'));
+    }
+  };
 
   useEffect(() => {
-    let isMounted = true;
-
-    setActiveUserHistoryAction(null);
-    setHasStartedAction(false);
-    setCheckedInCheckpointIds(new Set());
-    completedSubtasksRef.current = new Set();
     hasCalledCompleteAction.current = false;
+    pendingCheckpointIdsRef.current = new Set();
+
+    dispatch(clearSelectedAction());
+    dispatch(clearGpsActionDetail());
 
     if (actionIdFromRoute !== null) {
-      dispatch(fetchActionById(actionIdFromRoute));
-
-      const userId = currentUser?.id;
-      if (userId !== undefined && userId > 0) {
-        dispatch(fetchMyActions({active: true}))
-          .unwrap()
-          .then((userActions: UserActionHistoryDto[]) => {
-            if (!isMounted) {
-              return;
-            }
-
-            const matchingActionEntries = userActions.filter((userAction) => userAction.actionId === actionIdFromRoute);
-            if (matchingActionEntries.length === 0) {
-              return;
-            }
-
-            const matchedAction = matchingActionEntries.find((userAction) => !userAction.isSubtask) ?? null;
-
-            if (!matchedAction) {
-              return;
-            }
-
-            setActiveUserHistoryAction(matchedAction);
-            setHasStartedAction(true);
-
-            const completedSubtaskIds =
-              Array.isArray(matchedAction.completedSubtaskIds) && matchedAction.completedSubtaskIds.length > 0
-                ? matchedAction.completedSubtaskIds
-                : matchingActionEntries
-                    .filter((userAction) => userAction.isSubtask)
-                    .map((userAction) => Number(userAction.subtaskId ?? userAction.subactionId))
-                    .filter((subtaskId) => Number.isInteger(subtaskId) && subtaskId > 0);
-            const completedSubtaskSet = new Set(completedSubtaskIds);
-
-            setCheckedInCheckpointIds(completedSubtaskSet);
-            completedSubtasksRef.current = completedSubtaskSet;
-          })
-          .catch(() => {
-            if (!isMounted) {
-              return;
-            }
-
-            setActiveUserHistoryAction(null);
-          });
-      }
+      dispatch(loadGpsActionDetail({actionId: actionIdFromRoute, userId: currentUser?.id}));
     }
 
     return () => {
-      isMounted = false;
+      pendingCheckpointIdsRef.current = new Set();
       dispatch(clearSelectedAction());
+      dispatch(clearGpsActionDetail());
     };
-  }, [actionIdFromRoute, dispatch, currentUser?.id]);
+  }, [actionIdFromRoute, currentUser?.id, dispatch]);
 
   useEffect(() => {
     if (isDevMode) {
-      setIsTrackingLocation(false);
       return;
     }
 
@@ -370,51 +360,41 @@ export function GpsActionDetailPage() {
       }
       setIsTrackingLocation(false);
     };
-  }, [
-    applyLocalLocation,
-    initialCheckpoints,
-    checkedInCheckpointIds,
-    actionIdFromRoute,
-    dispatch,
-    hasStartedAction,
-    currentUser?.id,
-    isDevMode,
-  ]);
-
-  const allCheckpointsCheckedIn = checkpoints.length > 0 && checkpoints.every((cp) => cp.isCheckedIn);
-  const checkedInCount = checkpoints.filter((cp) => cp.isCheckedIn).length;
+  }, [applyLocalLocation, isDevMode]);
 
   useEffect(() => {
     const userId = currentUser?.id;
 
-    if (isDevMode) {
-      return;
-    }
-
-    if (allCheckpointsCheckedIn && userId && !hasCalledCompleteAction.current && actionIdFromRoute !== null) {
+    console.log(allCheckpointsCheckedIn, userId, hasCalledCompleteAction.current, actionIdFromRoute);
+    if (
+      allCheckpointsCheckedIn &&
+      userId &&
+      !hasCalledCompleteAction.current &&
+      actionIdFromRoute !== null &&
+      !hasCompletedActionBefore
+    ) {
       hasCalledCompleteAction.current = true;
-      dispatch(completeAction({userId, actionId: actionIdFromRoute}))
+      dispatch(finishGpsAction({userId, actionId: actionIdFromRoute}))
         .unwrap()
         .then(() => {
           toast.success(tRef.current('gpsActionDetail.actionCompleted'));
-          dispatch(fetchCurrentUser());
         })
-        .catch(() => {
+        .catch((requestError) => {
+          console.error('Error completing action:', requestError);
           hasCalledCompleteAction.current = false;
         });
     }
-  }, [allCheckpointsCheckedIn, dispatch, actionIdFromRoute, isDevMode, currentUser?.id]);
-  const polylinePositions = checkpoints.map((cp) => cp.position);
+  }, [allCheckpointsCheckedIn, dispatch, actionIdFromRoute, hasCompletedActionBefore, isDevMode, currentUser?.id]);
 
   const handleBack = () => {
     navigate('/dashboard');
   };
 
-  if (loading) {
+  if (isDetailLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand"></div>
+        <div className="flex h-64 items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-brand"></div>
         </div>
       </div>
     );
@@ -434,142 +414,182 @@ export function GpsActionDetailPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 lg:py-10">
       <div className="mb-6">
         <Button variant="ghost" onClick={handleBack} className="mb-4 pl-0">
-          <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
+          <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
           {t('gpsActionDetail.back')}
         </Button>
 
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">
-              {activeUserHistoryAction?.displayName ?? selectedAction.displayName}
-            </h1>
-            <p className="text-muted-foreground">
-              {activeUserHistoryAction?.description ?? selectedAction.description}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Badge
-              variant="secondary"
-              className="text-lg px-4 py-2 bg-brand-container border-brand text-on-brand-container"
-            >
-              <Award className="h-4 w-4 mr-1" />
-              {activeUserHistoryAction?.points ?? selectedAction.points} {t('points')}
-            </Badge>
-            {!hasStartedAction && (
-              <Button
-                className="h-12 text-lg px-4 bg-brand text-brand-foreground hover:bg-brand/90"
-                onClick={() => setShowStartDialog(true)}
+        <div className="overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-surface-container to-background shadow-xl">
+          <div className="grid gap-6 p-6 sm:p-8 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="secondary" className="border-brand bg-brand-container text-on-brand-container">
+                  <Target className="mr-1 h-4 w-4" />
+                  GPS
+                </Badge>
+                <Badge variant="outline" className="border-border bg-background/70">
+                  {checkedInCount} / {checkpoints.length} {t('gpsActionDetail.checkpoints')}
+                </Badge>
+                {hasStartedAction && (
+                  <Badge className="border border-transparent bg-info-container text-on-info-container">
+                    {t('gpsActionDetail.trackingActive')}
+                  </Badge>
+                )}
+              </div>
+
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                  {displayedAction?.displayName}
+                </h1>
+                <p className="mt-3 max-w-3xl text-base text-muted-foreground sm:text-lg">
+                  {displayedAction?.description}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row xl:flex-col xl:items-end xl:justify-center">
+              <Badge
+                variant="secondary"
+                className="justify-center border-brand bg-brand-container px-4 py-3 text-base text-on-brand-container"
               >
-                {t('gpsActionDetail.startAction')}
+                <Award className="mr-1 h-4 w-4" />
+                {actionPoints} {t('points')}
+              </Badge>
+
+              <Button
+                className="h-12 bg-brand px-5 text-base text-brand-foreground hover:bg-brand/90"
+                onClick={() => setShowStartDialog(true)}
+                disabled={isStartActionDisabled}
+              >
+                {hasCompletedActionBefore
+                  ? t('gpsActionDetail.alreadyCompleted')
+                  : hasStartedAction
+                    ? t('gpsActionDetail.alreadyStarted')
+                    : t('gpsActionDetail.startAction')}
               </Button>
-            )}
+            </div>
           </div>
         </div>
       </div>
 
       {showStartDialog && (
         <div
-          className="fixed inset-0 z-1000 flex items-center justify-center bg-black/50"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
           onClick={() => setShowStartDialog(false)}
           role="dialog"
           aria-modal="true"
           aria-label={t('gpsActionDetail.startDialogTitle')}
         >
           <div
-            className="relative bg-card border rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
+            className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setShowStartDialog(false)}
-              className="absolute top-3 right-3 p-1 hover:bg-surface-container-high rounded"
+              className="absolute right-3 top-3 rounded-md p-1 hover:bg-surface-container-high"
               aria-label={t('rootLayout.closeMenu')}
             >
               <X className="h-5 w-5" aria-hidden="true" />
             </button>
-            <h2 className="text-xl text-brand font-semibold mb-2">{t('gpsActionDetail.startDialogTitle')}</h2>
-            <p className="text-muted-foreground mb-6">{t('gpsActionDetail.startDialogDescription')}</p>
-            <div className="flex gap-3 justify-end">
+
+            <h2 className="mb-2 text-xl font-semibold text-brand">{t('gpsActionDetail.startDialogTitle')}</h2>
+            <p className="mb-6 text-sm text-muted-foreground">{t('gpsActionDetail.startDialogDescription')}</p>
+
+            <div className="flex justify-end gap-3">
               <Button variant="outline" className="border border-brand" onClick={() => setShowStartDialog(false)}>
                 {t('gpsActionDetail.cancel')}
               </Button>
               <Button
                 className="bg-brand text-brand-foreground hover:bg-brand/90"
                 onClick={handleStartAction}
-                disabled={isStartingAction}
+                disabled={gpsActionDetail.startLoading}
               >
-                {isStartingAction ? t('gpsActionDetail.starting') : t('gpsActionDetail.confirmStart')}
+                {gpsActionDetail.startLoading ? t('gpsActionDetail.starting') : t('gpsActionDetail.confirmStart')}
               </Button>
             </div>
           </div>
         </div>
       )}
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <Card className="overflow-hidden h-[620px] shadow-lg">
-            <MapContainer center={mapCenter} zoom={14} style={{height: '100%', width: '100%'}}>
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(340px,1fr)]">
+        <div className="min-w-0">
+          <Card className="overflow-hidden rounded-3xl border shadow-xl">
+            <div className="flex items-center justify-between border-b border-border bg-surface-container/60 px-5 py-4">
+              <div>
+                <h2 className="font-semibold text-foreground">{t('gpsActionDetail.progress')}</h2>
+                <p className="text-sm text-muted-foreground">
+                  {checkedInCount} / {checkpoints.length} {t('gpsActionDetail.checkpoints')}
+                </p>
+              </div>
+              <div className="rounded-full border border-border bg-background px-3 py-1 text-sm text-muted-foreground">
+                {isTrackingLocation ? t('gpsActionDetail.trackingEnabled') : t('gpsActionDetail.trackingDisabled')}
+              </div>
+            </div>
 
-              {polylinePositions.length > 1 && (
-                <Polyline
-                  positions={polylinePositions}
-                  color="var(--brand)"
-                  weight={4}
-                  dashArray="10, 10"
-                  opacity={0.7}
+            <div className="h-[620px] bg-surface-container/20">
+              <MapContainer center={mapCenter} zoom={14} style={{height: '100%', width: '100%'}}>
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
-              )}
 
-              {checkpoints.map((checkpoint) => (
-                <Marker
-                  key={checkpoint.id}
-                  position={checkpoint.position}
-                  icon={createCheckpointIcon(checkpoint.index, checkpoint.isCheckedIn)}
-                >
-                  <Popup>
-                    <div className="text-center p-2">
-                      <p className="font-bold">
-                        {t('gpsActionDetail.checkpoint')} {checkpoint.index}
-                      </p>
-                      <p className="text-sm">{checkpoint.displayName}</p>
-                      {checkpoint.isCheckedIn && (
-                        <Badge className="mt-2 bg-brand">
-                          {t('gpsActionDetail.checkpointReached', {
-                            checkpoint: checkpoint.index,
-                            name: checkpoint.displayName,
-                          })}
-                        </Badge>
-                      )}
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
+                {checkpoints.length > 1 && (
+                  <Polyline
+                    positions={checkpoints.map((cp) => cp.position)}
+                    color="var(--brand)"
+                    weight={4}
+                    dashArray="10, 10"
+                    opacity={0.7}
+                  />
+                )}
 
-              {userLocation && (
-                <>
-                  <Marker position={userLocation} icon={userLocationIcon}>
-                    <Popup>{t('gpsActionDetail.yourLocation')}</Popup>
+                {checkpoints.map((checkpoint) => (
+                  <Marker
+                    key={checkpoint.id}
+                    position={checkpoint.position}
+                    icon={createCheckpointIcon(checkpoint.index, checkpoint.isCheckedIn)}
+                  >
+                    <Popup>
+                      <div className="p-2 text-center">
+                        <p className="font-bold">
+                          {t('gpsActionDetail.checkpoint')} {checkpoint.index}
+                        </p>
+                        <p className="text-sm">{checkpoint.displayName}</p>
+                        {checkpoint.isCheckedIn && (
+                          <Badge className="mt-2 bg-brand">
+                            {t('gpsActionDetail.checkpointReached', {
+                              checkpoint: checkpoint.index,
+                              name: checkpoint.displayName,
+                            })}
+                          </Badge>
+                        )}
+                      </div>
+                    </Popup>
                   </Marker>
-                  <RecenterMap coords={userLocation} />
-                </>
-              )}
-            </MapContainer>
+                ))}
+
+                {userLocation && (
+                  <>
+                    <Marker position={userLocation} icon={userLocationIcon}>
+                      <Popup>{t('gpsActionDetail.yourLocation')}</Popup>
+                    </Marker>
+                    <RecenterMap coords={userLocation} />
+                  </>
+                )}
+              </MapContainer>
+            </div>
           </Card>
         </div>
 
         <div className="space-y-6">
-          <Card className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-info-container rounded-lg">
+          <Card className="rounded-3xl border p-6 shadow-lg">
+            <div className="flex items-center gap-3">
+              <div className="rounded-2xl bg-info-container p-2">
                 <Target className="h-5 w-5 text-on-info-container" aria-hidden="true" />
               </div>
-              <div>
+              <div className="min-w-0 flex-1">
                 <h3 className="font-semibold">{t('gpsActionDetail.progress')}</h3>
                 <p className="text-sm text-muted-foreground">
                   {checkedInCount} / {checkpoints.length} {t('gpsActionDetail.checkpoints')}
@@ -577,9 +597,9 @@ export function GpsActionDetailPage() {
               </div>
             </div>
 
-            <div className="w-full bg-surface-container rounded-full h-3 mb-4">
+            <div className="mt-4 h-3 w-full rounded-full bg-surface-container">
               <div
-                className="bg-brand h-3 rounded-full transition-all duration-500"
+                className="h-3 rounded-full bg-brand transition-all duration-500"
                 style={{
                   width: `${checkpoints.length > 0 ? (checkedInCount / checkpoints.length) * 100 : 0}%`,
                 }}
@@ -587,8 +607,8 @@ export function GpsActionDetailPage() {
             </div>
 
             {allCheckpointsCheckedIn && (
-              <div className="mt-4 p-4 bg-brand-container border border-brand rounded-lg">
-                <div className="flex items-center gap-2 text-on-brand-container">
+              <div className="mt-4 rounded-2xl border border-brand bg-brand-container p-4 text-on-brand-container">
+                <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
                   <span className="font-semibold">{t('gpsActionDetail.allCheckpointsReached')}</span>
                 </div>
@@ -596,20 +616,18 @@ export function GpsActionDetailPage() {
             )}
           </Card>
 
-          <Card className="p-6">
-            <h3 className="font-semibold mb-4">{t('gpsActionDetail.checkpointList')}</h3>
+          <Card className="rounded-3xl border p-6 shadow-lg">
+            <h3 className="mb-4 font-semibold">{t('gpsActionDetail.checkpointList')}</h3>
             <div className="space-y-3">
               {checkpoints.map((checkpoint) => (
                 <div
                   key={checkpoint.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                    checkpoint.isCheckedIn
-                      ? 'bg-brand-container border border-brand'
-                      : 'bg-surface-container border border-border'
+                  className={`flex items-center gap-3 rounded-2xl border p-3 transition-colors ${
+                    checkpoint.isCheckedIn ? 'border-brand bg-brand-container' : 'border-border bg-surface-container'
                   }`}
                 >
                   <div
-                    className={`p-2 rounded-full ${
+                    className={`rounded-full p-2 ${
                       checkpoint.isCheckedIn
                         ? 'bg-brand text-brand-foreground'
                         : 'bg-info-container text-on-info-container'
@@ -621,17 +639,20 @@ export function GpsActionDetailPage() {
                       <Circle className="h-4 w-4" aria-hidden="true" />
                     )}
                   </div>
-                  <div className="flex-1">
+
+                  <div className="min-w-0 flex-1">
                     <p className="font-medium">
                       {t('gpsActionDetail.checkpoint')} {checkpoint.index}
                     </p>
                     <p className="text-sm text-muted-foreground">{checkpoint.displayName}</p>
                   </div>
+
                   <div className="text-right">
                     <p className="text-xs text-muted-foreground">
                       {checkpoint.position[0].toFixed(4)}, {checkpoint.position[1].toFixed(4)}
                     </p>
                   </div>
+
                   {isDevMode && !checkpoint.isCheckedIn && (
                     <Button
                       variant="outline"
@@ -646,16 +667,16 @@ export function GpsActionDetailPage() {
               ))}
 
               {checkpoints.length === 0 && (
-                <p className="text-muted-foreground text-center py-4">{t('gpsActionDetail.noCheckpoints')}</p>
+                <p className="py-4 text-center text-muted-foreground">{t('gpsActionDetail.noCheckpoints')}</p>
               )}
             </div>
           </Card>
 
-          <Card className="p-6 bg-card">
+          <Card className="rounded-3xl border p-6 shadow-lg bg-card">
             <div className="flex items-start gap-3">
-              <Navigation className="h-5 w-5 text-brand flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <Navigation className="mt-0.5 h-5 w-5 flex-shrink-0 text-brand" aria-hidden="true" />
               <div className="text-sm">
-                <p className="font-semibold text-foreground mb-1">{t('gpsActionDetail.trackingActive')}</p>
+                <p className="mb-1 font-semibold text-foreground">{t('gpsActionDetail.trackingActive')}</p>
                 <p className="text-muted-foreground">
                   {isTrackingLocation ? t('gpsActionDetail.trackingEnabled') : t('gpsActionDetail.trackingDisabled')}
                 </p>
@@ -664,7 +685,7 @@ export function GpsActionDetailPage() {
           </Card>
 
           {userLocation && !isDevMode && (
-            <Card className="p-6">
+            <Card className="rounded-3xl border p-6 shadow-lg">
               <div className="flex items-center gap-3">
                 <MapPin className="h-5 w-5 text-destructive" aria-hidden="true" />
                 <div>
@@ -678,12 +699,12 @@ export function GpsActionDetailPage() {
           )}
 
           {isDevMode && (
-            <Card className="p-6">
+            <Card className="rounded-3xl border p-6 shadow-lg">
               <div className="flex items-center gap-3">
                 <MapPin className="h-5 w-5 text-destructive" aria-hidden="true" />
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm text-muted-foreground">{t('gpsActionDetail.yourLocation')}</p>
-                  <div className="flex gap-2 mt-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     <input
                       type="number"
                       step="0.000001"
@@ -717,7 +738,7 @@ export function GpsActionDetailPage() {
                       Set location
                     </Button>
                   </div>
-                  <p className="font-mono text-sm mt-2">
+                  <p className="mt-2 font-mono text-sm">
                     {userLocation
                       ? `${userLocation[0].toFixed(6)}, ${userLocation[1].toFixed(6)}`
                       : t('gpsActionDetail.noLocation')}
