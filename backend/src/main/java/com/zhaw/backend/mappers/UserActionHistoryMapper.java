@@ -19,6 +19,7 @@ public final class UserActionHistoryMapper {
                 .completionState(entity.getCompletionState())
                 .isSubtask(entity.getIsSubtask())
                 .subtaskId(entity.getSubtaskId())
+                .completedSubtaskIds(entity.getCompletedSubtaskIds())
                 .mappingCreatedOn(entity.getMappingCreatedOn().toString())
                 .build();
     }

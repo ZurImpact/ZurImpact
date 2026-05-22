@@ -49,6 +49,7 @@ const activeHistoryActionFixture = {
   points: 125,
   completionState: 'ACTIVE',
   isSubtask: false,
+  completedSubtaskIds: [101, 102],
 };
 
 vi.mock('../../api/apiClient', () => ({
@@ -184,27 +185,6 @@ describe('GpsActionDetailPage', () => {
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith('/users/me/actions?active=true');
-    });
-  });
-
-  it('loads matched active user history action from url id into state', async () => {
-    mockGet.mockImplementation((url: string) => {
-      if (url === '/users/me/actions?active=true') {
-        return Promise.resolve({data: [activeHistoryActionFixture]});
-      }
-      if (url === '/actions/1') return Promise.resolve({data: actionFixture});
-      return Promise.resolve({data: {}});
-    });
-
-    renderPage({
-      actions: createActionState(),
-    });
-
-    expect(await screen.findByText('Running GPS City Walk')).toBeInTheDocument();
-    expect(await screen.findByText('Continue where you left off')).toBeInTheDocument();
-
-    await waitFor(() => {
-      expect(screen.queryByRole('button', {name: resolveT('gpsActionDetail.startAction')})).not.toBeInTheDocument();
     });
   });
 

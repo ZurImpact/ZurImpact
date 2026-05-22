@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -31,11 +33,24 @@ public class UserActionHistoryDao {
             .completionState(String.valueOf(CompletionState.valueOf(rs.getString("completion_state"))))
             .isSubtask(rs.getBoolean("is_subtask"))
             .subtaskId(rs.getString("subtask_id"))
+            .completedSubtaskIds(parseCompletedSubtaskIds(rs.getString("completed_subtask_ids")))
             .mappingCreatedOn(toLocalDateTime(rs.getTimestamp("mapping_created_on")))
             .build();
 
     private static java.time.LocalDateTime toLocalDateTime(Timestamp timestamp) {
         return timestamp == null ? null : timestamp.toLocalDateTime();
+    }
+
+    private static List<Long> parseCompletedSubtaskIds(String completedSubtaskIds) {
+        if (completedSubtaskIds == null || completedSubtaskIds.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.stream(completedSubtaskIds.split(","))
+                .map(String::trim)
+                .filter(value -> !value.isEmpty())
+                .map(Long::valueOf)
+                .toList();
     }
 
     /**
@@ -45,22 +60,30 @@ public class UserActionHistoryDao {
      */
     public List<UserActionHistory> findUserActionHistory(Long userId, Boolean active) {
         StringBuilder sql = new StringBuilder(
-                "SELECT a.id AS action_id, a.description, a.display_name, a.points, a.tags, "
-                        + "a.valid_until, a.created_on AS action_created_on, "
-                        + "uam.completion_state, uam.is_subtask, uam.subtask_id, uam.created_on AS mapping_created_on "
+                "WITH latest_parent_mapping AS ( "
+                        + "SELECT uam.*, ROW_NUMBER() OVER (PARTITION BY uam.user_id, uam.action_id ORDER BY uam.created_on DESC, uam.id DESC) AS rn "
                         + "FROM user_action_mapping uam "
-                        + "JOIN action a ON a.id = uam.action_id "
-                        + "WHERE uam.user_id = ?");
+                        + "WHERE uam.user_id = ? AND uam.is_subtask = false ) "
+                        + "SELECT a.id AS action_id, a.description, a.display_name, a.points, a.tags, "
+                        + "a.valid_until, a.created_on AS action_created_on, "
+                        + "latest_parent_mapping.completion_state, latest_parent_mapping.is_subtask, latest_parent_mapping.subtask_id, latest_parent_mapping.created_on AS mapping_created_on, "
+                        + "COALESCE((SELECT STRING_AGG(sub_uam.subtask_id, ',' ORDER BY sub_uam.created_on) "
+                        + "FROM user_action_mapping sub_uam "
+                        + "WHERE sub_uam.user_id = latest_parent_mapping.user_id AND sub_uam.action_id = latest_parent_mapping.action_id "
+                        + "AND sub_uam.is_subtask = true AND sub_uam.completion_state = 'COMPLETED'), '') AS completed_subtask_ids "
+                        + "FROM latest_parent_mapping "
+                        + "JOIN action a ON a.id = latest_parent_mapping.action_id "
+                        + "WHERE latest_parent_mapping.rn = 1");
         List<Object> params = new ArrayList<>();
         params.add(userId);
 
-        if (active) {
-            sql.append(" AND uam.completion_state = 'IN_PROGRESS'");
-        }else{
-            sql.append(" AND uam.completion_state = 'COMPLETED'");
+        if (Boolean.TRUE.equals(active)) {
+            sql.append(" AND latest_parent_mapping.completion_state = 'IN_PROGRESS'");
+        } else {
+            sql.append(" AND latest_parent_mapping.completion_state = 'COMPLETED'");
         }
 
-        sql.append(" ORDER BY uam.created_on DESC");
+        sql.append(" ORDER BY latest_parent_mapping.created_on DESC");
 
         return jdbc.query(sql.toString(), HISTORY_ROW_MAPPER, params.toArray());
     }

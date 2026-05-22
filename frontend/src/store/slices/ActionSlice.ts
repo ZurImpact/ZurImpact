@@ -43,6 +43,7 @@ export interface UserActionHistoryDto {
   isSubtask?: boolean;
   subtaskId?: string;
   subactionId?: string;
+  completedSubtaskIds?: number[];
   mappingCreatedOn?: string;
 }
 
@@ -157,7 +158,9 @@ export const completeAction = createAsyncThunk(
   'action/completeAction',
   async ({userId, actionId}: {userId: number; actionId: number}, {rejectWithValue}) => {
     try {
-      const response = await apiClient.post(`/actions/completeAction`, {userId, actionId});
+      const response = await apiClient.post('/actions/completeAction', null, {
+        params: {userId, actionId},
+      });
       return response.data;
     } catch (error: unknown) {
       if (error instanceof Error) {

@@ -47,9 +47,13 @@ class UserActionHistoryDaoIntegrationTest {
     // ── Helper ──────────────────────────────────────────────────────────
 
     private void insertMapping(Long userId, Long actionId, CompletionState state) {
+        insertMapping(userId, actionId, state, false, null);
+    }
+
+    private void insertMapping(Long userId, Long actionId, CompletionState state, boolean isSubtask, String subtaskId) {
         jdbcTemplate.update(
-                "INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask) VALUES (?,?,?,?,?)",
-                userId, actionId, state.name(), Timestamp.valueOf(LocalDateTime.now()), false);
+                "INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subtask_id) VALUES (?,?,?,?,?,?)",
+                userId, actionId, state.name(), Timestamp.valueOf(LocalDateTime.now()), isSubtask, subtaskId);
     }
 
     // ── findUserActionHistory ────────────────────────────────────────────
@@ -81,6 +85,36 @@ class UserActionHistoryDaoIntegrationTest {
 
             assertEquals(1, result.size());
             assertEquals(CompletionState.IN_PROGRESS.name(), result.getFirst().getCompletionState());
+        }
+
+        @Test
+        @DisplayName("includes completed subtask ids for active actions")
+        void includesCompletedSubtaskIdsForActiveActions() {
+            insertMapping(userId, actionId, CompletionState.IN_PROGRESS);
+            insertMapping(userId, actionId, CompletionState.COMPLETED, true, "10");
+            insertMapping(userId, actionId, CompletionState.COMPLETED, true, "11");
+
+            List<UserActionHistory> result = historyDao.findUserActionHistory(userId, true);
+
+            assertEquals(1, result.size());
+            assertEquals(List.of(10L, 11L), result.getFirst().getCompletedSubtaskIds());
+        }
+
+        @Test
+        @DisplayName("does not return a completed action in active history")
+        void doesNotReturnCompletedActionInActiveHistory() {
+            insertMapping(userId, actionId, CompletionState.IN_PROGRESS);
+            insertMapping(userId, actionId, CompletionState.COMPLETED, true, "10");
+            insertMapping(userId, actionId, CompletionState.COMPLETED, true, "11");
+            insertMapping(userId, actionId, CompletionState.COMPLETED);
+
+            List<UserActionHistory> activeResult = historyDao.findUserActionHistory(userId, true);
+            List<UserActionHistory> completedResult = historyDao.findUserActionHistory(userId, false);
+
+            assertTrue(activeResult.isEmpty());
+            assertEquals(1, completedResult.size());
+            assertEquals(CompletionState.COMPLETED.name(), completedResult.getFirst().getCompletionState());
+            assertEquals(List.of(10L, 11L), completedResult.getFirst().getCompletedSubtaskIds());
         }
 
         @Test

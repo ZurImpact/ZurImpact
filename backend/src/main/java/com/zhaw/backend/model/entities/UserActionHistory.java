@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,5 +26,6 @@ public class UserActionHistory {
     private String completionState;
     private Boolean isSubtask;
     private String subtaskId;
+    private List<Long> completedSubtaskIds;
     private LocalDateTime mappingCreatedOn;
 }
