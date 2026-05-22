@@ -42,16 +42,6 @@ const actionFixture = {
   ],
 };
 
-const activeHistoryActionFixture = {
-  actionId: 1,
-  displayName: 'Running GPS City Walk',
-  description: 'Continue where you left off',
-  points: 125,
-  completionState: 'ACTIVE',
-  isSubtask: false,
-  completedSubtaskIds: [101, 102],
-};
-
 vi.mock('../../api/apiClient', () => ({
   default: {
     get: (...args: unknown[]) => mockGet(...args),
