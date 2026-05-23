@@ -95,13 +95,16 @@ const initialState: ActionState = {
 };
 
 function getErrorMessage(error: unknown, fallback: string): string {
-  if (error instanceof Error) {
-    return error.message;
+  if (error && typeof error === 'object' && 'response' in error) {
+    const axiosError = error as {
+      message?: string;
+      response?: {data?: {error?: string}};
+    };
+    return axiosError.response?.data?.error ?? axiosError.message ?? fallback;
   }
 
-  if (error && typeof error === 'object' && 'response' in error) {
-    const axiosError = error as {response?: {data?: {error?: string}}};
-    return axiosError.response?.data?.error ?? fallback;
+  if (error instanceof Error) {
+    return error.message;
   }
 
   return fallback;
