@@ -282,6 +282,13 @@ export function GpsActionDetailPage() {
           .catch((requestError) => {
             pendingCheckpointIdsRef.current.delete(cp.id);
             console.error('Error completing GPS checkpoint:', requestError);
+            toast.error(
+              tRef.current('gpsActionDetail.checkpointError', {
+                checkpoint: cp.index,
+                name: cp.displayName,
+                defaultValue: 'Checkpoint check-in failed. Please try again.',
+              }),
+            );
           });
       });
     },
