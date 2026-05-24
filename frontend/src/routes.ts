@@ -17,4 +17,5 @@ export const ROUTES = {
   passwordResetRequest: '/forgot-password',
   passwordResetConfirm: '/reset-password',
   profile: '/profile',
+  verifyEmailChange: '/verify-email-change',
 };

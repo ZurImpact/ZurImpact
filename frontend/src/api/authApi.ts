@@ -56,3 +56,7 @@ export async function requestPasswordReset(req: {email: string}): Promise<void> 
 export async function confirmPasswordReset(req: {token: string; newPassword: string}): Promise<void> {
   await apiClient.post('/auth/password-reset/confirm', req);
 }
+
+export async function verifyEmailChange(req: {token: string}): Promise<void> {
+  await apiClient.post('/auth/verify-email-change', req);
+}

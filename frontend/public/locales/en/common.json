@@ -180,6 +180,18 @@
       "descriptionFailed": "This verification link is invalid or has expired.",
       "resendHintFailed": "Request a new verification link below."
     },
+    "verifyEmailChange": {
+      "titleVerifying": "Verifying your email…",
+      "titleSuccess": "Email verified!",
+      "descriptionSuccess": "Your new email has been successfully verified.",
+      "returnToProfile": "Return to Profile",
+      "titleFailed": "Verification failed",
+      "descriptionFailed": "The link is invalid or has expired.",
+      "resendHintFailed": "Please return to your profile and submit your email change request again to receive a new link.",
+      "fallbackTitle": "Email Verification",
+      "fallbackDescription": "No verification token provided in the URL.",
+      "goToDashboard": "Go to Dashboard"
+    },
     "resendVerification": {
       "emailLabel": "Email",
       "emailPlaceholder": "you@example.com",

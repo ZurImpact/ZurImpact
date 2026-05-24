@@ -93,8 +93,7 @@ export function ProfilePage() {
     setEmailUpdateMessage(null);
 
     try {
-      const updatedUser = await updateCurrentUserEmail({newEmail: values.email});
-      dispatch(updateCurrentUser(updatedUser));
+      await updateCurrentUserEmail({newEmail: values.email});
       setEmailUpdateMessage(t('profile.updateEmail.success'));
     } catch {
       setEmailUpdateError(t('profile.updateEmail.errorGeneric'));
