@@ -509,7 +509,7 @@ export function GpsActionDetailPage() {
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <Card className="overflow-hidden h-[620px] shadow-lg">
+          <Card className="relative isolate overflow-hidden h-[620px] shadow-lg">
             <MapContainer center={mapCenter} zoom={14} style={{height: '100%', width: '100%'}}>
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

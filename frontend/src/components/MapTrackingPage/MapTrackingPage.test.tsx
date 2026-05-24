@@ -1,5 +1,5 @@
 import {describe, it, expect, vi, beforeEach} from 'vitest';
-import {screen, act} from '@testing-library/react';
+import {screen, act, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MapTrackingPage} from './MapTrackingPage';
 import {renderWithProviders} from '../../test/test.utils';
@@ -67,8 +67,30 @@ describe('MapTrackingPage', () => {
     renderWithProviders(<MapTrackingPage />);
 
     expect(screen.getByText(resolveT('actionDetail.header'))).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: /start tracking/i})).toBeInTheDocument();
+    expect(screen.getAllByRole('button', {name: /start tracking/i}).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByTestId('map-container')).toBeInTheDocument();
+  });
+
+  it('wraps the map in a relative isolate stacking context', () => {
+    renderWithProviders(<MapTrackingPage />);
+
+    const map = screen.getByTestId('map-container');
+    expect(map.closest('.relative.isolate')).not.toBeNull();
+  });
+
+  it('renders a mobile-only Start tracking FAB that triggers tracking', async () => {
+    const user = userEvent.setup();
+
+    renderWithProviders(<MapTrackingPage />);
+
+    const fab = screen.getByTestId('mobile-tracking-fab');
+    expect(fab).toBeInTheDocument();
+    expect(fab.className).toContain('lg:hidden');
+    expect(fab.className).toContain('fixed');
+
+    await user.click(within(fab).getByRole('button', {name: /start tracking/i}));
+
+    expect(watchPositionMock).toHaveBeenCalledTimes(1);
   });
 
   it('shows error toast when geolocation is unavailable', async () => {
@@ -81,7 +103,7 @@ describe('MapTrackingPage', () => {
 
     renderWithProviders(<MapTrackingPage />);
 
-    await user.click(screen.getByRole('button', {name: /start tracking/i}));
+    await user.click(screen.getAllByRole('button', {name: /start tracking/i})[0]);
 
     expect(mockToastError).toHaveBeenCalledWith(resolveT('actionDetail.geolocationError'));
   });
@@ -91,7 +113,7 @@ describe('MapTrackingPage', () => {
 
     renderWithProviders(<MapTrackingPage />);
 
-    await user.click(screen.getByRole('button', {name: /start tracking/i}));
+    await user.click(screen.getAllByRole('button', {name: /start tracking/i})[0]);
 
     expect(watchPositionMock).toHaveBeenCalledTimes(1);
     expect(screen.getByText('Currently Tracking')).toBeInTheDocument();
@@ -108,7 +130,7 @@ describe('MapTrackingPage', () => {
 
     expect(screen.getByText((content) => content.includes('0.11') && content.includes('km'))).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: /Stop & Save/}));
+    await user.click(screen.getAllByRole('button', {name: /Stop & Save/})[0]);
 
     expect(clearWatchMock).toHaveBeenCalledWith(123);
     expect(mockToastSuccess).toHaveBeenCalled();
@@ -119,7 +141,7 @@ describe('MapTrackingPage', () => {
 
     renderWithProviders(<MapTrackingPage />);
 
-    await user.click(screen.getByRole('button', {name: /start tracking/i}));
+    await user.click(screen.getAllByRole('button', {name: /start tracking/i})[0]);
 
     await act(async () => {
       watchErrorCallback?.({message: 'Permission denied'} as GeolocationPositionError);

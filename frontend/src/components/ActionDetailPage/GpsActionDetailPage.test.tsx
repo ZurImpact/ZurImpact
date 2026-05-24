@@ -178,6 +178,15 @@ describe('GpsActionDetailPage', () => {
     });
   });
 
+  it('wraps the map in a relative isolate stacking context', async () => {
+    renderPage({
+      actions: createActionState(),
+    });
+
+    const map = await screen.findByTestId('map-container');
+    expect(map.closest('.relative.isolate')).not.toBeNull();
+  });
+
   it('renders loading state', () => {
     renderPage({
       actions: createActionState({
