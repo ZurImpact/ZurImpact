@@ -2,7 +2,6 @@ import {useEffect, useState} from 'react';
 import type {RedemptionResult} from '../../store/slices/RewardSlice';
 import {Card} from '../ui/card';
 import {Button} from '../ui/button';
-import {Badge} from '../ui/badge';
 import {Gift, Coffee, Utensils, ShoppingBag, Ticket, Lock, User} from 'lucide-react';
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '../ui/dialog';
 import {toast} from 'sonner';
@@ -23,7 +22,6 @@ interface Reward {
   title: string;
   description: string;
   points: number;
-  category: string;
   icon: string;
   available: number;
 }
@@ -34,7 +32,6 @@ export function RewardsPage() {
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [redeemedResult, setRedeemedResult] = useState<RedemptionResult | null>(null);
   const [redeemError, setRedeemError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<string>('all');
 
   const {rewards, redemptionLoading, loading, redemptionSuccess, redemptionError} = useAppSelector((s) => s.rewards);
   const {currentUser, isAuthenticated, loading: userLoading, error: userError} = useAppSelector((s) => s.user);
@@ -93,9 +90,6 @@ export function RewardsPage() {
     dispatch(fetchCurrentUser());
   };
 
-  const categories = ['all', 'Food & Drink', 'Shopping', 'Culture', 'Tourism', 'Services'];
-  const filteredRewards = filter === 'all' ? rewards : rewards.filter((r) => r.category === filter);
-
   const getIcon = (iconName: string) => {
     return ICON_MAP[iconName] || Gift;
   };
@@ -147,27 +141,14 @@ export function RewardsPage() {
         </div>
       </Card>
 
-      <div className="flex flex-wrap gap-2 mb-8">
-        {categories.map((category) => (
-          <Button
-            key={category}
-            variant={filter === category ? 'default' : 'outline'}
-            onClick={() => setFilter(category)}
-            className={filter === category ? 'bg-brand hover:bg-brand/90 text-brand-foreground' : ''}
-          >
-            {category === 'all' ? t('rewardsPage.allRewards') : category}
-          </Button>
-        ))}
-      </div>
-
       {loading && <div className="text-center py-8 text-muted-foreground">{t('rewardsPage.loading')}</div>}
 
-      {!loading && filteredRewards.length === 0 && (
+      {!loading && rewards.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">{t('rewardsPage.noRewards')}</div>
       )}
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredRewards.map((reward) => {
+        {rewards.map((reward) => {
           const canAfford = (currentUser?.points ?? 0) >= reward.points;
           const Icon = getIcon(reward.icon);
 
@@ -187,9 +168,6 @@ export function RewardsPage() {
                   <Icon className="h-6 w-6 text-on-info-container" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
-                  <Badge variant="secondary" className="mb-2">
-                    {reward.category}
-                  </Badge>
                   <h3 className="font-semibold text-lg mb-1">{reward.title}</h3>
                 </div>
               </div>
