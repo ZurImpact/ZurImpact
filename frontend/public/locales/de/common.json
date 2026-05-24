@@ -186,7 +186,6 @@
       "submit": "Bestätigungs-E-Mail erneut senden",
       "submitPending": "Wird gesendet\u2026",
       "successMessage": "Falls ein Konto mit dieser Adresse existiert, haben wir einen neuen Bestätigungslink gesendet. Überprüfen Sie Ihren Posteingang.",
-      "sendDifferent": "An eine andere Adresse senden",
       "errorGeneric": "Server nicht erreichbar. Bitte versuchen Sie es erneut."
     },
     "forgotPassword": {
@@ -197,7 +196,6 @@
       "submit": "Zurücksetzungslink senden",
       "submitPending": "Wird gesendet\u2026",
       "successMessage": "Falls ein Konto mit dieser Adresse existiert, haben wir einen Passwort-Zurücksetzungslink gesendet. Überprüfen Sie Ihren Posteingang.",
-      "sendDifferent": "An eine andere Adresse senden",
       "rememberPassword": "Passwort wieder eingefallen?",
       "signInLink": "Anmelden",
       "errorGeneric": "Server nicht erreichbar. Bitte versuchen Sie es erneut."
