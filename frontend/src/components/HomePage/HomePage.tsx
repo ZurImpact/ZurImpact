@@ -1,18 +1,19 @@
 import {
-  // ArrowRight,
+  ArrowRight,
   Trash2,
   Leaf,
   TrendingUp,
   Gift,
+  Handshake
 } from 'lucide-react';
 import {ImageWithFallback} from '../ui/ImageWithFallback';
 import {Card} from '../ui/card';
 import {Badge} from '../ui/badge';
 import {useTranslation} from 'react-i18next';
-// import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router';
 
 export function HomePage() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const {t} = useTranslation();
 
   const steps = [
@@ -87,15 +88,24 @@ export function HomePage() {
             <br />
             {t('homePage.hero.titleLine2')}
           </h1>
-          <p className="text-lg md:text-xl text-white mb-8 max-w-2xl mx-auto">{t('homePage.hero.subtitle')}</p>
-          {/* <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">{t('homePage.hero.subtitle')}</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => navigate("/partners")}
+              className="inline-flex items-center justify-center gap-4 bg-brand hover:bg-green-600 text-primary-foreground px-15 py-6 rounded-lg transition-colors"
+            >
+              {t('homePage.hero.partner')}
+              <Handshake className="size-5" />
+            </button>
             <button
               onClick={() => navigate("/login")}
-              className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-primary-foreground px-8 py-3 rounded-lg transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-green-600/20 backdrop-blur-sm hover:bg-green-600/30 text-green-500 px-15 py-6 rounded-lg border border-green-600 transition-colors"
             >
-              Start Earning Rewards
+              {t('homePage.hero.start')}
               <ArrowRight className="size-5" />
-            </button> */}
+            </button>
+            
+          </div>
         </div>
       </section>
 
@@ -171,13 +181,13 @@ export function HomePage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl mb-6 text-brand-foreground">{t('homePage.ctaTitle')}</h2>
           <p className="text-lg text-brand-foreground/80 mb-8">{t('homePage.ctaSubtitle')}</p>
-          {/* <button
+          <button
             onClick={() => navigate("/login")}
-            className="inline-flex items-center gap-2 bg-white dark:bg-card text-green-600 hover:bg-gray-100 px-8 py-3 rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 bg-background text-brand hover:bg-background/80 px-8 py-3 rounded-lg transition-colors"
           >
-            Get Started Now
+            {t('homePage.ctaButton')}
             <ArrowRight className="size-5" />
-          </button> */}
+          </button>
         </div>
       </section>
     </div>

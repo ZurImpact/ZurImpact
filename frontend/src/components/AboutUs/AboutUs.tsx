@@ -1,5 +1,5 @@
 import {useNavigate} from 'react-router';
-import {Target, ArrowRight, FileText} from 'lucide-react';
+import {Target, ArrowRight} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {Card} from '../ui/card';
 import {ImageWithFallback} from '../ui/ImageWithFallback';
@@ -57,16 +57,8 @@ export function AboutPage() {
                 <span className="text-sm font-medium">{t('aboutPage.missionBadge')}</span>
               </div>
               <h2 className="text-3xl md:text-4xl mb-6 text-foreground">{t('aboutPage.missionTitle')}</h2>
-              <p className="text-lg text-muted-foreground mb-4">{t('aboutPage.missionDescription1')}</p>
-              <p className="text-lg text-muted-foreground mb-8">{t('aboutPage.missionDescription2')}</p>
-              <a
-                href="/Zurimpact_PitchDeck.pdf"
-                download
-                className="inline-flex items-center justify-center gap-2 bg-brand/10 backdrop-blur-sm text-brand px-8 py-3 rounded-lg border border-brand transition-colors"
-              >
-                <FileText className="size-5" />
-                Download Pitch Deck
-              </a>
+              <p className="text-lg text-foreground/80 mb-4">{t('aboutPage.missionDescription1')}</p>
+              <p className="text-lg text-foreground/80 mb-8">{t('aboutPage.missionDescription2')}</p>
             </div>
           </div>
         </div>
