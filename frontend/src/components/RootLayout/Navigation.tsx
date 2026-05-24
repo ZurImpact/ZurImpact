@@ -45,7 +45,13 @@ export const Navigation = () => {
   const renderNavLinks = (mobile = false) => {
     const linksToShow = isAuthenticated
       ? navLinks
-      : navLinks.filter((link) => link.to === ROUTES.home || link.to === ROUTES.about || link.to === ROUTES.faq || link.to === ROUTES.partners);
+      : navLinks.filter(
+          (link) =>
+            link.to === ROUTES.home ||
+            link.to === ROUTES.about ||
+            link.to === ROUTES.faq ||
+            link.to === ROUTES.partners,
+        );
 
     return linksToShow.map((link) => (
       <Link

@@ -1,11 +1,4 @@
-import {
-  ArrowRight,
-  Trash2,
-  Leaf,
-  TrendingUp,
-  Gift,
-  Handshake
-} from 'lucide-react';
+import {ArrowRight, Trash2, Leaf, TrendingUp, Gift, Handshake} from 'lucide-react';
 import {ImageWithFallback} from '../ui/ImageWithFallback';
 import {Card} from '../ui/card';
 import {Badge} from '../ui/badge';
@@ -91,20 +84,19 @@ export function HomePage() {
           <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">{t('homePage.hero.subtitle')}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => navigate("/partners")}
+              onClick={() => navigate('/partners')}
               className="inline-flex items-center justify-center gap-4 bg-brand hover:bg-green-600 text-primary-foreground px-15 py-6 rounded-lg transition-colors"
             >
               {t('homePage.hero.partner')}
               <Handshake className="size-5" />
             </button>
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate('/login')}
               className="inline-flex items-center justify-center gap-2 bg-green-600/20 backdrop-blur-sm hover:bg-green-600/30 text-green-500 px-15 py-6 rounded-lg border border-green-600 transition-colors"
             >
               {t('homePage.hero.start')}
               <ArrowRight className="size-5" />
             </button>
-            
           </div>
         </div>
       </section>
@@ -182,7 +174,7 @@ export function HomePage() {
           <h2 className="text-3xl md:text-4xl mb-6 text-brand-foreground">{t('homePage.ctaTitle')}</h2>
           <p className="text-lg text-brand-foreground/80 mb-8">{t('homePage.ctaSubtitle')}</p>
           <button
-            onClick={() => navigate("/login")}
+            onClick={() => navigate('/login')}
             className="inline-flex items-center gap-2 bg-background text-brand hover:bg-background/80 px-8 py-3 rounded-lg transition-colors"
           >
             {t('homePage.ctaButton')}

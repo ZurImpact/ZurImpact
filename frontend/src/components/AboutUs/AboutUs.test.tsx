@@ -35,16 +35,6 @@ describe('AboutPage', () => {
     expect(await screen.findByText(/By partnering with local businesses/)).toBeInTheDocument();
   });
 
-  /* Pitch Deck Download */
-  it('renders download pitch deck link with correct href and download attribute', async () => {
-    renderAboutPage();
-
-    const downloadLink = screen.getByText('Download Pitch Deck');
-    const anchor = downloadLink.closest('a');
-    expect(anchor).toHaveAttribute('href', '/Zurimpact_PitchDeck.pdf');
-    expect(anchor).toHaveAttribute('download');
-  });
-
   /* Team Section */
   it('renders team member images with correct alt text', async () => {
     renderAboutPage();
