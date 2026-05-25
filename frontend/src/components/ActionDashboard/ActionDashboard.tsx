@@ -15,9 +15,18 @@ export function ActionDashboard() {
   const {t} = useTranslation();
 
   const {isAuthenticated, currentUser, roles = []} = useAppSelector((state) => state.user);
-  const {actions, loading, error, userActions} = useAppSelector((state) => state.actions);
+  const {actions, loading, error, userActions = []} = useAppSelector((state) => state.actions);
 
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+
+  const completedActionIds = new Set(
+    userActions
+      .filter((userAction) => userAction.completionState === 'COMPLETED' && !userAction.isSubtask)
+      .map((userAction) => userAction.actionId)
+      .filter((actionId) => Number.isInteger(actionId) && actionId > 0),
+  );
+
+  const availableActions = actions.filter((action) => !completedActionIds.has(action.id));
 
   const handleActionClick = (actionId: number) => {
     // TODO Implement action click behavior (e.g., open details, start action, etc.)
@@ -73,11 +82,17 @@ export function ActionDashboard() {
       )}
 
       {/* Activity Types Info */}
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
-        {actions.map((action) => (
-          <ActionCard key={action.id} action={action} onClick={() => handleActionClick(action.id)} />
-        ))}
-      </div>
+      {actions.length > 0 && availableActions.length === 0 ? (
+        <Card className="mb-8 rounded-xl border bg-card p-6 text-center text-card-foreground">
+          <p className="text-muted-foreground">{t('actionDashboard.noAvailableActions')}</p>
+        </Card>
+      ) : (
+        <div className="mb-8 grid gap-6 md:grid-cols-3">
+          {availableActions.map((action) => (
+            <ActionCard key={action.id} action={action} onClick={() => handleActionClick(action.id)} />
+          ))}
+        </div>
+      )}
 
       {/* Activity History */}
       <Card className="p-6 bg-card text-card-foreground rounded-xl border">

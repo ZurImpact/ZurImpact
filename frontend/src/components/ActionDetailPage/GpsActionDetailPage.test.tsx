@@ -42,6 +42,22 @@ const actionFixture = {
   ],
 };
 
+const completedHistoryAction = {
+  actionId: 1,
+  displayName: 'GPS City Walk',
+  points: 120,
+  completionState: 'COMPLETED',
+  actionCreatedOn: '2026-03-01',
+};
+
+const startedHistoryAction = {
+  actionId: 1,
+  displayName: 'GPS City Walk',
+  points: 120,
+  completionState: 'IN_PROGRESS',
+  actionCreatedOn: '2026-03-01',
+};
+
 vi.mock('../../api/apiClient', () => ({
   default: {
     get: (...args: unknown[]) => mockGet(...args),
@@ -143,6 +159,7 @@ describe('GpsActionDetailPage', () => {
 
     mockGet.mockImplementation((url: string) => {
       if (url === '/users/me/actions?active=true') return Promise.resolve({data: []});
+      if (url === '/users/me/actions') return Promise.resolve({data: []});
       if (url === '/actions/1') return Promise.resolve({data: actionFixture});
       if (url === '/auth/whoami') return Promise.resolve({data: {id: 5}});
       if (url === '/users/5') return Promise.resolve({data: defaultUserState.currentUser});
@@ -167,7 +184,7 @@ describe('GpsActionDetailPage', () => {
     expect(await screen.findByText('GPS City Walk')).toBeInTheDocument();
     expect(await screen.findByText('Visit all checkpoints')).toBeInTheDocument();
     expect(await screen.findByRole('button', {name: resolveT('gpsActionDetail.startAction')})).toBeInTheDocument();
-    expect(await screen.findByText(/0 \/ 2/)).toBeInTheDocument();
+    expect((await screen.findAllByText(/0 \/ 2/)).length).toBeGreaterThan(0);
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith('/actions/1');
@@ -175,6 +192,76 @@ describe('GpsActionDetailPage', () => {
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith('/users/me/actions?active=true');
+    });
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith('/users/me/actions');
+    });
+  });
+
+  it('disables the start action button when the action was completed before', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/users/me/actions?active=true') return Promise.resolve({data: []});
+      if (url === '/users/me/actions') return Promise.resolve({data: [completedHistoryAction]});
+      if (url === '/actions/1') return Promise.resolve({data: actionFixture});
+      if (url === '/auth/whoami') return Promise.resolve({data: {id: 5}});
+      if (url === '/users/5') return Promise.resolve({data: defaultUserState.currentUser});
+      return Promise.resolve({data: {}});
+    });
+
+    renderPage({
+      actions: createActionState(),
+    });
+
+    const startButton = await screen.findByRole('button', {name: resolveT('gpsActionDetail.alreadyCompleted')});
+    expect(startButton).toBeDisabled();
+  });
+
+  it('disables the start action button when the action was started before', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/users/me/actions?active=true') return Promise.resolve({data: [startedHistoryAction]});
+      if (url === '/users/me/actions') return Promise.resolve({data: []});
+      if (url === '/actions/1') return Promise.resolve({data: actionFixture});
+      if (url === '/auth/whoami') return Promise.resolve({data: {id: 5}});
+      if (url === '/users/5') return Promise.resolve({data: defaultUserState.currentUser});
+      return Promise.resolve({data: {}});
+    });
+
+    renderPage({
+      actions: createActionState(),
+    });
+
+    const startButton = await screen.findByRole('button', {name: resolveT('gpsActionDetail.alreadyStarted')});
+    expect(startButton).toBeDisabled();
+  });
+
+  it('does not complete the action again after refresh on a completed action page', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/users/me/actions?active=true') return Promise.resolve({data: []});
+      if (url === '/users/me/actions') {
+        return Promise.resolve({
+          data: [
+            {
+              ...completedHistoryAction,
+              completedSubtaskIds: [101, 102],
+            },
+          ],
+        });
+      }
+      if (url === '/actions/1') return Promise.resolve({data: actionFixture});
+      if (url === '/auth/whoami') return Promise.resolve({data: {id: 5}});
+      if (url === '/users/5') return Promise.resolve({data: defaultUserState.currentUser});
+      return Promise.resolve({data: {}});
+    });
+
+    renderPage({
+      actions: createActionState(),
+    });
+
+    expect(await screen.findByRole('button', {name: resolveT('gpsActionDetail.alreadyCompleted')})).toBeDisabled();
+
+    expect(mockPost).not.toHaveBeenCalledWith('/actions/completeAction', null, {
+      params: {userId: 5, actionId: 1},
     });
   });
 
@@ -432,6 +519,7 @@ describe('GpsActionDetailPage', () => {
       mockGet.mockImplementation((url: string) => {
         if (url === '/actions/1') return Promise.resolve({data: fixture});
         if (url === '/users/me/actions?active=true') return Promise.resolve({data: []});
+        if (url === '/users/me/actions') return Promise.resolve({data: []});
         return Promise.resolve({data: {}});
       });
       const user = userEvent.setup();
@@ -456,7 +544,11 @@ describe('GpsActionDetailPage', () => {
     it('HARD: check-in triggers when user is 3m away', async () => {
       const fixture = makeFixture('HARD');
       mockGet.mockImplementation((url: string) =>
-        url === '/actions/1' ? Promise.resolve({data: fixture}) : Promise.resolve({data: {}}),
+        url === '/actions/1' || url === '/users/me/actions' || url === '/users/me/actions?active=true'
+          ? url === '/actions/1'
+            ? Promise.resolve({data: fixture})
+            : Promise.resolve({data: []})
+          : Promise.resolve({data: {}}),
       );
       const user = userEvent.setup();
       renderPage({actions: {...createActionState(), selectedAction: fixture}});
