@@ -189,7 +189,6 @@
       "submit": "Resend verification email",
       "submitPending": "Sending\u2026",
       "successMessage": "If an account with that address exists, we've sent a fresh verification link. Check your inbox.",
-      "sendDifferent": "Send to a different address",
       "errorGeneric": "Couldn't reach the server, please try again."
     },
     "forgotPassword": {
@@ -200,7 +199,6 @@
       "submit": "Send reset link",
       "submitPending": "Sending\u2026",
       "successMessage": "If an account with that address exists, we've sent a password reset link. Check your inbox.",
-      "sendDifferent": "Send to a different address",
       "rememberPassword": "Remember your password?",
       "signInLink": "Sign in",
       "errorGeneric": "Couldn't reach the server, please try again."
