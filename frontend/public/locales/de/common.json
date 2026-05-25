@@ -26,6 +26,7 @@
     "historyTitle": "Deine Aktivitätshistorie",
     "loading": "Aktivitäten werden geladen...",
     "noActions": "Du hast noch keine Aktivitäten abgeschlossen. Starte noch heute deinen nachhaltigen Weg!",
+    "noAvailableActions": "Du hast alle verfügbaren Aktionen abgeschlossen.",
     "loginPrompt": "Bitte melde dich zuerst an.",
     "createAction": "GPS-Aktion erstellen"
   },
@@ -96,6 +97,8 @@
     "actionStarted": "Aktion gestartet! Schliesse alle Checkpoints ab, um Punkte zu erhalten.",
     "startError": "Fehler beim Starten der Aktion. Bitte versuche es erneut.",
     "startAction": "Aktion starten",
+    "alreadyStarted": "Bereits gestartet",
+    "alreadyCompleted": "Bereits abgeschlossen",
     "startDialogTitle": "Diese Aktion starten?",
     "startDialogDescription": "Sobald du startest, kannst du Checkpoints abschliessen. Stelle sicher, dass du bereit bist, alle zu absolvieren!",
     "cancel": "Abbrechen",

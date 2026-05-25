@@ -26,6 +26,7 @@
     "historyTitle": "Your Activity History",
     "loading": "Loading actions...",
     "noActions": "You haven't completed any actions yet. Start making an impact today!",
+    "noAvailableActions": "You've completed all available actions.",
     "loginPrompt": "Please login first.",
     "createAction": "Create GPS Action"
   },
@@ -96,6 +97,8 @@
     "actionStarted": "Action started! Complete all checkpoints to earn points.",
     "startError": "Failed to start action. Please try again.",
     "startAction": "Start Action",
+    "alreadyStarted": "Already started",
+    "alreadyCompleted": "Already completed",
     "startDialogTitle": "Start this action?",
     "startDialogDescription": "Once you start, you can begin completing checkpoints. Make sure you're ready to complete all of them!",
     "cancel": "Cancel",

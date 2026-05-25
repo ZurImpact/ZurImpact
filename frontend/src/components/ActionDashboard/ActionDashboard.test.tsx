@@ -119,6 +119,19 @@ describe('ActionDashboard', () => {
     expect(screen.getByText('Plant Tree')).toBeInTheDocument();
   });
 
+  it('hides completed actions from the available actions grid', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/actions') return Promise.resolve({data: mockActions});
+      if (url === '/users/me/actions' || url.startsWith('/users/me/actions?'))
+        return Promise.resolve({data: mockUserActions});
+      return Promise.resolve({data: []});
+    });
+    renderAuthenticatedDashboard();
+
+    expect(await screen.findByText('Plant Tree')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: /Clean Park/i})).not.toBeInTheDocument();
+  });
+
   it('renders user action history with points', async () => {
     mockGet.mockImplementation((url: string) => {
       if (url === '/actions') return Promise.resolve({data: mockActions});
@@ -131,6 +144,18 @@ describe('ActionDashboard', () => {
     await waitFor(() => {
       expect(screen.getByText('+50')).toBeInTheDocument();
     });
+  });
+
+  it('shows an empty state when all available actions are completed', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/actions') return Promise.resolve({data: [mockActions[0]]});
+      if (url === '/users/me/actions' || url.startsWith('/users/me/actions?'))
+        return Promise.resolve({data: mockUserActions});
+      return Promise.resolve({data: []});
+    });
+    renderAuthenticatedDashboard();
+
+    expect(await screen.findByText(resolveT('actionDashboard.noAvailableActions'))).toBeInTheDocument();
   });
 
   it('displays error message when fetch fails', async () => {
