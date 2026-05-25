@@ -41,15 +41,6 @@ export function ResendVerificationForm({defaultEmail}: ResendVerificationFormPro
     return (
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">{t('auth.resendVerification.successMessage')}</p>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="text-xs"
-          onClick={() => dispatch(resetAuthOp('resendVerification'))}
-        >
-          {t('auth.resendVerification.sendDifferent')}
-        </Button>
       </div>
     );
   }

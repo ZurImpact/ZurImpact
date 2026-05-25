@@ -6,7 +6,6 @@ export interface RewardDto {
   title: string;
   description: string;
   points: number;
-  category: string;
   icon: string;
   available: number;
 }

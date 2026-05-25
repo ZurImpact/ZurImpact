@@ -18,7 +18,8 @@
     "signOut": "Sign out",
     "profile": "Profile",
     "about": "About",
-    "contact": "Contact"
+    "contact": "Contact",
+    "partners": "Partners"
   },
   "actionDashboard": {
     "header": "Activities",
@@ -26,6 +27,7 @@
     "historyTitle": "Your Activity History",
     "loading": "Loading actions...",
     "noActions": "You haven't completed any actions yet. Start making an impact today!",
+    "noAvailableActions": "You've completed all available actions.",
     "loginPrompt": "Please login first.",
     "createAction": "Create GPS Action"
   },
@@ -96,6 +98,8 @@
     "actionStarted": "Action started! Complete all checkpoints to earn points.",
     "startError": "Failed to start action. Please try again.",
     "startAction": "Start Action",
+    "alreadyStarted": "Already started",
+    "alreadyCompleted": "Already completed",
     "startDialogTitle": "Start this action?",
     "startDialogDescription": "Once you start, you can begin completing checkpoints. Make sure you're ready to complete all of them!",
     "cancel": "Cancel",
@@ -198,7 +202,6 @@
       "submit": "Resend verification email",
       "submitPending": "Sending\u2026",
       "successMessage": "If an account with that address exists, we've sent a fresh verification link. Check your inbox.",
-      "sendDifferent": "Send to a different address",
       "errorGeneric": "Couldn't reach the server, please try again."
     },
     "forgotPassword": {
@@ -209,7 +212,6 @@
       "submit": "Send reset link",
       "submitPending": "Sending\u2026",
       "successMessage": "If an account with that address exists, we've sent a password reset link. Check your inbox.",
-      "sendDifferent": "Send to a different address",
       "rememberPassword": "Remember your password?",
       "signInLink": "Sign in",
       "errorGeneric": "Couldn't reach the server, please try again."
@@ -290,6 +292,52 @@
       "errorGeneric": "Couldn't change password, please try again."
     }
   },
+  "partnerPage": {
+    "heroTitle": "Turn Zurich's 2040 Climate Goals into Guaranteed Foot Traffic.",
+    "heroSubtitle": "Join the CopenPay-inspired platform driving eco-conscious tourists directly to your door.",
+    "heroCta": "Contact Us",
+    "heroImageAlt": "Cafe",
+    "downloadPitchDeck": "Download Pitch Deck",
+    "benefitsTitle": "Why Partner With Us?",
+    "benefitsSubtitle": "Join a growing network of sustainable businesses making a positive impact in Zürich",
+    "benefit1Title": "Reach Engaged Customers",
+    "benefit1Desc": "Connect with thousands of eco-conscious visitors and locals actively participating in sustainable tourism.",
+    "benefit2Title": "Increase Foot Traffic",
+    "benefit2Desc": "Attract new customers through our rewards program and exclusive partner promotions.",
+    "benefit3Title": "Brand Recognition",
+    "benefit3Desc": "Showcase your commitment to sustainability and be recognized as a green business leader in Zürich.",
+    "benefit4Title": "Flexible Partnership",
+    "benefit4Desc": "Choose partnership levels that fit your business needs with customizable reward offerings.",
+    "whoCanPartnerTitle": "Who Can Partner?",
+    "whoCanPartnerSubtitle": "We welcome all businesses committed to sustainability",
+    "whoCanPartnerImgAlt": "Sustainable business",
+    "partnerType1Title": "Restaurants & Cafés",
+    "partnerType1Desc": "Offer meal vouchers, discounts, or complimentary items to our community.",
+    "partnerType1Examples": "Coffee shops, sustainable restaurants, organic markets",
+    "partnerType2Title": "Cultural Venues",
+    "partnerType2Desc": "Provide free or discounted entry to museums, galleries, and attractions.",
+    "partnerType2Examples": "Museums, art galleries, theaters, cultural centers",
+    "partnerType3Title": "Retail & Services",
+    "partnerType3Desc": "Share discounts on sustainable products and eco-friendly services.",
+    "partnerType3Examples": "Zero-waste shops, bike repair, sustainable fashion",
+    "partnerType4Title": "Tourism & Activities",
+    "partnerType4Desc": "Offer experiences like boat tours, guided walks, or outdoor activities.",
+    "partnerType4Examples": "Tour operators, activity providers, outdoor gear rental",
+    "examples": "Examples:",
+    "howItWorksTitle": "How It Works",
+    "howItWorksSubtitle": "Getting started is simple and straightforward",
+    "howItWorksImgAlt": "Partnership meeting",
+    "step1Title": "Apply & Review",
+    "step1Body": "Submit your application through our contact form. Our team will review and schedule a consultation call.",
+    "step2Title": "Set Up Your Rewards",
+    "step2Body": "Work with our team to create attractive rewards that align with your business goals and values.",
+    "step3Title": "Go Live & Grow",
+    "step3Body": "Launch your partnership, track redemptions, and watch your customer base grow with our engaged community.",
+    "ctaTitle": "Ready to Become a Partner?",
+    "ctaSubtitle": "Join our growing network of sustainable businesses and make a positive impact on Zürich's tourism ecosystem.",
+    "ctaButton": "Get Started",
+    "ctaSecondary": "Learn More About Us"
+  },
   "contactPage": {
     "heroTitle": "Get in Touch",
     "heroSubtitle": "Whether you're interested in becoming a partner, have questions about our platform, or just want to say hello, we'd love to hear from you!",
@@ -336,7 +384,9 @@
       "badge": "Sustainable Tourism in Zürich",
       "titleLine1": "Explore Zürich.",
       "titleLine2": "Make an Impact.",
-      "subtitle": "Get rewarded for making sustainable choices. Collect litter, use public transport, bike to work, and discover eco-friendly options while earning exclusive rewards."
+      "subtitle": "Get rewarded for making sustainable choices. Collect litter, use public transport, bike to work, and discover eco-friendly options while earning exclusive rewards.",
+      "partner": "Become a Partner",
+      "start": "Become a Member"
     },
     "statsParticipants": "Active Participants",
     "statsWasteCollected": "Waste Collected",

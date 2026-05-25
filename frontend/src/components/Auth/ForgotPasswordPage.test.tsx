@@ -144,28 +144,6 @@ describe('ForgotPasswordPage', () => {
       // Form should be hidden — email input no longer present
       expect(screen.queryByLabelText(/email/i)).not.toBeInTheDocument();
     });
-
-    it('restores the form when "Send to a different address" is clicked after success', async () => {
-      const user = userEvent.setup();
-      vi.mocked(authApi.requestPasswordReset).mockResolvedValueOnce(undefined);
-
-      renderForgotPasswordPage();
-
-      await user.type(screen.getByLabelText(/email/i), 'alice@example.com');
-      await user.click(screen.getByRole('button', {name: /send reset link/i}));
-
-      await waitFor(() => {
-        expect(screen.getByText(/if an account with that address exists/i)).toBeInTheDocument();
-      });
-
-      const differentAddressBtn = screen.getByRole('button', {name: /send to a different address/i});
-      await user.click(differentAddressBtn);
-
-      // Form should be visible again
-      await waitFor(() => {
-        expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-      });
-    });
   });
 
   describe('error handling', () => {

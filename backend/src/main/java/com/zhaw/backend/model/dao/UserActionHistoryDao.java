@@ -49,8 +49,17 @@ public class UserActionHistoryDao {
         return Arrays.stream(completedSubtaskIds.split(","))
                 .map(String::trim)
                 .filter(value -> !value.isEmpty())
-                .map(Long::valueOf)
+                .map(UserActionHistoryDao::tryParseLong)
+                .filter(value -> value != null)
                 .toList();
+    }
+
+    private static Long tryParseLong(String value) {
+        try {
+            return Long.valueOf(value);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
     /**
