@@ -66,7 +66,7 @@ export function PartnersPage() {
       <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
         <ImageWithFallback
           src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="cafe"
+          alt={t('partnerPage.heroImageAlt')}
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/50" />
@@ -133,7 +133,7 @@ export function PartnersPage() {
                 <div key={index} className="flex gap-5 items-start">
                   <div>
                     <h3 className="text-lg font-semibold text-brand-foreground mb-3">{type.title}</h3>
-                    <p className="text-brand-foreground/80 text-s mb-1">{type.description}</p>
+                    <p className="text-brand-foreground/80 text-base mb-1">{type.description}</p>
                     <p className="text-sm text-brand-foreground/70 italic">
                       {t('partnerPage.examples')} {type.examples}
                     </p>
