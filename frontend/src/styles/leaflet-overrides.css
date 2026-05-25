@@ -1,0 +1,31 @@
+/*
+ * Leaflet z-index overrides.
+ *
+ * Leaflet's default stylesheet ships with very high z-indexes on its panes
+ * (.leaflet-pane up to 700) and controls (.leaflet-control up to 800). Those
+ * values out-rank the app's chrome (sticky nav, Radix Dialog/Sheet overlays,
+ * which all sit at z-50 via Tailwind), which causes the map to paint over the
+ * top navigation, the right-side cards, and the mobile drawer.
+ *
+ * Lowering the Leaflet panes to z-index 0 lets the map participate normally
+ * in the document stacking context. Internal pane ordering inside the map
+ * (popups above markers above tiles) is preserved because all Leaflet panes
+ * remain descendants of the same .leaflet-map-pane and compete only within
+ * that subtree.
+ *
+ * App stacking ladder (after this fix):
+ *   Leaflet panes/tiles ......... 0
+ *   Leaflet controls ............ 1
+ *   Mobile tracking FAB ......... z-40
+ *   Sticky nav, Radix overlays .. z-50
+ *   Sonner toasts ............... z-[100] (and above)
+ */
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 0;
+}
+
+.leaflet-control {
+  z-index: 1;
+}

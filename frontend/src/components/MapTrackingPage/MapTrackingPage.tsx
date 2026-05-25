@@ -153,7 +153,7 @@ export function MapTrackingPage() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Map Placeholder */}
         <div className="lg:col-span-2">
-          <Card className="overflow-hidden h-[600px] bg-brand/20 flex items-center justify-center shadow-lg">
+          <Card className="relative isolate overflow-hidden h-[600px] bg-brand/20 flex items-center justify-center shadow-lg">
             <div className="h-full w-full">
               <MapContainer center={[47.3769, 8.5417]} zoom={13} style={{height: '100%', width: '100%'}}>
                 <TileLayer
@@ -287,6 +287,29 @@ export function MapTrackingPage() {
             </Badge>
           )}
         </div>
+      </div>
+
+      {/* Mobile-only sticky Start/Stop tracking FAB so users don't need to scroll past the map */}
+      <div data-testid="mobile-tracking-fab" className="lg:hidden fixed bottom-4 inset-x-4 z-40">
+        {!isTracking ? (
+          <Button
+            onClick={handleStartTracking}
+            className="w-full bg-brand hover:bg-brand/90 text-brand-foreground flex items-center justify-center gap-2 shadow-xl"
+            size="lg"
+          >
+            <Play className="h-5 w-5" aria-hidden="true" />
+            {t('actionDetail.startTracking')}
+          </Button>
+        ) : (
+          <Button
+            onClick={handleStopTracking}
+            className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground flex items-center justify-center gap-2 shadow-xl"
+            size="lg"
+          >
+            <Square className="h-5 w-5" aria-hidden="true" />
+            Stop & Save
+          </Button>
+        )}
       </div>
     </div>
   );

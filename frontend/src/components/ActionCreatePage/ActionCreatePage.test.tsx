@@ -97,6 +97,13 @@ describe('ActionCreatePage', () => {
     expect(screen.getByRole('button', {name: resolveT('actionCreatePage.submit')})).toBeInTheDocument();
   });
 
+  it('wraps each checkpoint map in a relative isolate stacking context', () => {
+    renderPage();
+
+    const map = screen.getByTestId('checkpoint-map');
+    expect(map.closest('.relative.isolate')).not.toBeNull();
+  });
+
   it('submits a GPS-only action payload and navigates to the created action', async () => {
     const user = userEvent.setup();
     mockPost.mockResolvedValueOnce({data: {id: 23}});
