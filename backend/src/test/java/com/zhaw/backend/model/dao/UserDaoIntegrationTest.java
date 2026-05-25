@@ -22,6 +22,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -147,6 +148,8 @@ class UserDaoIntegrationTest {
         assertEquals("dave@example.com", found.get().getEmail());
         assertEquals("hashed_pw", found.get().getPasswordHash());
         assertNotNull(found.get().getCreatedAt());
+        assertFalse(found.get().getEmailVerified(), "emailVerified should default to false on insert");
+        assertFalse(found.get().getHasPendingEmailChange(), "hasPendingEmailChange should default to false on insert");
     }
 
     @Test
@@ -200,12 +203,16 @@ class UserDaoIntegrationTest {
 
         saved.setEmail("heidi_new@example.com");
         saved.setPasswordHash("new_hash");
+        saved.setEmailVerified(true);
+        saved.setHasPendingEmailChange(true);
         userDao.save(saved);
 
         Optional<User> updated = userDao.findById(saved.getId());
         assertTrue(updated.isPresent());
         assertEquals("heidi_new@example.com", updated.get().getEmail());
         assertEquals("new_hash", updated.get().getPasswordHash());
+        assertTrue(updated.get().getEmailVerified(), "emailVerified should be updated");
+        assertTrue(updated.get().getHasPendingEmailChange(), "hasPendingEmailChange should be updated");
         assertEquals("heidi", updated.get().getUsername(), "Username should not change");
     }
 
@@ -292,5 +299,31 @@ class UserDaoIntegrationTest {
         Optional<User> updated = userDao.findById(saved.getId());
         assertTrue(updated.isPresent());
         assertEquals(7, updated.get().getPoints(), "Points should update on save");
+    }
+
+    // ── EMAIL VERIFICATION & PENDING CHANGE ───────────────────────────────
+
+    @Test
+    @DisplayName("insert sets default emailVerified and hasPendingEmailChange to false")
+    void insert_setsDefaultBooleans() {
+        User user = createSampleUser("bool_user", "bool_user@example.com");
+
+        User saved = userDao.save(user);
+
+        assertFalse(saved.getEmailVerified(), "emailVerified should default to false");
+        assertFalse(saved.getHasPendingEmailChange(), "hasPendingEmailChange should default to false");
+    }
+
+    @Test
+    @DisplayName("insert preserves explicit emailVerified and hasPendingEmailChange")
+    void insert_preservesExplicitBooleans() {
+        User user = createSampleUser("bool_explicit", "bool_explicit@example.com");
+        user.setEmailVerified(true);
+        user.setHasPendingEmailChange(true);
+
+        User saved = userDao.save(user);
+
+        assertTrue(saved.getEmailVerified());
+        assertTrue(saved.getHasPendingEmailChange());
     }
 }

@@ -26,6 +26,7 @@ public final class UserMapper {
 				.points(entity.getPoints())
 				.role(entity.getRole() == null ? null : Role.valueOf(entity.getRole()))
 				.emailVerified(entity.getEmailVerified())
+				.hasPendingEmailChange(entity.getHasPendingEmailChange())
 				.build();
 	}
 
@@ -43,6 +44,7 @@ public final class UserMapper {
 				.points(entity.getPoints())
 				.role(entity.getRole() == null ? null : Role.valueOf(entity.getRole()))
 				.emailVerified(entity.getEmailVerified())
+				.hasPendingEmailChange(entity.getHasPendingEmailChange())
 				.build();
 	}
 }

@@ -76,6 +76,7 @@ const renderPage = () =>
             points: 100,
             address: null,
             createdAt: null,
+            hasPendingEmailChange: false,
           },
           roles: [],
           isAuthenticated: true,

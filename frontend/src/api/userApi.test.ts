@@ -28,6 +28,7 @@ describe('userApi', () => {
       points: 50,
       address: null,
       createdAt: '2024-01-01T00:00:00Z',
+      hasPendingEmailChange: false,
     };
     mockedGet.mockResolvedValueOnce({data: payload});
     const result = await getUserById(1);
@@ -54,6 +55,7 @@ describe('userApi', () => {
       points: 50,
       address: null,
       createdAt: '2024-01-01T00:00:00Z',
+      hasPendingEmailChange: false,
     };
     mockedPost.mockResolvedValueOnce({data: payload});
 
@@ -73,6 +75,7 @@ describe('userApi', () => {
       points: 50,
       address: null,
       createdAt: '2024-01-01T00:00:00Z',
+      hasPendingEmailChange: true,
     };
     mockedPost.mockResolvedValueOnce({data: payload});
 

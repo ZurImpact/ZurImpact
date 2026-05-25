@@ -242,6 +242,15 @@ export function ProfilePage() {
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">{t('profile.updateEmail.description')}</p>
 
+          {currentUser.hasPendingEmailChange && (
+            <div
+              role="alert"
+              className="rounded-md border border-yellow-500/40 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-700"
+            >
+              {t('profile.updateEmail.pendingVerificationBanner')}
+            </div>
+          )}
+
           {emailUpdateError && (
             <div
               role="alert"

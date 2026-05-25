@@ -19,4 +19,5 @@ public class UserDto {
     private Integer points;
     private Role role;
     private Boolean emailVerified;
+    private Boolean hasPendingEmailChange;
 }

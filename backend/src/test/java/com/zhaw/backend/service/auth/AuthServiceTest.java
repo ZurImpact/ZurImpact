@@ -256,6 +256,7 @@ class AuthServiceTest {
         verify(emailChangeTokenService).invalidateAllForUser(11L);
         verify(emailChangeTokenService).issue(11L, "newemail@example.com");
         verify(mailService).sendEmailChangeVerificationEmail("newemail@example.com", "alice", "change-token");
+        verify(userDao).setPendingEmailChangeStatus(11L, true);
     }
 
     @Test
@@ -295,6 +296,7 @@ class AuthServiceTest {
         assertTrue(ok);
         verify(userDao).updateEmail(11L, "updated@example.com");
         verify(userDao).markEmailVerified(11L);
+        verify(userDao).setPendingEmailChangeStatus(11L, false);
         verify(emailChangeTokenService).markConsumed("change-token");
     }
 

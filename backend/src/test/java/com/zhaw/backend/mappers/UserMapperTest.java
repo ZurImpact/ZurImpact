@@ -30,6 +30,8 @@ class UserMapperTest {
         entity.setCreatedAt(createdAt);
         entity.setPoints(99);
         entity.setRole("ROLE_ADMIN");
+        entity.setEmailVerified(true);
+        entity.setHasPendingEmailChange(false);
 
         UserDto dto = UserMapper.toDto(entity);
 
@@ -42,6 +44,8 @@ class UserMapperTest {
         assertEquals(createdAt.toString(), dto.getCreatedAt());
         assertEquals(entity.getPoints(), dto.getPoints());
         assertEquals(Role.ROLE_ADMIN, dto.getRole());
+        assertEquals(entity.getEmailVerified(), dto.getEmailVerified());
+        assertEquals(entity.getHasPendingEmailChange(), dto.getHasPendingEmailChange());
     }
 
     @Test
@@ -59,6 +63,8 @@ class UserMapperTest {
         assertNotNull(dto);
         assertNull(dto.getCreatedAt());
         assertNull(dto.getRole());
+        assertNull(dto.getEmailVerified());
+        assertNull(dto.getHasPendingEmailChange());
     }
 
     @Test
@@ -79,6 +85,8 @@ class UserMapperTest {
         entity.setCreatedAt(createdAt);
         entity.setPoints(99);
         entity.setRole("ROLE_ADMIN");
+        entity.setEmailVerified(true);
+        entity.setHasPendingEmailChange(false);
 
         UserResponseDto dto = UserMapper.toResponseDto(entity);
 
@@ -90,6 +98,7 @@ class UserMapperTest {
         assertEquals(createdAt.toString(), dto.getCreatedAt());
         assertEquals(entity.getPoints(), dto.getPoints());
         assertEquals(Role.ROLE_ADMIN, dto.getRole());
+        assertEquals(entity.getEmailVerified(), dto.getEmailVerified());
+        assertEquals(entity.getHasPendingEmailChange(), dto.getHasPendingEmailChange());
     }
 }
-

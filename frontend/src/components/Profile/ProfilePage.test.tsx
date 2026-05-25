@@ -57,6 +57,7 @@ const fullyPopulatedUser = {
   points: 250,
   address: null,
   createdAt: '2024-03-15T10:00:00Z',
+  hasPendingEmailChange: false,
 };
 
 function renderProfilePage(preloadedState?: DeepPartial<RootState>) {
@@ -123,6 +124,32 @@ describe('ProfilePage', () => {
 
       // The date 2024-03-15 should appear in some human-readable format
       expect(screen.getByText(/march.*2024|2024.*march|mar.*2024|15.*2024/i)).toBeInTheDocument();
+    });
+
+    it('renders pending email verification banner when hasPendingEmailChange is true', () => {
+      renderProfilePage({
+        user: {
+          loading: false,
+          isAuthenticated: true,
+          currentUser: {...fullyPopulatedUser, hasPendingEmailChange: true},
+          error: null,
+        },
+      });
+
+      expect(screen.getByText(/pending email verification is ongoing/i)).toBeInTheDocument();
+    });
+
+    it('does not render pending email verification banner when hasPendingEmailChange is false or undefined', () => {
+      renderProfilePage({
+        user: {
+          loading: false,
+          isAuthenticated: true,
+          currentUser: {...fullyPopulatedUser, hasPendingEmailChange: false},
+          error: null,
+        },
+      });
+
+      expect(screen.queryByText(/pending email verification is ongoing/i)).not.toBeInTheDocument();
     });
 
     it('allows changing the profile name', async () => {
