@@ -42,10 +42,11 @@ describe('RootLayout', () => {
     mockApiPost.mockResolvedValue({});
   });
 
-  it('renders the app name translation key', async () => {
+  it('renders the app name in navigation and footer', async () => {
     renderWithRouter();
 
-    expect(await screen.findByText(resolveT('appName'))).toBeInTheDocument();
+    const appNames = screen.getAllByText(resolveT('appName'));
+    expect(appNames).toHaveLength(2);
   });
 
   it('renders the dashboard navigation link', async () => {
