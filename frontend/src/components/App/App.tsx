@@ -20,6 +20,7 @@ import {ROUTES} from '../../routes';
 import {ThemeProvider} from 'next-themes';
 import {HomePage} from '../HomePage/HomePage';
 import {FaqPage} from '../FaqPage/FaqPage';
+import {VerifyEmailChangePage} from '../Auth/VerifyEmailChangePage';
 import {PartnersPage} from '../PartnerPage/PartnerPage';
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
             <Route path={ROUTES.verifyEmail} element={<VerifyEmailPage />} />
             <Route path={ROUTES.passwordResetRequest} element={<ForgotPasswordPage />} />
             <Route path={ROUTES.passwordResetConfirm} element={<ResetPasswordPage />} />
+            <Route path={ROUTES.verifyEmailChange} element={<VerifyEmailChangePage />} />
           </Route>
 
           {/* Public marketing pages — with app nav, no auth required */}
