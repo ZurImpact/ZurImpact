@@ -243,7 +243,9 @@ const authSlice = createSlice({
     builder
       .addCase(verifyEmailChangeToken.pending, (state) => setPending(state.verifyEmailChange))
       .addCase(verifyEmailChangeToken.fulfilled, (state) => setFulfilled(state.verifyEmailChange))
-      .addCase(verifyEmailChangeToken.rejected, (state, action) => setRejected(state.verifyEmailChange, action.payload as string));
+      .addCase(verifyEmailChangeToken.rejected, (state, action) =>
+        setRejected(state.verifyEmailChange, action.payload as string),
+      );
   },
 });
 

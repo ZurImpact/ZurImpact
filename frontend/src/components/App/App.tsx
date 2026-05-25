@@ -20,7 +20,7 @@ import {ROUTES} from '../../routes';
 import {ThemeProvider} from 'next-themes';
 import {HomePage} from '../HomePage/HomePage';
 import {FaqPage} from '../FaqPage/FaqPage';
-import { VerifyEmailChangePage } from '../Auth/VerifyEmailChangePage';
+import {VerifyEmailChangePage} from '../Auth/VerifyEmailChangePage';
 
 function App() {
   return (
