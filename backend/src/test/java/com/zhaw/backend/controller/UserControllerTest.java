@@ -1,8 +1,9 @@
 package com.zhaw.backend.controller;
 
+import com.zhaw.backend.enums.Role;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
+import com.zhaw.backend.model.dto.UserResponseDto;
 import com.zhaw.backend.model.dto.auth.PasswordChangeRequest;
-import com.zhaw.backend.model.entities.User;
 import com.zhaw.backend.security.AuthenticatedUser;
 import com.zhaw.backend.service.auth.AuthService;
 import com.zhaw.backend.security.CurrentUserResolver;
@@ -52,10 +53,10 @@ class UserControllerTest {
         @Test
         @DisplayName("returns 200 when user exists")
         void getUserOk() {
-            User user = User.builder().id(1L).username("alice").email("alice@example.com").points(100).role("ROLE_USER").build();
-            when(userService.findUserById(1L)).thenReturn(Optional.of(user));
+            UserResponseDto userDto = UserResponseDto.builder().id(1L).username("alice").email("alice@example.com").points(100).role(Role.ROLE_USER).build();
+            when(userService.getUserProfile(1L)).thenReturn(Optional.of(userDto));
 
-            ResponseEntity<?> response = controller.getUser(1L);
+            ResponseEntity<UserResponseDto> response = controller.getUser(1L);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertNotNull(response.getBody());
@@ -66,7 +67,7 @@ class UserControllerTest {
         void getUserNotFound() {
             when(userService.getUserProfile(99L)).thenReturn(Optional.empty());
 
-            ResponseEntity<?> response = controller.getUser(99L);
+            ResponseEntity<UserResponseDto> response = controller.getUser(99L);
 
             assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         }
