@@ -116,33 +116,31 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("register silently re-issues verify mail when an unverified duplicate exists")
-    void registerReIssuesForUnverifiedDuplicate() {
+    @DisplayName("register throws when username already exists")
+    void registerDuplicateUsernameThrows() {
         User existing = user("grace", "old", Role.ROLE_USER, false);
         when(userDao.findByUsername("grace")).thenReturn(Optional.of(existing));
-        when(userDao.findByEmail("grace@example.com")).thenReturn(Optional.of(existing));
-        when(verificationTokenService.issue(11L)).thenReturn("re-issued-token");
+        when(userDao.findByEmail("grace@example.com")).thenReturn(Optional.empty());
 
-        authService.register("grace", "grace@example.com", "secret123");
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> authService.register("grace", "grace@example.com", "secret123"));
 
+        assertEquals("username_taken", ex.getMessage());
         verify(userDao, never()).save(any());
-        verify(verificationTokenService).invalidateAllForUser(11L);
-        verify(verificationTokenService).issue(11L);
-        verify(mailService).sendVerificationEmail("grace@example.com", "grace", "re-issued-token");
     }
 
     @Test
-    @DisplayName("register stays silent for verified duplicates")
-    void registerSilentForVerifiedDuplicate() {
+    @DisplayName("register throws when email already exists")
+    void registerDuplicateEmailThrows() {
         User existing = user("heidi", "old", Role.ROLE_USER, true);
-        when(userDao.findByUsername("heidi")).thenReturn(Optional.of(existing));
+        when(userDao.findByUsername("newuser")).thenReturn(Optional.empty());
         when(userDao.findByEmail("heidi@example.com")).thenReturn(Optional.of(existing));
 
-        authService.register("heidi", "heidi@example.com", "secret123");
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> authService.register("newuser", "heidi@example.com", "secret123"));
 
+        assertEquals("email_taken", ex.getMessage());
         verify(userDao, never()).save(any());
-        verify(verificationTokenService, never()).issue(anyLong());
-        verify(mailService, never()).sendVerificationEmail(anyString(), anyString(), anyString());
     }
 
     @Test
