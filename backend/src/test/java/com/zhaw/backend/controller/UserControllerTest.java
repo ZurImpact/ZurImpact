@@ -64,7 +64,7 @@ class UserControllerTest {
         @Test
         @DisplayName("returns 404 when user does not exist")
         void getUserNotFound() {
-            when(userService.findUserById(99L)).thenReturn(Optional.empty());
+            when(userService.getUserProfile(99L)).thenReturn(Optional.empty());
 
             ResponseEntity<?> response = controller.getUser(99L);
 

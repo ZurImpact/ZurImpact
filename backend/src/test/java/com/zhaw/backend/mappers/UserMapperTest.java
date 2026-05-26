@@ -14,7 +14,7 @@ class UserMapperTest {
 
     @Test
     void toDto_null_returnsNull() {
-        assertNull(UserMapper.toDto(null));
+        assertNull(UserMapper.toDto(null, false));
     }
 
     @Test
@@ -63,12 +63,12 @@ class UserMapperTest {
         assertNull(dto.getCreatedAt());
         assertNull(dto.getRole());
         assertNull(dto.getEmailVerified());
-        assertNull(dto.getHasPendingEmailChange());
+        assertFalse(dto.getHasPendingEmailChange());
     }
 
     @Test
     void toResponseDto_null_returnsNull() {
-        assertNull(UserMapper.toResponseDto(null));
+        assertNull(UserMapper.toResponseDto(null, false));
     }
 
     @Test
