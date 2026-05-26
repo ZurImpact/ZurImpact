@@ -14,7 +14,7 @@ class UserMapperTest {
 
     @Test
     void toDto_null_returnsNull() {
-        assertNull(UserMapper.toDto(null, false));
+        assertNull(UserMapper.toDto(null));
     }
 
     @Test
@@ -68,7 +68,7 @@ class UserMapperTest {
 
     @Test
     void toResponseDto_null_returnsNull() {
-        assertNull(UserMapper.toResponseDto(null, false));
+        assertNull(UserMapper.toResponseDto(null));
     }
 
     @Test
