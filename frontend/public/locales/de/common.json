@@ -18,7 +18,8 @@
     "signOut": "Abmelden",
     "profile": "Profil",
     "about": "Über uns",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "partners": "Partner"
   },
   "actionDashboard": {
     "header": "Aktivitäten",
@@ -189,7 +190,6 @@
       "submit": "Bestätigungs-E-Mail erneut senden",
       "submitPending": "Wird gesendet\u2026",
       "successMessage": "Falls ein Konto mit dieser Adresse existiert, haben wir einen neuen Bestätigungslink gesendet. Überprüfen Sie Ihren Posteingang.",
-      "sendDifferent": "An eine andere Adresse senden",
       "errorGeneric": "Server nicht erreichbar. Bitte versuchen Sie es erneut."
     },
     "forgotPassword": {
@@ -200,7 +200,6 @@
       "submit": "Zurücksetzungslink senden",
       "submitPending": "Wird gesendet\u2026",
       "successMessage": "Falls ein Konto mit dieser Adresse existiert, haben wir einen Passwort-Zurücksetzungslink gesendet. Überprüfen Sie Ihren Posteingang.",
-      "sendDifferent": "An eine andere Adresse senden",
       "rememberPassword": "Passwort wieder eingefallen?",
       "signInLink": "Anmelden",
       "errorGeneric": "Server nicht erreichbar. Bitte versuchen Sie es erneut."
@@ -281,6 +280,52 @@
       "errorGeneric": "Passwort konnte nicht geändert werden. Bitte versuchen Sie es erneut."
     }
   },
+  "partnerPage": {
+    "heroTitle": "Verwandle Zürichs 2040-Klimaziele in garantierten Kundenverkehr.",
+    "heroSubtitle": "Werde Teil der von CopenPay inspirierten Plattform, die umweltbewusste Touristen direkt zu deiner Tür führt.",
+    "heroCta": "Kontaktiere uns",
+    "heroImageAlt": "Kaffee",
+    "downloadPitchDeck": "Pitch Deck herunterladen",
+    "benefitsTitle": "Warum mit uns partneren?",
+    "benefitsSubtitle": "Werde Teil eines wachsenden Netzwerks nachhaltiger Unternehmen, die einen positiven Einfluss in Zürich haben",
+    "benefit1Title": "Engagierte Kunden erreichen",
+    "benefit1Desc": "Vernetze dich mit Tausenden von umweltbewussten Besuchern und Einheimischen, die aktiv am nachhaltigen Tourismus teilnehmen.",
+    "benefit2Title": "Mehr Kundenverkehr",
+    "benefit2Desc": "Gewinne neue Kunden durch unser Prämienprogramm und exklusive Partneraktionen.",
+    "benefit3Title": "Markenbekanntheit",
+    "benefit3Desc": "Zeige dein Engagement für Nachhaltigkeit und werde als grüner Vorreiter in Zürich anerkannt.",
+    "benefit4Title": "Flexible Partnerschaft",
+    "benefit4Desc": "Wähle Partnerschaftsstufen, die zu deinem Unternehmen passen, mit anpassbaren Belohnungsangeboten.",
+    "whoCanPartnerTitle": "Wer kann Partner werden?",
+    "whoCanPartnerSubtitle": "Wir heissen alle Unternehmen willkommen, die sich der Nachhaltigkeit verpflichtet fühlen",
+    "whoCanPartnerImgAlt": "Nachhaltiges Unternehmen",
+    "partnerType1Title": "Restaurants & Cafés",
+    "partnerType1Desc": "Biete Essensgutscheine, Rabatte oder kostenlose Produkte für unsere Community an.",
+    "partnerType1Examples": "Cafés, nachhaltige Restaurants, Bioläden",
+    "partnerType2Title": "Kultureinrichtungen",
+    "partnerType2Desc": "Ermögliche freien oder ermässigten Eintritt zu Museen, Galerien und Attraktionen.",
+    "partnerType2Examples": "Museen, Kunstgalerien, Theater, Kulturzentren",
+    "partnerType3Title": "Einzelhandel & Dienstleistungen",
+    "partnerType3Desc": "Teile Rabatte auf nachhaltige Produkte und umweltfreundliche Dienstleistungen.",
+    "partnerType3Examples": "Unverpackt-Läden, Velowerkstätten, nachhaltige Mode",
+    "partnerType4Title": "Tourismus & Aktivitäten",
+    "partnerType4Desc": "Biete Erlebnisse wie Bootstouren, geführte Wanderungen oder Outdoor-Aktivitäten an.",
+    "partnerType4Examples": "Reiseveranstalter, Aktivitätsanbieter, Outdoor-Ausrüstungsverleih",
+    "examples": "Beispiele:",
+    "howItWorksTitle": "So funktioniert's",
+    "howItWorksSubtitle": "Der Einstieg ist einfach und unkompliziert",
+    "howItWorksImgAlt": "Partnerschaftstreffen",
+    "step1Title": "Bewerben & prüfen",
+    "step1Body": "Reiche deine Bewerbung über unser Kontaktformular ein. Unser Team prüft sie und vereinbart ein Beratungsgespräch.",
+    "step2Title": "Belohnungen einrichten",
+    "step2Body": "Arbeite mit unserem Team zusammen, um attraktive Belohnungen zu erstellen, die zu deinen Geschäftszielen passen.",
+    "step3Title": "Live gehen & wachsen",
+    "step3Body": "Starte deine Partnerschaft, verfolge Einlösungen und sieh zu, wie dein Kundenstamm mit unserer engagierten Community wächst.",
+    "ctaTitle": "Bereit, Partner zu werden?",
+    "ctaSubtitle": "Werde Teil unseres wachsenden Netzwerks nachhaltiger Unternehmen und gestalte den Tourismus in Zürich positiv mit.",
+    "ctaButton": "Loslegen",
+    "ctaSecondary": "Mehr über uns erfahren"
+  },
   "contactPage": {
     "heroTitle": "Kontaktiere uns",
     "heroSubtitle": "Egal, ob du Partner werden möchtest, Fragen zu unserer Plattform hast oder einfach Hallo sagen möchtest, wir freuen uns, von dir zu hören!",
@@ -327,7 +372,9 @@
       "badge": "Nachhaltiger Tourismus in Zürich",
       "titleLine1": "Entdecke Zürich.",
       "titleLine2": "Mach einen Unterschied.",
-      "subtitle": "Werde belohnt für nachhaltige Entscheidungen. Sammle Abfall, nutze öffentliche Verkehrsmittel, fahre mit dem Velo zur Arbeit und entdecke umweltfreundliche Optionen, während du exklusive Belohnungen verdienst."
+      "subtitle": "Werde belohnt für nachhaltige Entscheidungen. Sammle Abfall, nutze öffentliche Verkehrsmittel, fahre mit dem Velo zur Arbeit und entdecke umweltfreundliche Optionen, während du exklusive Belohnungen verdienst.",
+      "partner": "Werde Partner",
+      "start": "Werde Mitglied"
     },
     "statsParticipants": "Aktive Teilnehmer",
     "statsWasteCollected": "Gesammelter Abfall",
@@ -371,6 +418,10 @@
     "isAppFreeAnswer": "Ja, absolut! Die ZurImpact-App kann komplett kostenlos heruntergeladen und genutzt werden. Unsere Mission ist es, nachhaltiges Verhalten zu fördern, und nicht, Geld dafür zu verlangen.",
     "howIsImpactMeasuredTitle": "Wie wird mein Impact gemessen?",
     "howIsImpactMeasuredAnswer": "Obwohl Punkte ein toller Anreiz sind, wird dein wahrer Impact durch die gemeinsame Anstrengung unserer Community gemessen. Auf unserer Startseite zeigen wir zusammengefasste Statistiken wie die Gesamtmenge des gesammelten Mülls und die Anzahl der unternommenen nachhaltigen Fahrten. Deine Aktionen tragen direkt zu diesen Zahlen bei!"
+  },
+  "footer": {
+    "instagram": "Instagram",
+    "allRightsReserved": "Alle Rechte vorbehalten."
   },
   "points": "Punkte",
   "language": "Sprache"

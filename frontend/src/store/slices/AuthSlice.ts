@@ -18,6 +18,7 @@ export interface AuthState {
   requestPasswordReset: AuthOpState;
   confirmPasswordReset: AuthOpState;
   changePassword: AuthOpState;
+  verifyEmailChange: AuthOpState;
 }
 
 const makeIdleOp = (): AuthOpState => ({status: 'idle', error: null});
@@ -31,6 +32,7 @@ const initialState: AuthState = {
   requestPasswordReset: makeIdleOp(),
   confirmPasswordReset: makeIdleOp(),
   changePassword: makeIdleOp(),
+  verifyEmailChange: makeIdleOp(),
 };
 
 interface AxiosErrorContext {
@@ -148,6 +150,17 @@ export const changePassword = createAsyncThunk(
   },
 );
 
+export const verifyEmailChangeToken = createAsyncThunk(
+  'auth/verifyEmailChange',
+  async (req: {token: string}, {rejectWithValue}) => {
+    try {
+      return await authApi.verifyEmailChange(req);
+    } catch {
+      return rejectWithValue('verify_email_change_failed');
+    }
+  },
+);
+
 function setPending(op: AuthOpState) {
   op.status = 'pending';
   op.error = null;
@@ -225,6 +238,14 @@ const authSlice = createSlice({
       .addCase(changePassword.pending, (state) => setPending(state.changePassword))
       .addCase(changePassword.fulfilled, (state) => setFulfilled(state.changePassword))
       .addCase(changePassword.rejected, (state, action) => setRejected(state.changePassword, action.payload as string));
+
+    // verifyEmailChangeToken
+    builder
+      .addCase(verifyEmailChangeToken.pending, (state) => setPending(state.verifyEmailChange))
+      .addCase(verifyEmailChangeToken.fulfilled, (state) => setFulfilled(state.verifyEmailChange))
+      .addCase(verifyEmailChangeToken.rejected, (state, action) =>
+        setRejected(state.verifyEmailChange, action.payload as string),
+      );
   },
 });
 

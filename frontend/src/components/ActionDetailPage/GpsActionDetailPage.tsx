@@ -522,7 +522,7 @@ export function GpsActionDetailPage() {
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(340px,1fr)]">
         <div className="min-w-0">
-          <Card className="overflow-hidden rounded-3xl border shadow-xl">
+          <Card className="relative isolate overflow-hidden rounded-3xl border shadow-xl">
             <div className="flex items-center justify-between border-b border-border bg-surface-container/60 px-5 py-4">
               <div>
                 <h2 className="font-semibold text-foreground">{t('gpsActionDetail.progress')}</h2>

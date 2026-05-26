@@ -20,6 +20,8 @@ import {ROUTES} from '../../routes';
 import {ThemeProvider} from 'next-themes';
 import {HomePage} from '../HomePage/HomePage';
 import {FaqPage} from '../FaqPage/FaqPage';
+import {VerifyEmailChangePage} from '../Auth/VerifyEmailChangePage';
+import {PartnersPage} from '../PartnerPage/PartnerPage';
 
 function App() {
   return (
@@ -33,6 +35,7 @@ function App() {
             <Route path={ROUTES.verifyEmail} element={<VerifyEmailPage />} />
             <Route path={ROUTES.passwordResetRequest} element={<ForgotPasswordPage />} />
             <Route path={ROUTES.passwordResetConfirm} element={<ResetPasswordPage />} />
+            <Route path={ROUTES.verifyEmailChange} element={<VerifyEmailChangePage />} />
           </Route>
 
           {/* Public marketing pages — with app nav, no auth required */}
@@ -42,6 +45,7 @@ function App() {
             <Route path={ROUTES.faq} element={<FaqPage />} />
             <Route path={ROUTES.about} element={<AboutPage />} />
             <Route path={ROUTES.contact} element={<ContactPage />} />
+            <Route path={ROUTES.partners} element={<PartnersPage />} />
           </Route>
 
           {/* Protected app pages — auth required */}

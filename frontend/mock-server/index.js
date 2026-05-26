@@ -393,6 +393,11 @@ app.post(BASE_URL + '/auth/register', (req, res) => {
     // Real backend may return 409 here; FE treats register errors generically.
     return res.status(409).json({message: 'username_taken'});
   }
+  for (const u of users.values()) {
+    if (u.email === email) {
+      return res.status(409).json({message: 'email_taken'});
+    }
+  }
 
   const id = users.size + 1000;
   const user = {

@@ -118,7 +118,7 @@ function CheckpointMapPicker({
         <Label>{checkpointLabel}</Label>
         <p className="text-xs text-muted-foreground">{helperText}</p>
       </div>
-      <div className="overflow-hidden rounded-lg border border-border/70 bg-muted/20">
+      <div className="relative isolate overflow-hidden rounded-lg border border-border/70 bg-muted/20">
         <MapContainer center={center} zoom={14} scrollWheelZoom={false} style={{height: '18rem', width: '100%'}}>
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

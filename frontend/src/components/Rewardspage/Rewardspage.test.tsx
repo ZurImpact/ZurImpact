@@ -21,7 +21,6 @@ const baseRewards = [
     title: 'Coffee Voucher',
     description: 'A free coffee',
     points: 100,
-    category: 'Food & Drink',
     icon: 'Coffee',
     available: 5,
   },
@@ -30,7 +29,6 @@ const baseRewards = [
     title: 'Museum Ticket',
     description: 'One museum entry',
     points: 200,
-    category: 'Culture',
     icon: 'Ticket',
     available: 2,
   },
@@ -135,9 +133,7 @@ describe('RewardsPage', () => {
     });
   });
 
-  it('filters rewards by category', async () => {
-    const user = userEvent.setup();
-
+  it('renders all rewards without category filtering', async () => {
     renderRewardsPage({
       rewards: {
         rewards: baseRewards,
@@ -160,10 +156,8 @@ describe('RewardsPage', () => {
     expect(await screen.findByText('Coffee Voucher')).toBeInTheDocument();
     expect(await screen.findByText('Museum Ticket')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'Culture'}));
-
-    expect(screen.queryByText('Coffee Voucher')).not.toBeInTheDocument();
-    expect(screen.getByText('Museum Ticket')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Culture'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Food & Drink'})).not.toBeInTheDocument();
   });
 
   it('opens and closes redemption dialog', async () => {

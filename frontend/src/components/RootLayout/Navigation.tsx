@@ -1,9 +1,10 @@
 import {Link, useLocation, useNavigate} from 'react-router';
-import {Mountain, Award, Menu, Moon, Sun, LogOut, LogIn, User} from 'lucide-react';
+import {Award, Menu, Moon, Sun, LogOut, LogIn, User, UserPlus} from 'lucide-react';
+import logo from '/logo.png';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from 'next-themes';
 import {Sheet, SheetContent, SheetTrigger} from '../ui/sheet';
-import {Button} from '../ui/button';
+// import {Button} from '../ui/button';
 import {logoutUser} from '../../store/slices/AuthSlice';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {ROUTES} from '../../routes';
@@ -20,11 +21,27 @@ export const Navigation = () => {
   const navLinks = [
     {to: ROUTES.home, label: t('rootLayout.home')},
     {to: ROUTES.about, label: t('rootLayout.about')},
+    {to: ROUTES.partners, label: t('rootLayout.partners')},
     {to: ROUTES.dashboard, label: t('rootLayout.dashboard')},
     {to: ROUTES.track, label: t('rootLayout.track')},
     {to: ROUTES.rewards, label: t('rootLayout.rewards')},
     {to: ROUTES.faq, label: t('rootLayout.faq')},
   ];
+
+  const handleSignOut = async () => {
+    await dispatch(logoutUser());
+    navigate(ROUTES.login);
+  };
+
+  // Shared classes so auth links look more aligned with nav links
+  const linkClass = (to: string, mobile = false) => {
+    const base = mobile
+      ? 'text-lg hover:text-brand transition-colors whitespace-nowrap flex items-center gap-2'
+      : 'hover:text-brand transition-colors whitespace-nowrap flex items-center gap-1';
+    const active =
+      location.pathname === to ? (mobile ? 'text-brand font-semibold' : 'text-brand') : 'text-muted-foreground';
+    return `${base} ${active}`;
+  };
 
   const renderThemeButton = () => (
     <button
@@ -43,22 +60,22 @@ export const Navigation = () => {
 
   const renderNavLinks = (mobile = false) => {
     const linksToShow = isAuthenticated
-      ? navLinks
-      : navLinks.filter((link) => link.to === ROUTES.home || link.to === ROUTES.about || link.to === ROUTES.faq);
+      ? navLinks.filter(
+          (link) => link.to === ROUTES.dashboard || link.to === ROUTES.track || link.to === ROUTES.rewards,
+        )
+      : navLinks.filter(
+          (link) =>
+            link.to === ROUTES.home ||
+            link.to === ROUTES.about ||
+            link.to === ROUTES.partners ||
+            link.to === ROUTES.faq,
+        );
 
     return linksToShow.map((link) => (
       <Link
         key={link.to}
         to={link.to}
-        className={
-          mobile
-            ? `text-lg hover:text-brand transition-colors whitespace-nowrap ${
-                location.pathname === link.to ? 'text-brand font-semibold' : 'text-muted-foreground'
-              }`
-            : `hover:text-brand transition-colors whitespace-nowrap ${
-                location.pathname === link.to ? 'text-brand' : 'text-muted-foreground'
-              }`
-        }
+        className={linkClass(link.to, mobile)}
         aria-current={location.pathname === link.to ? 'page' : undefined}
       >
         {link.label}
@@ -66,62 +83,45 @@ export const Navigation = () => {
     ));
   };
 
-  const handleSignOut = async () => {
-    await dispatch(logoutUser());
-    navigate(ROUTES.login);
-  };
-
-  const renderAuthControls = (className = '') => {
+  // Auth links rendered as individual items, so they flow with the nav links
+  const renderAuthLinks = (mobile = false) => {
     if (isAuthenticated) {
       return (
-        <div className={`flex items-center gap-2 ${className}`.trim()}>
-          <span className="text-sm font-medium whitespace-nowrap">{currentUser?.username}</span>
-          <Link
-            to={ROUTES.profile}
-            className="flex items-center gap-1 text-sm hover:text-brand transition-colors whitespace-nowrap"
-            aria-label={t('rootLayout.profile')}
-          >
-            <User className="h-4 w-4 shrink-0" aria-hidden="true" />
+        <>
+          <Link to={ROUTES.profile} className={linkClass(ROUTES.profile, mobile)}>
+            <User className={mobile ? 'h-5 w-5 shrink-0' : 'h-4 w-4 shrink-0'} aria-hidden="true" />
             {t('rootLayout.profile')}
           </Link>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2 bg-card border whitespace-nowrap"
-            onClick={() => void handleSignOut()}
-          >
-            <LogOut className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <button onClick={() => void handleSignOut()} className={`${linkClass('', mobile)} text-left`}>
+            <LogOut className={mobile ? 'h-5 w-5 shrink-0' : 'h-4 w-4 shrink-0'} aria-hidden="true" />
             {t('rootLayout.signOut')}
-          </Button>
-        </div>
+          </button>
+        </>
       );
     }
 
     return (
-      <div className={`flex items-center gap-2 ${className}`.trim()}>
-        <Link
-          to={ROUTES.login}
-          className="flex items-center gap-1 text-sm hover:text-brand transition-colors whitespace-nowrap"
-          aria-label={t('rootLayout.signIn')}
-        >
-          <LogIn className="h-4 w-4 shrink-0" aria-hidden="true" />
+      <>
+        <Link to={ROUTES.login} className={linkClass(ROUTES.login, mobile)}>
+          <LogIn className={mobile ? 'h-5 w-5 shrink-0' : 'h-4 w-4 shrink-0'} aria-hidden="true" />
           {t('rootLayout.signIn')}
         </Link>
-        <Link
-          to={ROUTES.register}
-          className="flex items-center gap-1 text-sm hover:text-brand transition-colors whitespace-nowrap"
-          aria-label={t('rootLayout.signUp')}
-        >
+        <Link to={ROUTES.register} className={linkClass(ROUTES.register, mobile)}>
+          <UserPlus className={mobile ? 'h-5 w-5 shrink-0' : 'h-4 w-4 shrink-0'} aria-hidden="true" />
           {t('rootLayout.signUp')}
         </Link>
-      </div>
+      </>
     );
   };
 
-  const renderPointsDisplay = () => {
+  const renderPointsDisplay = (mobile = false) => {
     if (!isAuthenticated) return null;
     return (
-      <div className="flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full shrink-0 whitespace-nowrap">
+      <div
+        className={`flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full shrink-0 whitespace-nowrap ${
+          mobile ? 'self-start' : ''
+        }`}
+      >
         <Award className="h-4 w-4 text-on-brand-container shrink-0" aria-hidden="true" />
         <span className="font-medium text-on-brand-container whitespace-nowrap">{`${points} ${t('points')}`}</span>
       </div>
@@ -133,17 +133,22 @@ export const Navigation = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 shrink-0">
-            <Mountain className="h-8 w-8 text-brand" />
+            <img src={logo} alt={t('appName')} className="h-8 w-auto" />
             <span className="text-2xl font-bold text-brand whitespace-nowrap">{t('appName')}</span>
           </Link>
+
+          {/* Desktop */}
           <div className="hidden md:flex items-center gap-4 lg:gap-6 ml-6">
             {renderNavLinks()}
+            {/* Subtle separator before auth section */}
+            <div className="h-5 w-px bg-border" aria-hidden="true" />
+            {renderAuthLinks()}
+            {isAuthenticated && <span className="text-sm font-medium whitespace-nowrap">{currentUser?.username}</span>}
+            {renderPointsDisplay()}
             {renderThemeButton()}
-            <div className="flex items-center gap-3">
-              {renderPointsDisplay()}
-              {renderAuthControls()}
-            </div>
           </div>
+
+          {/* Mobile */}
           <div className="flex md:hidden items-center gap-4">
             {renderThemeButton()}
             <Sheet>
@@ -158,10 +163,11 @@ export const Navigation = () => {
               <SheetContent side="right">
                 <div className="flex flex-col gap-4 mt-13 pl-8">
                   {renderNavLinks(true)}
-                  <div className="mt-4 flex flex-col gap-3 pr-8">
-                    {renderPointsDisplay()}
-                    {renderAuthControls('w-full flex-col')}
-                  </div>
+                  {/* Separator between nav and auth */}
+                  <div className="h-px w-3/4 bg-border my-2" aria-hidden="true" />
+                  {isAuthenticated && <span className="text-sm font-medium">{currentUser?.username}</span>}
+                  {renderAuthLinks(true)}
+                  {renderPointsDisplay(true)}
                 </div>
               </SheetContent>
             </Sheet>

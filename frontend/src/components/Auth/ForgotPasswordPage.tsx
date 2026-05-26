@@ -54,18 +54,6 @@ export function ForgotPasswordPage() {
       >
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">{t('auth.forgotPassword.successMessage')}</p>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-xs"
-            onClick={() => {
-              form.reset();
-              dispatch(resetAuthOp('requestPasswordReset'));
-            }}
-          >
-            {t('auth.forgotPassword.sendDifferent')}
-          </Button>
         </div>
       </AuthFormCard>
     );
