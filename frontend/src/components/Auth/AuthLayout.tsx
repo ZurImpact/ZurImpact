@@ -9,7 +9,7 @@ export function AuthLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="flex items-center justify-between px-6 py-4 border-b">
-        <Link to={ROUTES.home} className="flex items-center gap-2">
+        <Link to={ROUTES.root} className="flex items-center gap-2">
           <img src={logo} alt={t('auth.layout.logoAlt')} className="h-8 w-auto" aria-hidden="true" />
           <span className="text-2xl font-bold text-brand">{t('auth.layout.logoAlt')}</span>
         </Link>
