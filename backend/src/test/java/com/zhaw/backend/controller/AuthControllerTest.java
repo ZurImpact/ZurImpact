@@ -73,6 +73,21 @@ class AuthControllerTest {
             assertNull(body.getId(), "register response must not leak internal id");
             verify(authService).register("frank", "frank@example.com", "secret123");
         }
+
+        @Test
+        @DisplayName("returns 409 when username or email is taken")
+        void registerConflict() {
+            doThrow(new IllegalArgumentException("username_taken"))
+                    .when(authService).register("frank", "frank@example.com", "secret123");
+
+            ResponseEntity<?> response = controller.register(
+                    new RegisterRequest("frank", "frank@example.com", "secret123"));
+
+            assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+            @SuppressWarnings("unchecked")
+            Map<String, String> body = (Map<String, String>) response.getBody();
+            assertEquals("username_taken", body.get("message"));
+        }
     }
 
     @Nested
