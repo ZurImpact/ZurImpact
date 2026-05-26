@@ -14,7 +14,7 @@ public interface UserService {
 
     Optional<User> findUserById(Long id);
 
-    Optional<UserResponseDto> getUserProfile(Long id);
+    boolean hasPendingEmailToken(Long userId);
 
     UserDto findUserByUsername(String username);
 

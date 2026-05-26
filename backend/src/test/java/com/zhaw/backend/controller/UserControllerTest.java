@@ -3,6 +3,7 @@ package com.zhaw.backend.controller;
 import com.zhaw.backend.enums.Role;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.UserResponseDto;
+import com.zhaw.backend.model.entities.User;
 import com.zhaw.backend.model.dto.auth.PasswordChangeRequest;
 import com.zhaw.backend.security.AuthenticatedUser;
 import com.zhaw.backend.service.auth.AuthService;
@@ -53,19 +54,22 @@ class UserControllerTest {
         @Test
         @DisplayName("returns 200 when user exists")
         void getUserOk() {
-            UserResponseDto userDto = UserResponseDto.builder().id(1L).username("alice").email("alice@example.com").points(100).role(Role.ROLE_USER).build();
-            when(userService.getUserProfile(1L)).thenReturn(Optional.of(userDto));
+            User user = User.builder().id(1L).username("alice").email("alice@example.com").points(100).role(Role.ROLE_USER.name()).build();
+            when(userService.findUserById(1L)).thenReturn(Optional.of(user));
+            when(userService.hasPendingEmailToken(1L)).thenReturn(true);
 
             ResponseEntity<UserResponseDto> response = controller.getUser(1L);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertNotNull(response.getBody());
+            assertEquals("alice", response.getBody().getUsername());
+            assertTrue(response.getBody().getHasPendingEmailChange());
         }
 
         @Test
         @DisplayName("returns 404 when user does not exist")
         void getUserNotFound() {
-            when(userService.getUserProfile(99L)).thenReturn(Optional.empty());
+            when(userService.findUserById(99L)).thenReturn(Optional.empty());
 
             ResponseEntity<UserResponseDto> response = controller.getUser(99L);
 
