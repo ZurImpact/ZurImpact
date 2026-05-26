@@ -196,7 +196,6 @@ public class AuthServiceImpl implements AuthService {
         emailChangeTokenService.invalidateAllForUser(userId);
         String token = emailChangeTokenService.issue(userId, newEmail);
         mailService.sendEmailChangeVerificationEmail(newEmail, userOpt.get().getUsername(), token);
-        userDao.setPendingEmailChangeStatus(userId, true);
     }
 
     @Override
@@ -205,7 +204,6 @@ public class AuthServiceImpl implements AuthService {
         return emailChangeTokenService.lookupValid(rawToken).map(token -> {
             userDao.updateEmail(token.getUserId(), token.getNewEmail());
             userDao.markEmailVerified(token.getUserId());
-            userDao.setPendingEmailChangeStatus(token.getUserId(), false);
             emailChangeTokenService.markConsumed(rawToken);
             return Boolean.TRUE;
         }).orElse(Boolean.FALSE);

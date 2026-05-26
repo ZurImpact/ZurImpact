@@ -1,2 +1,0 @@
-ALTER TABLE users 
-ADD COLUMN has_pending_email_change BOOLEAN DEFAULT FALSE NOT NULL;

@@ -2,7 +2,9 @@ package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.Role;
 import com.zhaw.backend.model.dao.UserDao;
+import com.zhaw.backend.model.dao.EmailChangeTokenDao;
 import com.zhaw.backend.model.dto.UserDto;
+import com.zhaw.backend.model.dto.UserResponseDto;
 import com.zhaw.backend.model.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,13 +41,16 @@ class UserServiceImplTest {
     @Mock
     private UserDao userDao;
 
+    @Mock
+    private EmailChangeTokenDao emailChangeTokenDao;
+
     private UserServiceImpl userService;
 
     private User sampleUser;
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userDao);
+        userService = new UserServiceImpl(userDao, emailChangeTokenDao);
         sampleUser = new User();
         sampleUser.setId(1L);
         sampleUser.setUsername("testuser");
@@ -105,12 +110,15 @@ class UserServiceImplTest {
         @DisplayName("returns the user when found")
         void returnsUser_whenFound() {
             when(userDao.findByUsername("testuser")).thenReturn(Optional.of(sampleUser));
+            when(emailChangeTokenDao.hasValidPendingToken(1L)).thenReturn(false);
 
             UserDto result = userService.findUserByUsername("testuser");
 
             assertNotNull(result);
             assertEquals("test@example.com", result.getEmail());
+            assertFalse(result.getHasPendingEmailChange());
             verify(userDao).findByUsername("testuser");
+            verify(emailChangeTokenDao).hasValidPendingToken(1L);
         }
 
         @Test
@@ -122,6 +130,40 @@ class UserServiceImplTest {
 
             assertNull(result);
             verify(userDao).findByUsername("unknown");
+        }
+    }
+
+    // ── getUserProfile ───────────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("getUserProfile")
+    class GetUserProfile {
+
+        @Test
+        @DisplayName("returns profile DTO with pending status when user found")
+        void returnsProfileDto_whenFound() {
+            when(userDao.findById(1L)).thenReturn(Optional.of(sampleUser));
+            when(emailChangeTokenDao.hasValidPendingToken(1L)).thenReturn(true);
+
+            Optional<UserResponseDto> result = userService.getUserProfile(1L);
+
+            assertTrue(result.isPresent());
+            assertEquals("testuser", result.get().getUsername());
+            assertTrue(result.get().getHasPendingEmailChange());
+            verify(userDao).findById(1L);
+            verify(emailChangeTokenDao).hasValidPendingToken(1L);
+        }
+
+        @Test
+        @DisplayName("returns empty when user not found")
+        void returnsEmpty_whenNotFound() {
+            when(userDao.findById(99L)).thenReturn(Optional.empty());
+
+            Optional<UserResponseDto> result = userService.getUserProfile(99L);
+
+            assertTrue(result.isEmpty());
+            verify(userDao).findById(99L);
+            verify(emailChangeTokenDao, never()).hasValidPendingToken(anyLong());
         }
     }
 

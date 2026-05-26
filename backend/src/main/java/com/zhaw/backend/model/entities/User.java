@@ -55,9 +55,6 @@ public class User {
     @Column(name = "email_verified", nullable = false)
     private Boolean emailVerified;
 
-    @Column(name = "has_pending_email_change", nullable = false)
-    private Boolean hasPendingEmailChange;
-
     /**
      * Sets createdAt in-memory before INSERT so the field is never null
      * immediately after em.persist() — without waiting for a DB round-trip.
@@ -69,9 +66,6 @@ public class User {
         }
         if (emailVerified == null) {
             emailVerified = Boolean.FALSE;
-        }
-        if (hasPendingEmailChange == null) {
-            hasPendingEmailChange = Boolean.FALSE;
         }
     }
 }

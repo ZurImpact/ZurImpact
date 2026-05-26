@@ -37,7 +37,6 @@ public class UserDao {
                 .points(rs.getInt("points"))
                 .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                 .emailVerified(rs.getBoolean("email_verified"))
-                .hasPendingEmailChange(rs.getBoolean("has_pending_email_change")) 
                 .build();
     };
 
@@ -99,12 +98,6 @@ public class UserDao {
                 newUsername, userId);
     }
 
-    public void setPendingEmailChangeStatus(Long userId, boolean status) {
-        jdbc.update(
-                "UPDATE users SET has_pending_email_change = ? WHERE id = ?",
-                status, userId);
-    }
-
     private User insert(User user) {
         if (user.getCreatedAt() == null) {
             user.setCreatedAt(LocalDateTime.now());
@@ -119,16 +112,12 @@ public class UserDao {
             user.setRole("ROLE_USER");
         }
 
-        if (user.getHasPendingEmailChange() == null) {
-            user.setHasPendingEmailChange(Boolean.FALSE);
-        }
-
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO users (username, email, address_id, password_hash, created_at, points, "
-                            + "role, email_verified, has_pending_email_change) "
-                            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            + "role, email_verified) "
+                            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
@@ -142,7 +131,6 @@ public class UserDao {
             ps.setInt(6, user.getPoints() != null ? user.getPoints() : 0);
             ps.setString(7, user.getRole());
             ps.setBoolean(8, user.getEmailVerified());
-            ps.setBoolean(9, user.getHasPendingEmailChange()); 
             return ps;
         }, keyHolder);
 
@@ -158,7 +146,7 @@ public class UserDao {
     private User update(User user) {
         jdbc.update(
                 "UPDATE users SET username = ?, email = ?, password_hash = ?, address_id = ?, "
-                        + "points = ?, role = ?, email_verified = ?, has_pending_email_change = ? WHERE id = ?",
+                        + "points = ?, role = ?, email_verified = ? WHERE id = ?",
                 user.getUsername(),
                 user.getEmail(),
                 user.getPasswordHash(),
@@ -166,7 +154,6 @@ public class UserDao {
                 user.getPoints() != null ? user.getPoints() : 0,
                 user.getRole() != null ? user.getRole() : "ROLE_USER",
                 user.getEmailVerified() != null ? user.getEmailVerified() : Boolean.FALSE,
-                user.getHasPendingEmailChange() != null ? user.getHasPendingEmailChange() : Boolean.FALSE, 
                 user.getId());
         return user;
     }

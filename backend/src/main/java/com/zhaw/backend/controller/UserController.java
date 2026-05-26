@@ -44,8 +44,7 @@ public class UserController {
     @Operation(summary = "Get user by ID", description = "Returns a user by their ID. Restricted to the user themselves and admin.")
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.userId")
     public ResponseEntity<UserResponseDto> getUser(@PathVariable Long id) {
-        return userService.findUserById(id)
-                .map(UserMapper::toResponseDto)
+        return userService.getUserProfile(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
