@@ -419,6 +419,10 @@
     "howIsImpactMeasuredTitle": "Wie wird mein Impact gemessen?",
     "howIsImpactMeasuredAnswer": "Obwohl Punkte ein toller Anreiz sind, wird dein wahrer Impact durch die gemeinsame Anstrengung unserer Community gemessen. Auf unserer Startseite zeigen wir zusammengefasste Statistiken wie die Gesamtmenge des gesammelten Mülls und die Anzahl der unternommenen nachhaltigen Fahrten. Deine Aktionen tragen direkt zu diesen Zahlen bei!"
   },
+  "footer": {
+    "instagram": "Instagram",
+    "allRightsReserved": "Alle Rechte vorbehalten."
+  },
   "points": "Punkte",
   "language": "Sprache"
 }

@@ -1,6 +1,7 @@
 import {Outlet} from 'react-router';
 import {useEffect} from 'react';
 import {Navigation} from './Navigation';
+import {Footer} from '../Footer/Footer';
 import {useAppDispatch} from '../../store/store';
 import {fetchCurrentUser} from '../../store/slices/UserSlice';
 import {useTranslation} from 'react-i18next';
@@ -26,6 +27,7 @@ export function RootLayout() {
       <main id="main-content" tabIndex={-1}>
         <Outlet />
       </main>
+      <Footer />
     </div>
   );
 }

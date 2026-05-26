@@ -431,6 +431,10 @@
     "howIsImpactMeasuredTitle": "How is my impact measured?",
     "howIsImpactMeasuredAnswer": "While points are a great incentive, your true impact is measured by the collective effort of our community. On our homepage, we showcase aggregated statistics like the total amount of waste collected and the number of sustainable trips taken. Your actions directly contribute to these numbers!"
   },
+  "footer": {
+    "instagram": "Instagram",
+    "allRightsReserved": "All rights reserved."
+  },
   "points": "Points",
   "language": "Language"
 }
