@@ -4,6 +4,7 @@ import com.zhaw.backend.config.DockerAvailableCondition;
 import com.zhaw.backend.config.TestDatabaseConfig;
 import com.zhaw.backend.config.TestDataHelper;
 import com.zhaw.backend.enums.CompletionState;
+import com.zhaw.backend.mappers.ActionFilterMapper;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,6 +71,30 @@ class ActionDaoIntegrationTest {
 
             assertTrue(result.stream().anyMatch(a -> a.getId().equals(id1)));
             assertTrue(result.stream().anyMatch(a -> a.getId().equals(id2)));
+        }
+
+        @Test
+        @DisplayName("filters out expired actions even when no filter options provided")
+        void filtersExpiredActionsWithoutExplicitFilter() {
+            // Create an action that expired in the past
+            Action expiredAction = buildAction("Expired Action", "FOOD", 10, "GPS");
+            expiredAction.setValidUntil(LocalDateTime.now().minusDays(5)); // 5 days ago
+            Long expiredId = actionDao.createAction(expiredAction);
+
+            // Create a valid action (future expiry)
+            Action validAction = buildAction("Valid Action", "FOOD", 10, "GPS");
+            validAction.setValidUntil(LocalDateTime.now().plusDays(30)); // 30 days from now
+            Long validId = actionDao.createAction(validAction);
+
+            ActionFilterDto dto = ActionFilterMapper.fromRequest(null, null, null, null);
+
+            List<Action> result = actionDao.findAllFiltered(dto);
+
+            // The result should NOT contain the expired action
+            assertTrue(result.stream().anyMatch(a -> a.getId().equals(validId)),
+                "Valid action should be present");
+            assertFalse(result.stream().anyMatch(a -> a.getId().equals(expiredId)),
+                "Expired action should be filtered out");
         }
 
         @Test

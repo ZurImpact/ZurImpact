@@ -45,9 +45,15 @@ class ActionFilterMapperTest {
 
     @Test
     void fromRequest_setsNullTags_whenInputTagsBlank() {
+        LocalDateTime before = LocalDateTime.now();
         ActionFilterDto dto = ActionFilterMapper.fromRequest("bike", 10, "   ", null);
 
         assertNull(dto.getTags());
-        assertNull(dto.getValidUntil());
+        assertNotNull(dto.getValidUntil());
+
+        LocalDateTime after = LocalDateTime.now();
+        // dto.validUntil must be between before and after
+        assertFalse(dto.getValidUntil().isBefore(before), "validUntil should not be before the call started");
+        assertFalse(dto.getValidUntil().isAfter(after), "validUntil should not be after the call finished");
     }
 }
