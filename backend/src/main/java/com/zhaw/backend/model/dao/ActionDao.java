@@ -62,7 +62,7 @@ public class ActionDao {
             hasWhere = appendTextFilter(sql, params, hasWhere, filter.getText());
             hasWhere = appendEquals(sql, params, hasWhere, "points", filter.getPoints());
             hasWhere = appendTagFilter(sql, params, hasWhere, filter.getTags());
-            appendTimestamp(sql, params, hasWhere, "valid_until", filter.getValidUntil());
+            appendTimestampEqualsGreater(sql, params, hasWhere, "valid_until", filter.getValidUntil());
         }
 
         return jdbc.query(sql.toString(), ROW_MAPPER, params.toArray());
@@ -225,11 +225,11 @@ public class ActionDao {
         return true;
     }
 
-    private boolean appendTimestamp(StringBuilder sql, List<Object> params, boolean hasWhere, String column, java.time.LocalDateTime value) {
+    private boolean appendTimestampEqualsGreater(StringBuilder sql, List<Object> params, boolean hasWhere, String column, java.time.LocalDateTime value) {
         if (value == null) {
             return hasWhere;
         }
-        sql.append(hasWhere ? " AND " : " WHERE ").append(column).append(" = ?");
+        sql.append(hasWhere ? " AND " : " WHERE ").append(column).append(" >= ?");
         params.add(Timestamp.valueOf(value));
         return true;
     }
