@@ -73,6 +73,29 @@ class ActionDaoIntegrationTest {
         }
 
         @Test
+        @DisplayName("filters out expired actions even when no filter options provided")
+        void filtersExpiredActionsWithoutExplicitFilter() {
+            // Create an action that expired in the past
+            Action expiredAction = buildAction("Expired Action", "FOOD", 10, "GPS");
+            expiredAction.setValidUntil(LocalDateTime.now().minusDays(5)); // 5 days ago
+            Long expiredId = actionDao.createAction(expiredAction);
+
+            // Create a valid action (future expiry)
+            Action validAction = buildAction("Valid Action", "FOOD", 10, "GPS");
+            validAction.setValidUntil(LocalDateTime.now().plusDays(30)); // 30 days from now
+            Long validId = actionDao.createAction(validAction);
+
+            // Query with no filter
+            List<Action> result = actionDao.findAllFiltered(null);
+
+            // The result should NOT contain the expired action
+            assertTrue(result.stream().anyMatch(a -> a.getId().equals(validId)),
+                "Valid action should be present");
+            assertFalse(result.stream().anyMatch(a -> a.getId().equals(expiredId)),
+                "Expired action should be filtered out");
+        }
+
+        @Test
         @DisplayName("text filter matches description and displayName case-insensitively")
         void textFilterMatchesBothFields() {
             actionDao.createAction(buildAction("Biking Tour", "SPORTS", 10, "GPS"));

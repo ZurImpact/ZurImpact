@@ -10,11 +10,12 @@ import java.util.stream.Collectors;
 public final class ActionFilterMapper {
 
     public static ActionFilterDto fromRequest(String text, Integer points, String tags, LocalDateTime validUntil) {
+        LocalDateTime validValue = validUntil != null ? validUntil : LocalDateTime.now();
         return ActionFilterDto.builder()
                 .text(text)
                 .points(points)
                 .tags(parseTags(tags))
-                .validUntil(validUntil)
+                .validUntil(validValue)
                 .build();
     }
 
