@@ -4,6 +4,7 @@ import com.zhaw.backend.config.DockerAvailableCondition;
 import com.zhaw.backend.config.TestDatabaseConfig;
 import com.zhaw.backend.config.TestDataHelper;
 import com.zhaw.backend.enums.CompletionState;
+import com.zhaw.backend.mappers.ActionFilterMapper;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,8 +86,9 @@ class ActionDaoIntegrationTest {
             validAction.setValidUntil(LocalDateTime.now().plusDays(30)); // 30 days from now
             Long validId = actionDao.createAction(validAction);
 
-            // Query with no filter
-            List<Action> result = actionDao.findAllFiltered(null);
+            ActionFilterDto dto = new ActionFilterDto();
+
+            List<Action> result = actionDao.findAllFiltered(dto);
 
             // The result should NOT contain the expired action
             assertTrue(result.stream().anyMatch(a -> a.getId().equals(validId)),
