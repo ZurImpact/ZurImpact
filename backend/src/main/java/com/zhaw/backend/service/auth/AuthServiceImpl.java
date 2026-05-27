@@ -57,9 +57,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     * Self-serve registration. Always silent on duplicate to prevent enumeration:
-     * a new account is only created when both username and email are free; an existing
-     * unverified account triggers a fresh verification email.
+     * Self-serve registration. Rejects duplicate username/email and returns a 409 via controller.
      */
     @Override
     @Transactional
@@ -67,30 +65,25 @@ public class AuthServiceImpl implements AuthService {
         Optional<User> existingByUsername = userDao.findByUsername(username);
         Optional<User> existingByEmail = userDao.findByEmail(email);
 
-        if (existingByUsername.isEmpty() && existingByEmail.isEmpty()) {
-            User user = User.builder()
-                    .username(username)
-                    .email(email)
-                    .passwordHash(passwordEncoder.encode(rawPassword))
-                    .createdAt(LocalDateTime.now())
-                    .points(0)
-                    .role(Role.ROLE_USER.name())
-                    .emailVerified(Boolean.FALSE)
-                    .build();
-            User saved = userDao.save(user);
-            String token = verificationTokenService.issue(saved.getId());
-            mailService.sendVerificationEmail(email, username, token);
-            return;
+        if (existingByUsername.isPresent()) {
+            throw new IllegalArgumentException("username_taken");
+        }
+        if (existingByEmail.isPresent()) {
+            throw new IllegalArgumentException("email_taken");
         }
 
-        Optional<User> matchOpt = existingByUsername
-                .filter(u -> u.getEmail().equalsIgnoreCase(email));
-        if (matchOpt.isPresent() && Boolean.FALSE.equals(matchOpt.get().getEmailVerified())) {
-            User match = matchOpt.get();
-            verificationTokenService.invalidateAllForUser(match.getId());
-            String token = verificationTokenService.issue(match.getId());
-            mailService.sendVerificationEmail(match.getEmail(), match.getUsername(), token);
-        }
+        User user = User.builder()
+                .username(username)
+                .email(email)
+                .passwordHash(passwordEncoder.encode(rawPassword))
+                .createdAt(LocalDateTime.now())
+                .points(0)
+                .role(Role.ROLE_USER.name())
+                .emailVerified(Boolean.FALSE)
+                .build();
+        User saved = userDao.save(user);
+        String token = verificationTokenService.issue(saved.getId());
+        mailService.sendVerificationEmail(email, username, token);
     }
 
     /** Re-sends a verification email for an existing unverified account. Always silent. */

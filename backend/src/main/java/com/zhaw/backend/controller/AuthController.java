@@ -53,12 +53,17 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        authService.register(request.username(), request.email(), request.password());
-        UserResponseDto body = UserResponseDto.builder()
-                .username(request.username())
-                .email(request.email())
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(body);
+        try {
+            authService.register(request.username(), request.email(), request.password());
+            UserResponseDto body = UserResponseDto.builder()
+                    .username(request.username())
+                    .email(request.email())
+                    .build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(body);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", ex.getMessage()));
+        }
     }
 
     @PostMapping("/verify-email")
