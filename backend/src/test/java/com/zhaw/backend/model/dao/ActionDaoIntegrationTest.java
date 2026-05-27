@@ -86,7 +86,7 @@ class ActionDaoIntegrationTest {
             validAction.setValidUntil(LocalDateTime.now().plusDays(30)); // 30 days from now
             Long validId = actionDao.createAction(validAction);
 
-            ActionFilterDto dto = new ActionFilterDto();
+            ActionFilterDto dto = ActionFilterMapper.fromRequest(null, null, null, null);
 
             List<Action> result = actionDao.findAllFiltered(dto);
 
