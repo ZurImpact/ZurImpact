@@ -1,6 +1,5 @@
 package com.zhaw.backend.service;
 
-import com.zhaw.backend.model.dto.UserResponseDto;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
 

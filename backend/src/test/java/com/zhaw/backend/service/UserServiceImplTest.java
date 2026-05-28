@@ -106,14 +106,15 @@ class UserServiceImplTest {
     class FindUserByUsername {
 
         @Test
-        @DisplayName("returns the DTO when found")
-        void returnsDto_whenFound() {
+        @DisplayName("returns the user when found")
+        void returnsUser_whenFound() {
             when(userDao.findByUsername("testuser")).thenReturn(Optional.of(sampleUser));
             when(emailChangeTokenService.hasPendingEmailToken(1L)).thenReturn(false);
 
             UserDto result = userService.findUserByUsername("testuser");
 
             assertNotNull(result);
+            assertEquals("test@example.com", result.getEmail());
             assertEquals("testuser", result.getUsername());
             assertEquals(1L, result.getId());
             assertFalse(result.getHasPendingEmailChange());
@@ -122,8 +123,8 @@ class UserServiceImplTest {
         }
 
         @Test
-        @DisplayName("returns null when username does not exist")
-        void returnsNull_whenNotFound() {
+        @DisplayName("returns emtpy when username does not exist")
+        void returnsEmpty_whenNotFound() {
             when(userDao.findByUsername("unknown")).thenReturn(Optional.empty());
 
             UserDto result = userService.findUserByUsername("unknown");
