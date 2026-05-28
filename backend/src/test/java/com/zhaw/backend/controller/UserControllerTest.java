@@ -7,6 +7,7 @@ import com.zhaw.backend.model.entities.User;
 import com.zhaw.backend.model.dto.auth.PasswordChangeRequest;
 import com.zhaw.backend.security.AuthenticatedUser;
 import com.zhaw.backend.service.auth.AuthService;
+import com.zhaw.backend.service.auth.EmailChangeTokenService;
 import com.zhaw.backend.security.CurrentUserResolver;
 import com.zhaw.backend.service.UserActionHistoryService;
 import com.zhaw.backend.service.UserService;
@@ -42,6 +43,7 @@ class UserControllerTest {
     @Mock private UserService userService;
     @Mock private UserActionHistoryService userActionHistoryService;
     @Mock private AuthService authService;
+    @Mock private EmailChangeTokenService emailChangeTokenService;
     @Mock private CurrentUserResolver currentUserResolver;
 
     @InjectMocks
@@ -56,7 +58,7 @@ class UserControllerTest {
         void getUserOk() {
             User user = User.builder().id(1L).username("alice").email("alice@example.com").points(100).role(Role.ROLE_USER.name()).build();
             when(userService.findUserById(1L)).thenReturn(Optional.of(user));
-            when(userService.hasPendingEmailToken(1L)).thenReturn(true);
+            when(emailChangeTokenService.hasPendingEmailToken(1L)).thenReturn(true);
 
             ResponseEntity<UserResponseDto> response = controller.getUser(1L);
 

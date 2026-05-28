@@ -14,8 +14,6 @@ public interface UserService {
 
     Optional<User> findUserById(Long id);
 
-    boolean hasPendingEmailToken(Long userId);
-
     UserDto findUserByUsername(String username);
 
     List<User> findAllUsers();

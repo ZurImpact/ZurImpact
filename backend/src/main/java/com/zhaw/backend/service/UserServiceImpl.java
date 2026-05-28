@@ -1,10 +1,10 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.mappers.UserMapper;
-import com.zhaw.backend.model.dao.EmailChangeTokenDao;
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
+import com.zhaw.backend.service.auth.EmailChangeTokenService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,11 +19,11 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
-    private final EmailChangeTokenDao emailChangeTokenDao;
+    private final EmailChangeTokenService emailChangeTokenService;
 
-    public UserServiceImpl(UserDao userDao, EmailChangeTokenDao emailChangeTokenDao) {
+    public UserServiceImpl(UserDao userDao, EmailChangeTokenService emailChangeTokenService) {
         this.userDao = userDao;
-        this.emailChangeTokenDao = emailChangeTokenDao;
+        this.emailChangeTokenService = emailChangeTokenService;
     }
 
     @Override
@@ -36,16 +36,8 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserDto findUserByUsername(String username) {
         return userDao.findByUsername(username)
-                .map(user -> {
-                    boolean hasPending = hasPendingEmailToken(user.getId());
-                    return UserMapper.toDto(user, hasPending);
-                }).orElse(null);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean hasPendingEmailToken(Long userId) {
-        return emailChangeTokenDao.hasValidPendingToken(userId);
+                .map(user -> UserMapper.toDto(user, emailChangeTokenService.hasPendingEmailToken(user.getId())))
+                .orElse(null);
     }
 
     @Override
