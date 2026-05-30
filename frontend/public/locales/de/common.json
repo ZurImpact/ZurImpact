@@ -255,7 +255,8 @@
       "submit": "E-Mail speichern",
       "submitPending": "E-Mail wird gespeichert...",
       "success": "Deine E-Mail-Adresse wurde aktualisiert.",
-      "errorGeneric": "Die E-Mail konnte nicht aktualisiert werden. Bitte versuche es erneut."
+      "errorGeneric": "Die E-Mail konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+      "pendingVerificationBanner": "Eine ausstehende E-Mail-Verifizierung ist im Gange. Bitte überprüfen Sie Ihren Posteingang."
     },
     "deleteProfile": {
       "title": "Profil löschen",
