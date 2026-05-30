@@ -22,6 +22,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -147,6 +148,7 @@ class UserDaoIntegrationTest {
         assertEquals("dave@example.com", found.get().getEmail());
         assertEquals("hashed_pw", found.get().getPasswordHash());
         assertNotNull(found.get().getCreatedAt());
+        assertFalse(found.get().getEmailVerified(), "emailVerified should default to false on insert");
     }
 
     @Test
@@ -200,12 +202,14 @@ class UserDaoIntegrationTest {
 
         saved.setEmail("heidi_new@example.com");
         saved.setPasswordHash("new_hash");
+        saved.setEmailVerified(true);
         userDao.save(saved);
 
         Optional<User> updated = userDao.findById(saved.getId());
         assertTrue(updated.isPresent());
         assertEquals("heidi_new@example.com", updated.get().getEmail());
         assertEquals("new_hash", updated.get().getPasswordHash());
+        assertTrue(updated.get().getEmailVerified(), "emailVerified should be updated");
         assertEquals("heidi", updated.get().getUsername(), "Username should not change");
     }
 

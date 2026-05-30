@@ -4,6 +4,7 @@ import com.zhaw.backend.mappers.UserMapper;
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
+import com.zhaw.backend.service.auth.EmailChangeTokenService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,9 +19,11 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
+    private final EmailChangeTokenService emailChangeTokenService;
 
-    public UserServiceImpl(UserDao userDao) {
+    public UserServiceImpl(UserDao userDao, EmailChangeTokenService emailChangeTokenService) {
         this.userDao = userDao;
+        this.emailChangeTokenService = emailChangeTokenService;
     }
 
     @Override
@@ -32,8 +35,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserDto findUserByUsername(String username) {
-        Optional<User> user = userDao.findByUsername(username);
-        return user.map(UserMapper::toDto).orElse(null);
+        return userDao.findByUsername(username)
+                .map(user -> UserMapper.toDto(user, emailChangeTokenService.hasPendingEmailToken(user.getId())))
+                .orElse(null);
     }
 
     @Override

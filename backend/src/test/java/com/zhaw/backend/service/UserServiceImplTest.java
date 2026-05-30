@@ -4,6 +4,7 @@ import com.zhaw.backend.enums.Role;
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
+import com.zhaw.backend.service.auth.EmailChangeTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,13 +40,16 @@ class UserServiceImplTest {
     @Mock
     private UserDao userDao;
 
+    @Mock
+    private EmailChangeTokenService emailChangeTokenService;
+
     private UserServiceImpl userService;
 
     private User sampleUser;
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userDao);
+        userService = new UserServiceImpl(userDao, emailChangeTokenService);
         sampleUser = new User();
         sampleUser.setId(1L);
         sampleUser.setUsername("testuser");
@@ -105,16 +109,21 @@ class UserServiceImplTest {
         @DisplayName("returns the user when found")
         void returnsUser_whenFound() {
             when(userDao.findByUsername("testuser")).thenReturn(Optional.of(sampleUser));
+            when(emailChangeTokenService.hasPendingEmailToken(1L)).thenReturn(false);
 
             UserDto result = userService.findUserByUsername("testuser");
 
             assertNotNull(result);
             assertEquals("test@example.com", result.getEmail());
+            assertEquals("testuser", result.getUsername());
+            assertEquals(1L, result.getId());
+            assertFalse(result.getHasPendingEmailChange());
             verify(userDao).findByUsername("testuser");
+            verify(emailChangeTokenService).hasPendingEmailToken(1L);
         }
 
         @Test
-        @DisplayName("returns empty when username does not exist")
+        @DisplayName("returns emtpy when username does not exist")
         void returnsEmpty_whenNotFound() {
             when(userDao.findByUsername("unknown")).thenReturn(Optional.empty());
 
@@ -122,6 +131,7 @@ class UserServiceImplTest {
 
             assertNull(result);
             verify(userDao).findByUsername("unknown");
+            verify(emailChangeTokenService, never()).hasPendingEmailToken(anyLong());
         }
     }
 

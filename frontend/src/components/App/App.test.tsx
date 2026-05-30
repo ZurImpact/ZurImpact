@@ -104,6 +104,7 @@ describe('App', () => {
             points: 0,
             address: null,
             createdAt: null,
+            hasPendingEmailChange: false,
           },
           error: null,
         },

@@ -7,6 +7,7 @@ import com.zhaw.backend.model.dto.auth.ChangeEmailRequest;
 import com.zhaw.backend.model.dto.auth.ChangeUsernameRequest;
 import com.zhaw.backend.model.dto.auth.PasswordChangeRequest;
 import com.zhaw.backend.service.auth.AuthService;
+import com.zhaw.backend.service.auth.EmailChangeTokenService;
 import com.zhaw.backend.security.CurrentUserResolver;
 import com.zhaw.backend.service.UserActionHistoryService;
 import com.zhaw.backend.service.UserService;
@@ -38,6 +39,7 @@ public class UserController {
     private final UserService userService;
     private final UserActionHistoryService userActionHistoryService;
     private final AuthService authService;
+    private final EmailChangeTokenService emailChangeTokenService;
     private final CurrentUserResolver currentUserResolver;
 
     @GetMapping("/{id}")
@@ -45,7 +47,10 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.userId")
     public ResponseEntity<UserResponseDto> getUser(@PathVariable Long id) {
         return userService.findUserById(id)
-                .map(UserMapper::toResponseDto)
+                .map(user -> {
+                    boolean hasPending = emailChangeTokenService.hasPendingEmailToken(user.getId());
+                    return UserMapper.toResponseDto(user, hasPending);
+                })
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

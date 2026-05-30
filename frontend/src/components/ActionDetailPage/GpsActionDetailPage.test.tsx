@@ -122,6 +122,7 @@ const defaultUserState: DeepPartial<RootState['user']> = {
     points: 100,
     address: null,
     createdAt: null,
+    hasPendingEmailChange: false,
   },
   isAuthenticated: true,
   loading: false,

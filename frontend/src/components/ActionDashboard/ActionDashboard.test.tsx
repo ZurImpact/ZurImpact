@@ -44,6 +44,7 @@ const baseUser: UserDto = {
   points: 100,
   address: null,
   createdAt: null,
+  hasPendingEmailChange: false,
 };
 
 const renderAuthenticatedDashboard = () =>

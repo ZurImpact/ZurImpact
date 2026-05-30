@@ -56,4 +56,12 @@ public class EmailChangeTokenDao {
     public int deleteByUserId(Long userId) {
         return jdbc.update("DELETE FROM email_change_token WHERE user_id = ?", userId);
     }
+
+    public boolean hasValidPendingToken(Long userId) {
+        Integer count = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM email_change_token WHERE user_id = ? AND consumed_at IS NULL AND expires_at > CURRENT_TIMESTAMP",
+            Integer.class, userId
+        );
+        return count != null && count > 0;
+    }
 }

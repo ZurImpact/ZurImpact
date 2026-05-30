@@ -11,7 +11,7 @@ public final class UserMapper {
 		// utility class
 	}
 
-	public static UserDto toDto(User entity) {
+	public static UserDto toDto(User entity, boolean hasPendingEmailChange) {
 		if (entity == null) {
 			return null;
 		}
@@ -26,10 +26,11 @@ public final class UserMapper {
 				.points(entity.getPoints())
 				.role(entity.getRole() == null ? null : Role.valueOf(entity.getRole()))
 				.emailVerified(entity.getEmailVerified())
+				.hasPendingEmailChange(hasPendingEmailChange)
 				.build();
 	}
 
-	public static UserResponseDto toResponseDto(User entity) {
+	public static UserResponseDto toResponseDto(User entity, boolean hasPendingEmailChange) {
 		if (entity == null) {
 			return null;
 		}
@@ -43,6 +44,7 @@ public final class UserMapper {
 				.points(entity.getPoints())
 				.role(entity.getRole() == null ? null : Role.valueOf(entity.getRole()))
 				.emailVerified(entity.getEmailVerified())
+				.hasPendingEmailChange(hasPendingEmailChange)
 				.build();
 	}
 }

@@ -63,4 +63,9 @@ public class EmailChangeTokenService {
     public void invalidateAllForUser(Long userId) {
         dao.deleteByUserId(userId);
     }
+
+    @Transactional(readOnly = true)
+    public boolean hasPendingEmailToken(Long userId) {
+        return dao.hasValidPendingToken(userId);
+    }
 }

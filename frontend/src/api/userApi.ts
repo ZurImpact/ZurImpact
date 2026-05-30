@@ -9,6 +9,7 @@ export interface UserDto {
   points: number;
   address: number | null;
   createdAt: string | null;
+  hasPendingEmailChange: boolean;
 }
 
 export async function getUserById(id: number): Promise<UserDto> {

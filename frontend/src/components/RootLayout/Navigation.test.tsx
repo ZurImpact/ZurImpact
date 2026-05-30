@@ -44,6 +44,7 @@ const authenticatedState = {
       points: 42,
       address: null,
       createdAt: null,
+      hasPendingEmailChange: false,
     },
     isAuthenticated: true,
     loading: false,

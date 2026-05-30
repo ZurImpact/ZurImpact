@@ -42,6 +42,7 @@ const stubUser: UserDto = {
   points: 100,
   address: null,
   createdAt: null,
+  hasPendingEmailChange: false,
 };
 
 describe('UserSlice', () => {

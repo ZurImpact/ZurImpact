@@ -54,6 +54,7 @@ const authenticatedUser = {
   points: 100,
   address: null,
   createdAt: '2024-01-01T00:00:00Z',
+  hasPendingEmailChange: false,
 };
 
 function renderChangePasswordForm(preloadedState?: DeepPartial<RootState>) {
