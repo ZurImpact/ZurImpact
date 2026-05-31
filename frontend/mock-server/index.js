@@ -29,7 +29,10 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json());
+// body-parser v2 is strict by default and rejects the literal "null". Axios
+// sends `null` as the body for parameterless POSTs (e.g. /actions/startAction)
+// alongside Content-Type: application/json, which would otherwise 400 here.
+app.use(express.json({strict: false}));
 app.use(cookieParser());
 
 const BASE_URL = '/backend_war_exploded/api';
@@ -466,6 +469,18 @@ app.post(BASE_URL + '/auth/verify-email', (req, res) => {
       return res.status(204).end();
     }
   }
+  res.status(400).json({message: 'invalid_token'});
+});
+
+// POST /auth/verify-email-change — finalises an email-change request.
+//
+// The current mock email-change flow updates the email immediately and does
+// NOT mint a verify token, so this endpoint exists only to back the FE's
+// rejection UI: any token submitted here is invalid. When the real backend's
+// tokenised flow is wired up, replace this with proper token tracking.
+app.post(BASE_URL + '/auth/verify-email-change', (req, res) => {
+  const {token} = req.body ?? {};
+  if (!token) return res.status(400).json({message: 'invalid_token'});
   res.status(400).json({message: 'invalid_token'});
 });
 

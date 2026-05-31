@@ -5,7 +5,8 @@ import tailwindcss from '@tailwindcss/vite';
 // API proxy target:
 // - real backend (Tomcat) on :8080 by default
 // - mock server on :4000 when `VITE_USE_MOCK=1` (set by `yarn dev:mock`)
-const API_TARGET = process.env.VITE_USE_MOCK === '1' ? 'http://localhost:4000' : 'http://localhost:8080';
+const USE_MOCK = process.env.VITE_USE_MOCK === '1';
+const API_TARGET = USE_MOCK ? 'http://localhost:4000' : 'http://localhost:8080';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
@@ -18,7 +19,11 @@ export default defineConfig({
         // The Docker backend deploys as ROOT.war (paths under /api), matching
         // the production nginx rewrite. The IntelliJ war:exploded layout serves
         // under /backend_war_exploded — strip the prefix so both work.
-        rewrite: (path) => path.replace(/^\/backend_war_exploded/, ''),
+        //
+        // The mock server, however, registers all routes under
+        // /backend_war_exploded/api, so stripping the prefix would 404 every
+        // mock request. Keep the prefix intact when proxying to the mock.
+        ...(USE_MOCK ? {} : {rewrite: (path: string) => path.replace(/^\/backend_war_exploded/, '')}),
       },
     },
   },

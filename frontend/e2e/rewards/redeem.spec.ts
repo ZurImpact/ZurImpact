@@ -29,4 +29,60 @@ test.describe('rewards / redeem', () => {
     const expensive = page.locator('[data-testid="reward-card"][data-reward-id="4"]');
     await expect(expensive.getByTestId('reward-redeem-btn')).toBeDisabled();
   });
+
+  test('decrements user points and reward availability after redemption', async ({authedPage: page}) => {
+    await page.goto('/rewards');
+
+    // Seed: alice has 123 points; reward "1" costs 50 and starts with availability 45.
+    // After redeeming once: 123 - 50 = 73 points; availability 45 - 1 = 44.
+    const rewardCard = page.locator('[data-testid="reward-card"][data-reward-id="1"]');
+    const userPoints = page.getByTestId('user-points');
+
+    await expect(userPoints).toContainText('123');
+    await expect(rewardCard).toContainText('45');
+
+    await rewardCard.getByTestId('reward-redeem-btn').click();
+    await page.getByTestId('reward-confirm-redeem-btn').click();
+
+    // Voucher dialog appears with the generated code.
+    await expect(page.getByText(/VCHR-/)).toBeVisible();
+
+    // Closing the dialog triggers a re-fetch of currentUser + rewards, which
+    // is what surfaces the decremented values in the UI.
+    // The voucher dialog renders both an explicit "Close" button and a Radix
+    // X-icon close button with sr-only "Close" text — pick the first.
+    await page.getByRole('button', {name: /close/i}).first().click();
+
+    await expect(userPoints).toContainText('73');
+    await expect(rewardCard).toContainText('44');
+
+    // The original 150-point reward (id "4") was disabled at 123 points and
+    // must remain disabled now that the user has only 73.
+    const expensive = page.locator('[data-testid="reward-card"][data-reward-id="4"]');
+    await expect(expensive.getByTestId('reward-redeem-btn')).toBeDisabled();
+  });
+
+  test('blocks the redemption when the user has just dropped below the cost', async ({authedPage: page}) => {
+    // After two redemptions of the 50-pt coffee, alice has 23 points left and
+    // the 75-pt Bio Market reward (id "2") becomes unaffordable.
+    await page.goto('/rewards');
+
+    const coffee = page.locator('[data-testid="reward-card"][data-reward-id="1"]');
+    const bioMarket = page.locator('[data-testid="reward-card"][data-reward-id="2"]');
+
+    // Bio Market starts affordable (123 >= 75) — sanity check.
+    await expect(bioMarket.getByTestId('reward-redeem-btn')).toBeEnabled();
+
+    for (let i = 0; i < 2; i++) {
+      await coffee.getByTestId('reward-redeem-btn').click();
+      await page.getByTestId('reward-confirm-redeem-btn').click();
+      await expect(page.getByText(/VCHR-/)).toBeVisible();
+      // The voucher dialog renders both an explicit "Close" button and a Radix
+      // X-icon close button with sr-only "Close" text — pick the first.
+      await page.getByRole('button', {name: /close/i}).first().click();
+    }
+
+    await expect(page.getByTestId('user-points')).toContainText('23');
+    await expect(bioMarket.getByTestId('reward-redeem-btn')).toBeDisabled();
+  });
 });

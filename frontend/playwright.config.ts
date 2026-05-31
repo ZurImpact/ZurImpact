@@ -15,10 +15,15 @@ export default defineConfig({
   testDir: './e2e',
   testMatch: '**/*.spec.ts',
   // app.spec.ts is the old placeholder — kept as a smoke test that the app boots.
+  // Tests share a single mock server, and /_test/reset wipes all sessions.
+  // Parallel workers would race on reset and evict each other's auth cookies,
+  // so the suite must run serially until the mock learns to scope state per
+  // worker. fullyParallel stays true so tests within a file can interleave
+  // within the single worker.
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   reporter: process.env.CI ? [['html'], ['github']] : 'html',
 
   expect: {
@@ -45,14 +50,19 @@ export default defineConfig({
   webServer: [
     {
       // Mock backend — MOCK_TEST_MODE=1 unlocks /_test/reset and seeds admin user.
-      command: 'MOCK_TEST_MODE=1 yarn mock',
+      // Use Playwright's `env` field rather than inline shell syntax: when the
+      // command is spawned without a shell, `VAR=1 cmd` would leak the assignment
+      // as a positional arg instead of setting the env var.
+      command: 'yarn mock',
+      env: {MOCK_TEST_MODE: '1'},
       // /actions is public and returns 200 → safe readiness probe.
       url: 'http://localhost:4000/backend_war_exploded/api/actions',
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,
     },
     {
-      command: 'VITE_USE_MOCK=1 yarn dev',
+      command: 'yarn dev',
+      env: {VITE_USE_MOCK: '1'},
       url: 'http://localhost:5173',
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
