@@ -155,6 +155,8 @@ export function RewardsPage() {
           return (
             <Card
               key={reward.id}
+              data-testid="reward-card"
+              data-reward-id={reward.id}
               className={`p-6 relative ${!canAfford ? 'opacity-60' : 'hover:shadow-lg transition-shadow'}`}
             >
               {!canAfford && (
@@ -184,6 +186,7 @@ export function RewardsPage() {
                   </div>
                 </div>
                 <Button
+                  data-testid="reward-redeem-btn"
                   onClick={() => setSelectedReward(reward)}
                   disabled={!canAfford || redemptionLoading}
                   className={canAfford ? 'bg-brand hover:bg-brand/90 text-brand-foreground' : 'bg-muted'}
@@ -263,6 +266,7 @@ export function RewardsPage() {
                       {t('rewardsPage.cancel')}
                     </Button>
                     <Button
+                      data-testid="reward-confirm-redeem-btn"
                       className="flex-1 bg-brand hover:bg-brand/90 text-brand-foreground"
                       onClick={() => handleRedeem(selectedReward)}
                       disabled={redemptionLoading}
