@@ -7,6 +7,7 @@ import {type DeepPartial, type RootState} from '../../store/store';
 import {ProfilePage} from './ProfilePage';
 import {resolveT} from '../../test/setup';
 import * as userApi from '../../api/userApi';
+import apiClient from '../../api/apiClient';
 
 vi.mock('../../api/userApi', () => ({
   changePassword: vi.fn(),
@@ -154,10 +155,12 @@ describe('ProfilePage', () => {
 
     it('allows changing the profile name', async () => {
       const user = userEvent.setup();
-      vi.mocked(userApi.updateCurrentUserName).mockResolvedValueOnce({
-        ...fullyPopulatedUser,
-        username: 'alice2',
-      });
+      vi.mocked(userApi.updateCurrentUserName).mockResolvedValueOnce(undefined);
+      // After the POST succeeds, ProfilePage dispatches fetchCurrentUser, which calls
+      // GET /auth/whoami followed by GET /users/{id}. Mock both to return the updated user.
+      vi.mocked(apiClient.get)
+        .mockResolvedValueOnce({data: {id: 1, roles: ['ROLE_USER']}})
+        .mockResolvedValueOnce({data: {...fullyPopulatedUser, username: 'alice2'}});
 
       renderProfilePage({
         user: {
