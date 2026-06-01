@@ -1,5 +1,8 @@
 package com.zhaw.backend.controller;
 
+import com.zhaw.backend.exception.BadRequestException;
+import com.zhaw.backend.exception.NotFoundException;
+import com.zhaw.backend.exception.UnauthorizedException;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.auth.PasswordChangeRequest;
 import com.zhaw.backend.model.entities.User;
@@ -22,7 +25,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -65,13 +67,11 @@ class UserControllerTest {
         }
 
         @Test
-        @DisplayName("returns 404 when user does not exist")
+        @DisplayName("throws NotFoundException when user does not exist")
         void getUserNotFound() {
             when(userService.findUserById(99L)).thenReturn(Optional.empty());
 
-            ResponseEntity<?> response = controller.getUser(99L);
-
-            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertThrows(NotFoundException.class, () -> controller.getUser(99L));
         }
     }
 
@@ -97,13 +97,11 @@ class UserControllerTest {
         }
 
         @Test
-        @DisplayName("returns 500 when the service throws")
+        @DisplayName("propagates service exception to the global handler")
         void getActionsFailure() {
             when(userActionHistoryService.getUserActions(7L, false)).thenThrow(new RuntimeException("db"));
 
-            ResponseEntity<List<UserActionHistoryDto>> response = controller.getUserActions(7L, false);
-
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertThrows(RuntimeException.class, () -> controller.getUserActions(7L, false));
         }
     }
 
@@ -127,7 +125,7 @@ class UserControllerTest {
         }
 
         @Test
-        @DisplayName("returns 400 when current password is wrong")
+        @DisplayName("throws BadRequestException when current password is wrong")
         void changeWrongCurrent() {
             Authentication auth = new UsernamePasswordAuthenticationToken(
                     new AuthenticatedUser(11L, "alice"), null, Set.of());
@@ -135,29 +133,23 @@ class UserControllerTest {
             when(authService.changePassword(eq(11L), eq("bad"), anyString()))
                     .thenReturn(AuthService.ChangePasswordResult.WRONG_CURRENT);
 
-            ResponseEntity<?> response = controller.changePassword(
-                    new PasswordChangeRequest("bad", "newPassword123"), auth);
-
-            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-            @SuppressWarnings("unchecked")
-            Map<String, String> body = (Map<String, String>) response.getBody();
-            assertEquals("wrong_current_password", body.get("message"));
+            BadRequestException ex = assertThrows(BadRequestException.class, () -> controller.changePassword(
+                    new PasswordChangeRequest("bad", "newPassword123"), auth));
+            assertEquals("wrong_current_password", ex.getMessage());
         }
 
         @Test
-        @DisplayName("returns 401 when no authenticated user is present")
+        @DisplayName("throws UnauthorizedException when no authenticated user is present")
         void changeUnauthenticated() {
             when(currentUserResolver.userIdOf(null)).thenReturn(null);
 
-            ResponseEntity<?> response = controller.changePassword(
-                    new PasswordChangeRequest("a", "newPassword123"), null);
-
-            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertThrows(UnauthorizedException.class, () -> controller.changePassword(
+                    new PasswordChangeRequest("a", "newPassword123"), null));
             verify(authService, never()).changePassword(anyLong(), anyString(), anyString());
         }
 
         @Test
-        @DisplayName("returns 401 when user not found in DB")
+        @DisplayName("throws UnauthorizedException when user not found in DB")
         void changeUserNotFound() {
             Authentication auth = new UsernamePasswordAuthenticationToken(
                     new AuthenticatedUser(11L, "alice"), null, Set.of());
@@ -165,13 +157,9 @@ class UserControllerTest {
             when(authService.changePassword(eq(11L), eq("old"), anyString()))
                     .thenReturn(AuthService.ChangePasswordResult.USER_NOT_FOUND);
 
-            ResponseEntity<?> response = controller.changePassword(
-                    new PasswordChangeRequest("old", "newPassword123"), auth);
-
-            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-            @SuppressWarnings("unchecked")
-            Map<String, String> body = (Map<String, String>) response.getBody();
-            assertEquals("Not authenticated", body.get("message"));
+            UnauthorizedException ex = assertThrows(UnauthorizedException.class, () -> controller.changePassword(
+                    new PasswordChangeRequest("old", "newPassword123"), auth));
+            assertEquals("Not authenticated", ex.getMessage());
         }
     }
 }

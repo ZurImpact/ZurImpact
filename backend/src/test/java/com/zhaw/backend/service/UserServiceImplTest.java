@@ -1,6 +1,7 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.Role;
+import com.zhaw.backend.exception.ConflictException;
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
@@ -340,7 +341,7 @@ class UserServiceImplTest {
         when(userDao.findById(11L)).thenReturn(Optional.of(u));
         when(userDao.findByUsername("existing")).thenReturn(Optional.of(other));
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ConflictException.class,
             () -> userService.changeUsername(11L, "existing"));
 
         verify(userDao, never()).updateUsername(anyLong(), anyString());

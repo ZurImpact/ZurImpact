@@ -1,6 +1,10 @@
 package com.zhaw.backend.controller;
 
 import com.zhaw.backend.enums.Role;
+import com.zhaw.backend.exception.BadRequestException;
+import com.zhaw.backend.exception.ConflictException;
+import com.zhaw.backend.exception.ForbiddenException;
+import com.zhaw.backend.exception.UnauthorizedException;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.dto.UserResponseDto;
 import com.zhaw.backend.model.dto.auth.EmailRequest;
@@ -75,18 +79,14 @@ class AuthControllerTest {
         }
 
         @Test
-        @DisplayName("returns 409 when username or email is taken")
+        @DisplayName("throws ConflictException when username or email is taken")
         void registerConflict() {
             doThrow(new IllegalArgumentException("username_taken"))
                     .when(authService).register("frank", "frank@example.com", "secret123");
 
-            ResponseEntity<?> response = controller.register(
-                    new RegisterRequest("frank", "frank@example.com", "secret123"));
-
-            assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-            @SuppressWarnings("unchecked")
-            Map<String, String> body = (Map<String, String>) response.getBody();
-            assertEquals("username_taken", body.get("message"));
+            ConflictException ex = assertThrows(ConflictException.class, () -> controller.register(
+                    new RegisterRequest("frank", "frank@example.com", "secret123")));
+            assertEquals("username_taken", ex.getMessage());
         }
     }
 
@@ -105,13 +105,11 @@ class AuthControllerTest {
         }
 
         @Test
-        @DisplayName("returns 400 on bad token")
+        @DisplayName("throws BadRequestException on bad token")
         void verifyBad() {
             when(authService.verifyEmail("bad")).thenReturn(false);
 
-            ResponseEntity<?> response = controller.verifyEmail(new VerifyEmailRequest("bad"));
-
-            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+            assertThrows(BadRequestException.class, () -> controller.verifyEmail(new VerifyEmailRequest("bad")));
         }
     }
 
@@ -151,26 +149,22 @@ class AuthControllerTest {
         }
 
         @Test
-        @DisplayName("returns 401 for bad credentials")
+        @DisplayName("throws UnauthorizedException for bad credentials")
         void loginBad() {
             when(authService.authenticate("alice", "wrong")).thenThrow(new BadCredentialsException("bad"));
 
-            ResponseEntity<?> response = controller.login(new LoginRequest("alice", "wrong"), request);
-
-            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertThrows(UnauthorizedException.class,
+                    () -> controller.login(new LoginRequest("alice", "wrong"), request));
         }
 
         @Test
-        @DisplayName("returns 403 email_not_verified when account is unverified")
+        @DisplayName("throws ForbiddenException email_not_verified when account is unverified")
         void loginUnverified() {
             when(authService.authenticate("alice", "secret")).thenThrow(new DisabledException("nv"));
 
-            ResponseEntity<?> response = controller.login(new LoginRequest("alice", "secret"), request);
-
-            assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-            @SuppressWarnings("unchecked")
-            Map<String, String> body = (Map<String, String>) response.getBody();
-            assertEquals("email_not_verified", body.get("message"));
+            ForbiddenException ex = assertThrows(ForbiddenException.class,
+                    () -> controller.login(new LoginRequest("alice", "secret"), request));
+            assertEquals("email_not_verified", ex.getMessage());
         }
     }
 
@@ -199,10 +193,9 @@ class AuthControllerTest {
     class WhoAmI {
 
         @Test
-        @DisplayName("returns 401 when unauthenticated")
+        @DisplayName("throws UnauthorizedException when unauthenticated")
         void whoamiUnauthenticated() {
-            ResponseEntity<?> response = controller.whoami(null);
-            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertThrows(UnauthorizedException.class, () -> controller.whoami(null));
         }
 
         @Test
@@ -252,14 +245,12 @@ class AuthControllerTest {
         }
 
         @Test
-        @DisplayName("confirm returns 400 on bad token")
+        @DisplayName("confirm throws BadRequestException on bad token")
         void confirmBad() {
             when(authService.confirmPasswordReset(eq("bad"), anyString())).thenReturn(false);
 
-            ResponseEntity<?> response = controller.confirmPasswordReset(
-                    new PasswordResetConfirmRequest("bad", "newPassword123"));
-
-            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+            assertThrows(BadRequestException.class, () -> controller.confirmPasswordReset(
+                    new PasswordResetConfirmRequest("bad", "newPassword123")));
         }
     }
 }
