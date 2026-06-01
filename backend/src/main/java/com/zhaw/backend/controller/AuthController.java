@@ -1,5 +1,10 @@
 package com.zhaw.backend.controller;
 
+import com.zhaw.backend.exception.BadRequestException;
+import com.zhaw.backend.exception.ConflictException;
+import com.zhaw.backend.exception.ForbiddenException;
+import com.zhaw.backend.exception.NotFoundException;
+import com.zhaw.backend.exception.UnauthorizedException;
 import com.zhaw.backend.model.dto.UserResponseDto;
 import com.zhaw.backend.model.dto.auth.EmailRequest;
 import com.zhaw.backend.model.dto.auth.LoginRequest;
@@ -38,6 +43,12 @@ import java.util.stream.Collectors;
  * because these are public, must avoid user-enumeration responses, and have
  * a different threat model than user-resource CRUD.
  *
+ * <p>Error responses flow through {@code GlobalExceptionHandler} as RFC 9457
+ * problems. Enumeration-safe behaviour is preserved: {@code resend-verification}
+ * and {@code password-reset/request} always return 204; token endpoints return
+ * a generic 400; {@code login} returns a generic 401 for every credential
+ * failure and 403 only for an unverified-but-correct login.
+ *
  * <p>CSRF is disabled at the chain level — the API is JSON-only with a
  * SameSite=Lax cookie and no cross-site forms; see {@code SecurityConfig}.
  */
@@ -61,21 +72,21 @@ public class AuthController {
                     .build();
             return ResponseEntity.status(HttpStatus.CREATED).body(body);
         } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", ex.getMessage()));
+            // username_taken / email_taken — preserve existing 409 semantics
+            throw new ConflictException(ex.getMessage());
         }
     }
 
     @PostMapping("/verify-email")
-    public ResponseEntity<?> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+    public ResponseEntity<Void> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
         if (!authService.verifyEmail(request.token())) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Invalid or expired token"));
+            throw new BadRequestException("Invalid or expired token");
         }
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/resend-verification")
-    public ResponseEntity<?> resendVerification(@Valid @RequestBody EmailRequest request) {
+    public ResponseEntity<Void> resendVerification(@Valid @RequestBody EmailRequest request) {
         authService.resendVerification(request.email());
         return ResponseEntity.noContent().build();
     }
@@ -89,16 +100,15 @@ public class AuthController {
                     .header(HttpHeaders.SET_COOKIE, sessionCookie(token, httpRequest, Duration.ofHours(8)).toString())
                     .body(new LoginResponse(result.username(), result.role().name()));
         } catch (DisabledException ex) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "email_not_verified"));
+            throw new ForbiddenException("email_not_verified");
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Invalid username or password"));
+            // Generic 401 for every other failure — no user enumeration.
+            throw new UnauthorizedException("Invalid username or password");
         }
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest httpRequest) {
+    public ResponseEntity<Void> logout(HttpServletRequest httpRequest) {
         sessionService.invalidate(readAuthCookie(httpRequest));
         ResponseCookie deleteCookie = sessionCookie("", httpRequest, Duration.ZERO);
         return ResponseEntity.noContent()
@@ -109,14 +119,14 @@ public class AuthController {
     @GetMapping("/whoami")
     public ResponseEntity<?> whoami(Authentication authentication) {
         if (authentication == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Not authenticated"));
+            throw new UnauthorizedException("Not authenticated");
         }
         Set<String> roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
         var user = userService.findUserByUsername(authentication.getName());
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found"));
+            throw new NotFoundException("User not found");
         }
         return ResponseEntity.ok(Map.of(
                 "id", user.getId(),
@@ -127,15 +137,15 @@ public class AuthController {
     }
 
     @PostMapping("/password-reset/request")
-    public ResponseEntity<?> requestPasswordReset(@Valid @RequestBody EmailRequest request) {
+    public ResponseEntity<Void> requestPasswordReset(@Valid @RequestBody EmailRequest request) {
         authService.requestPasswordReset(request.email());
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/password-reset/confirm")
-    public ResponseEntity<?> confirmPasswordReset(@Valid @RequestBody PasswordResetConfirmRequest request) {
+    public ResponseEntity<Void> confirmPasswordReset(@Valid @RequestBody PasswordResetConfirmRequest request) {
         if (!authService.confirmPasswordReset(request.token(), request.newPassword())) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Invalid or expired token"));
+            throw new BadRequestException("Invalid or expired token");
         }
         return ResponseEntity.noContent().build();
     }
@@ -166,9 +176,9 @@ public class AuthController {
     public record LoginResponse(String username, String role) {}
 
     @PostMapping("/verify-email-change")
-    public ResponseEntity<?> verifyEmailChange(@Valid @RequestBody VerifyEmailRequest request) {
+    public ResponseEntity<Void> verifyEmailChange(@Valid @RequestBody VerifyEmailRequest request) {
         if (!authService.confirmEmailChange(request.token())) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Invalid or expired token"));
+            throw new BadRequestException("Invalid or expired token");
         }
         return ResponseEntity.noContent().build();
     }
