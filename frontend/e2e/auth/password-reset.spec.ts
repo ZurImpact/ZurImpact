@@ -19,7 +19,9 @@ test.describe('auth / password reset', () => {
     await page.getByRole('button', {name: /send reset link/i}).click();
 
     // The forgot-password page swaps to a success card on fulfillment.
-    await expect(page.getByRole('button', {name: /send to a different address/i})).toBeVisible();
+    // The card renders an "If an account with that address exists, we've sent
+    // a password reset link" paragraph — assert via the stable substring.
+    await expect(page.getByText(/sent a password reset link/i)).toBeVisible();
 
     // 2. Pull the reset token the mock emitted.
     const token = await getLatestResetToken(request, seedEmail);
