@@ -42,8 +42,24 @@ export function RegisterPage() {
 
     if (registerUser.fulfilled.match(result)) {
       navigate(ROUTES.verifyEmail, {replace: true, state: {pendingEmail: submittedEmail}});
+      return;
+    }
+
+    if (registerUser.rejected.match(result)) {
+      const code = result.payload as string;
+      if (code === 'username_taken') {
+        form.setError('username', {type: 'server', message: t('auth.register.errorUsernameTaken')});
+      } else if (code === 'email_taken') {
+        form.setError('email', {type: 'server', message: t('auth.register.errorEmailTaken')});
+      }
     }
   };
+
+  const showGenericError =
+    registerStatus === 'rejected' &&
+    registerError !== null &&
+    registerError !== 'username_taken' &&
+    registerError !== 'email_taken';
 
   const isPending = registerStatus === 'pending';
 
@@ -58,7 +74,7 @@ export function RegisterPage() {
 
   return (
     <AuthFormCard title={t('auth.register.title')} description={t('auth.register.description')} footer={footer}>
-      {registerError && registerStatus === 'rejected' && (
+      {showGenericError && (
         <div
           role="alert"
           className="mb-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"

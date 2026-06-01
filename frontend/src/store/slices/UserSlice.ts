@@ -1,5 +1,6 @@
 import {createSlice, createAsyncThunk, type PayloadAction} from '@reduxjs/toolkit';
 import apiClient from '../../api/apiClient';
+import {getErrorMessage, getHttpStatus} from '../../api/problemDetail';
 import type {UserDto} from '../../api/userApi';
 import {logoutUser} from './AuthSlice';
 
@@ -39,19 +40,11 @@ export const fetchCurrentUser = createAsyncThunk('user/fetchCurrentUser', async 
       roles,
     } satisfies FetchCurrentUserResult;
   } catch (error: unknown) {
-    if (error && typeof error === 'object' && 'response' in error) {
-      const axiosError = error as {
-        response?: {status?: number; data?: {error?: string}};
-      };
-      if (axiosError.response?.status === 401) {
-        return rejectWithValue('not_authenticated');
-      }
-      return rejectWithValue(axiosError.response?.data?.error ?? 'Failed to fetch user');
+    // 401 is an expected "not logged in" signal that gates the app — keep it as a code.
+    if (getHttpStatus(error) === 401) {
+      return rejectWithValue('not_authenticated');
     }
-    if (error instanceof Error) {
-      return rejectWithValue(error.message);
-    }
-    return rejectWithValue('Failed to fetch user');
+    return rejectWithValue(getErrorMessage(error, 'Failed to fetch user'));
   }
 });
 

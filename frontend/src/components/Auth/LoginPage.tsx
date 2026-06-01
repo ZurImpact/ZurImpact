@@ -77,12 +77,14 @@ export function LoginPage() {
         </div>
       )}
 
-      {loginError === 'invalid_credentials' && (
+      {loginError && loginError !== 'email_not_verified' && (
         <div
           role="alert"
           className="mb-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
-          {t('auth.login.errorInvalidCredentials')}
+          {loginError === 'invalid_credentials'
+            ? t('auth.login.errorInvalidCredentials')
+            : t('auth.login.errorGeneric')}
         </div>
       )}
 
