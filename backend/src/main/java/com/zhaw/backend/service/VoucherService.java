@@ -10,5 +10,5 @@ public interface VoucherService {
     boolean createVoucher(VoucherDto voucherDto);
     VoucherDto getVoucherById(Long id);
     List<VoucherDto> getAllVouchers();
-    UserVoucherDto redeemVoucher(String username, Long voucherId) throws Exception;
+    UserVoucherDto redeemVoucher(String username, Long voucherId);
 }

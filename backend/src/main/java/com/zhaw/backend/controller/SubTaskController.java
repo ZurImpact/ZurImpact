@@ -22,7 +22,7 @@ public class SubTaskController {
 
     @PostMapping(value = "/completeSubTask")
     public ResponseEntity<Void> completeSubTask(
-            @Valid @RequestBody SubTaskCompletionRequestDto requestDto) throws Exception {
+            @Valid @RequestBody SubTaskCompletionRequestDto requestDto) {
         subTaskService.completeSubTaskForUser(requestDto);
         return ResponseEntity.ok().build();
     }

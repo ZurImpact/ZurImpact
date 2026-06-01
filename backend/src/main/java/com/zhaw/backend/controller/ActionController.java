@@ -48,7 +48,7 @@ public class ActionController {
             @RequestParam(name = "text", required = false) String text,
             @RequestParam(name = "points", required = false) Integer points,
             @RequestParam(name = "tags", required = false) String tags,
-            @RequestParam(name = "validUntil", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime validUntil) throws Exception {
+            @RequestParam(name = "validUntil", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime validUntil) {
         return ResponseEntity.ok(actionService.getActions(text, points, tags, validUntil));
     }
 
@@ -61,7 +61,7 @@ public class ActionController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Get action by ID", description = "Returns a single action including subtasks. Open to all users.", tags = "Actions")
-    public ResponseEntity<ActionDto> getAction(@PathVariable("id") Long id) throws Exception {
+    public ResponseEntity<ActionDto> getAction(@PathVariable("id") Long id) {
         ActionDto actionDto = actionService.getActionById(id);
         if (actionDto == null) {
             throw new NotFoundException("Action with id " + id + " not found");
@@ -149,7 +149,7 @@ public class ActionController {
     @Operation(summary = "Complete action", description = "Records that a user has completed an action.", tags = "User Progress")
     public ResponseEntity<Void> completeAction(
             @RequestParam(name = "userId") Long userId,
-            @RequestParam(name = "actionId") Long actionId) throws Exception {
+            @RequestParam(name = "actionId") Long actionId) {
         actionService.completeActionForUser(userId, actionId);
         return ResponseEntity.ok().build();
     }

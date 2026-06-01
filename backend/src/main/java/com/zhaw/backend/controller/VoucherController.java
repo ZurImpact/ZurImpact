@@ -28,7 +28,7 @@ public class VoucherController {
     }
 
     @PostMapping("/{voucherId}/redeem")
-    public ResponseEntity<UserVoucherDto> redeemVoucher(@PathVariable Long voucherId, Authentication authentication) throws Exception {
+    public ResponseEntity<UserVoucherDto> redeemVoucher(@PathVariable Long voucherId, Authentication authentication) {
         return ResponseEntity.ok(voucherService.redeemVoucher(authentication.getName(), voucherId));
     }
 }

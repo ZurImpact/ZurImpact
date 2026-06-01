@@ -42,7 +42,7 @@ class ActionControllerTest {
 
         @Test
         @DisplayName("returns 200 with actions when service succeeds")
-        void returns200WhenServiceSucceeds() throws Exception {
+        void returns200WhenServiceSucceeds() {
             LocalDateTime validUntil = LocalDateTime.of(2026, 12, 1, 10, 0);
             when(actionService.getActions("bike", 10, "FOOD", validUntil)).thenReturn(List.of(actionDto(1L)));
 
@@ -56,7 +56,7 @@ class ActionControllerTest {
 
         @Test
         @DisplayName("propagates service exception to the global handler")
-        void propagatesWhenServiceThrows() throws Exception {
+        void propagatesWhenServiceThrows() {
             when(actionService.getActions(null, null, null, null)).thenThrow(new RuntimeException("db error"));
 
             assertThrows(RuntimeException.class, () -> actionController.getActions(null, null, null, null));
@@ -69,7 +69,7 @@ class ActionControllerTest {
 
         @Test
         @DisplayName("returns 200 when action exists")
-        void returns200WhenActionExists() throws Exception {
+        void returns200WhenActionExists() {
             when(actionService.getActionById(1L)).thenReturn(actionDto(1L));
 
             ResponseEntity<ActionDto> response = actionController.getAction(1L);
@@ -81,7 +81,7 @@ class ActionControllerTest {
 
         @Test
         @DisplayName("throws NotFoundException when action does not exist")
-        void throwsNotFoundWhenActionDoesNotExist() throws Exception {
+        void throwsNotFoundWhenActionDoesNotExist() {
             when(actionService.getActionById(99L)).thenReturn(null);
 
             assertThrows(NotFoundException.class, () -> actionController.getAction(99L));
@@ -89,7 +89,7 @@ class ActionControllerTest {
 
         @Test
         @DisplayName("propagates service exception to the global handler")
-        void propagatesWhenServiceThrows() throws Exception {
+        void propagatesWhenServiceThrows() {
             when(actionService.getActionById(1L)).thenThrow(new RuntimeException("db error"));
 
             assertThrows(RuntimeException.class, () -> actionController.getAction(1L));
@@ -212,7 +212,7 @@ class ActionControllerTest {
 
         @Test
         @DisplayName("completeAction returns 200 on success")
-        void completeActionReturns200OnSuccess() throws Exception {
+        void completeActionReturns200OnSuccess() {
             ResponseEntity<Void> response = actionController.completeAction(1L, 2L);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -221,10 +221,10 @@ class ActionControllerTest {
 
         @Test
         @DisplayName("completeAction propagates service exception")
-        void completeActionPropagatesException() throws Exception {
-            when(actionService.completeActionForUser(1L, 2L)).thenThrow(new Exception("failed"));
+        void completeActionPropagatesException() {
+            when(actionService.completeActionForUser(1L, 2L)).thenThrow(new RuntimeException("failed"));
 
-            assertThrows(Exception.class, () -> actionController.completeAction(1L, 2L));
+            assertThrows(RuntimeException.class, () -> actionController.completeAction(1L, 2L));
         }
 
         @Test
