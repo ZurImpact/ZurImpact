@@ -104,10 +104,11 @@ class GlobalExceptionHandlerTest {
         binding.addError(new FieldError("sampleBody", "name", "must not be blank"));
         MethodArgumentNotValidException ex = new MethodArgumentNotValidException(parameter, binding);
 
-        ResponseEntity<Object> response = (ResponseEntity<Object>) new GlobalExceptionHandler()
+        ResponseEntity<Object> response = new GlobalExceptionHandler()
                 .handleMethodArgumentNotValid(ex, new HttpHeaders(), HttpStatus.BAD_REQUEST,
                         new ServletWebRequest(new MockHttpServletRequest()));
 
+        assertNotNull(response);
         assertEquals(400, response.getStatusCode().value());
         ProblemDetail pd = (ProblemDetail) response.getBody();
         assertNotNull(pd);
@@ -118,8 +119,8 @@ class GlobalExceptionHandlerTest {
         assertNotNull(pd.getProperties());
         List<Map<String, Object>> errors = (List<Map<String, Object>>) pd.getProperties().get("errors");
         assertNotNull(errors);
-        assertEquals("name", errors.get(0).get("field"));
-        assertEquals("must not be blank", errors.get(0).get("message"));
+        assertEquals("name", errors.getFirst().get("field"));
+        assertEquals("must not be blank", errors.getFirst().get("message"));
     }
 
     @RestController
