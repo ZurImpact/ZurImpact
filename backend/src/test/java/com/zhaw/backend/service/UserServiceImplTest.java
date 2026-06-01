@@ -1,7 +1,9 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.Role;
+import com.zhaw.backend.exception.BadRequestException;
 import com.zhaw.backend.exception.ConflictException;
+import com.zhaw.backend.exception.NotFoundException;
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
@@ -385,5 +387,28 @@ class UserServiceImplTest {
 
         assertTrue(result);
         verify(userDao).updateUsername(11L, maxLength);
+    }
+
+    @Test
+    @DisplayName("changeUsername returns false for a null username")
+    void changeUsernameNullReturnsFalse() {
+        assertFalse(userService.changeUsername(11L, null));
+        verify(userDao, never()).updateUsername(anyLong(), anyString());
+    }
+
+    @Test
+    @DisplayName("changeUsername throws BadRequestException when too short")
+    void changeUsernameTooShortThrows() {
+        assertThrows(BadRequestException.class, () -> userService.changeUsername(11L, "ab"));
+        verify(userDao, never()).updateUsername(anyLong(), anyString());
+    }
+
+    @Test
+    @DisplayName("changeUsername throws NotFoundException when the user does not exist")
+    void changeUsernameUserNotFoundThrows() {
+        when(userDao.findById(11L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> userService.changeUsername(11L, "validname"));
+        verify(userDao, never()).updateUsername(anyLong(), anyString());
     }
 }

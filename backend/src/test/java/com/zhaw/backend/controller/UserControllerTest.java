@@ -1,9 +1,12 @@
 package com.zhaw.backend.controller;
 
 import com.zhaw.backend.exception.BadRequestException;
+import com.zhaw.backend.exception.ConflictException;
 import com.zhaw.backend.exception.NotFoundException;
 import com.zhaw.backend.exception.UnauthorizedException;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
+import com.zhaw.backend.model.dto.auth.ChangeEmailRequest;
+import com.zhaw.backend.model.dto.auth.ChangeUsernameRequest;
 import com.zhaw.backend.model.dto.auth.PasswordChangeRequest;
 import com.zhaw.backend.model.entities.User;
 import com.zhaw.backend.security.AuthenticatedUser;
@@ -25,6 +28,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -160,6 +165,151 @@ class UserControllerTest {
             UnauthorizedException ex = assertThrows(UnauthorizedException.class, () -> controller.changePassword(
                     new PasswordChangeRequest("old", "newPassword123"), auth));
             assertEquals("Not authenticated", ex.getMessage());
+        }
+    }
+
+    private Authentication userAuth() {
+        return new UsernamePasswordAuthenticationToken(new AuthenticatedUser(11L, "alice"), null, Set.of());
+    }
+
+    @Nested
+    @DisplayName("getMyActions")
+    class GetMyActions {
+
+        @Test
+        @DisplayName("throws UnauthorizedException when not authenticated")
+        void unauthenticated() {
+            when(currentUserResolver.userIdOf(null)).thenReturn(null);
+
+            assertThrows(UnauthorizedException.class, () -> controller.getMyActions(false, null));
+        }
+
+        @Test
+        @DisplayName("returns the action history for the current user")
+        void ok() {
+            Authentication auth = userAuth();
+            when(currentUserResolver.userIdOf(auth)).thenReturn(11L);
+            when(userActionHistoryService.getUserActions(11L, true))
+                    .thenReturn(List.of(UserActionHistoryDto.builder().actionId(1L).displayName("Bike").build()));
+
+            ResponseEntity<List<UserActionHistoryDto>> response = controller.getMyActions(true, auth);
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(1, response.getBody().size());
+        }
+    }
+
+    @Nested
+    @DisplayName("changeName")
+    class ChangeName {
+
+        @Test
+        @DisplayName("throws UnauthorizedException when not authenticated")
+        void unauthenticated() {
+            when(currentUserResolver.userIdOf(null)).thenReturn(null);
+
+            assertThrows(UnauthorizedException.class,
+                    () -> controller.changeName(new ChangeUsernameRequest("newname"), null));
+        }
+
+        @Test
+        @DisplayName("throws BadRequestException when the service rejects the username")
+        void invalid() {
+            Authentication auth = userAuth();
+            when(currentUserResolver.userIdOf(auth)).thenReturn(11L);
+            when(userService.changeUsername(11L, "newname")).thenReturn(false);
+
+            assertThrows(BadRequestException.class,
+                    () -> controller.changeName(new ChangeUsernameRequest("newname"), auth));
+        }
+
+        @Test
+        @DisplayName("returns 204 on success")
+        void ok() {
+            Authentication auth = userAuth();
+            when(currentUserResolver.userIdOf(auth)).thenReturn(11L);
+            when(userService.changeUsername(11L, "newname")).thenReturn(true);
+
+            ResponseEntity<Void> response = controller.changeName(new ChangeUsernameRequest("newname"), auth);
+
+            assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("changeEmail")
+    class ChangeEmail {
+
+        @Test
+        @DisplayName("throws UnauthorizedException when not authenticated")
+        void unauthenticated() {
+            when(currentUserResolver.userIdOf(null)).thenReturn(null);
+
+            assertThrows(UnauthorizedException.class,
+                    () -> controller.changeEmail(new ChangeEmailRequest("new@example.com"), null));
+        }
+
+        @Test
+        @DisplayName("returns 202 accepted on success")
+        void ok() {
+            Authentication auth = userAuth();
+            when(currentUserResolver.userIdOf(auth)).thenReturn(11L);
+
+            ResponseEntity<?> response = controller.changeEmail(new ChangeEmailRequest("new@example.com"), auth);
+
+            assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
+            @SuppressWarnings("unchecked")
+            Map<String, String> body = (Map<String, String>) response.getBody();
+            assertEquals("verification_sent", body.get("message"));
+            verify(authService).requestEmailChange(11L, "new@example.com");
+        }
+
+        @Test
+        @DisplayName("maps IllegalArgumentException to ConflictException (email in use)")
+        void conflict() {
+            Authentication auth = userAuth();
+            when(currentUserResolver.userIdOf(auth)).thenReturn(11L);
+            doThrow(new IllegalArgumentException("dup")).when(authService).requestEmailChange(11L, "taken@example.com");
+
+            ConflictException ex = assertThrows(ConflictException.class,
+                    () -> controller.changeEmail(new ChangeEmailRequest("taken@example.com"), auth));
+            assertEquals("email_in_use", ex.getMessage());
+        }
+
+        @Test
+        @DisplayName("maps IllegalStateException to NotFoundException (user missing)")
+        void notFound() {
+            Authentication auth = userAuth();
+            when(currentUserResolver.userIdOf(auth)).thenReturn(11L);
+            doThrow(new IllegalStateException("missing")).when(authService).requestEmailChange(11L, "new@example.com");
+
+            assertThrows(NotFoundException.class,
+                    () -> controller.changeEmail(new ChangeEmailRequest("new@example.com"), auth));
+        }
+    }
+
+    @Nested
+    @DisplayName("deleteAccount")
+    class DeleteAccount {
+
+        @Test
+        @DisplayName("throws UnauthorizedException when not authenticated")
+        void unauthenticated() {
+            when(currentUserResolver.userIdOf(null)).thenReturn(null);
+
+            assertThrows(UnauthorizedException.class, () -> controller.deleteAccount(null));
+        }
+
+        @Test
+        @DisplayName("returns 200 and deletes the account on success")
+        void ok() {
+            Authentication auth = userAuth();
+            when(currentUserResolver.userIdOf(auth)).thenReturn(11L);
+
+            ResponseEntity<?> response = controller.deleteAccount(auth);
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            verify(userService).deleteUserById(11L);
         }
     }
 }

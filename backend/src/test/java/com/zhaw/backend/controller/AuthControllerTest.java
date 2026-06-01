@@ -220,6 +220,29 @@ class AuthControllerTest {
     }
 
     @Nested
+    @DisplayName("verifyEmailChange")
+    class VerifyEmailChange {
+
+        @Test
+        @DisplayName("returns 204 on success")
+        void ok() {
+            when(authService.confirmEmailChange("tok")).thenReturn(true);
+
+            ResponseEntity<?> response = controller.verifyEmailChange(new VerifyEmailRequest("tok"));
+
+            assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        }
+
+        @Test
+        @DisplayName("throws BadRequestException on bad token")
+        void bad() {
+            when(authService.confirmEmailChange("bad")).thenReturn(false);
+
+            assertThrows(BadRequestException.class, () -> controller.verifyEmailChange(new VerifyEmailRequest("bad")));
+        }
+    }
+
+    @Nested
     @DisplayName("password reset endpoints")
     class PasswordReset {
 
