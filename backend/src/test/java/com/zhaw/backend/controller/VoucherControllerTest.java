@@ -1,5 +1,7 @@
 package com.zhaw.backend.controller;
 
+import com.zhaw.backend.exception.BusinessRuleException;
+import com.zhaw.backend.exception.NotFoundException;
 import com.zhaw.backend.model.dto.UserVoucherDto;
 import com.zhaw.backend.model.dto.VoucherDto;
 import com.zhaw.backend.service.VoucherService;
@@ -19,6 +21,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,14 +60,11 @@ class VoucherControllerTest {
         }
 
         @Test
-        @DisplayName("returns 500 when service throws exception")
-        void returns500WhenServiceThrowsException() {
+        @DisplayName("propagates service exception to the global handler")
+        void propagatesWhenServiceThrows() {
             when(voucherService.getAllVouchers()).thenThrow(new RuntimeException("db error"));
 
-            ResponseEntity<List<VoucherDto>> response = voucherController.getAllVouchers();
-
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-            verify(voucherService).getAllVouchers();
+            assertThrows(RuntimeException.class, () -> voucherController.getAllVouchers());
         }
     }
 
@@ -90,7 +90,7 @@ class VoucherControllerTest {
                     .build();
             when(voucherService.redeemVoucher("alice", 1L)).thenReturn(dto);
 
-            ResponseEntity<?> response = voucherController.redeemVoucher(1L, auth());
+            ResponseEntity<UserVoucherDto> response = voucherController.redeemVoucher(1L, auth());
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertNotNull(response.getBody());
@@ -98,27 +98,23 @@ class VoucherControllerTest {
         }
 
         @Test
-        @DisplayName("returns 404 when voucher not found")
-        void returns404WhenVoucherNotFound() throws Exception {
+        @DisplayName("propagates NotFoundException when voucher not found")
+        void propagatesNotFoundWhenVoucherNotFound() throws Exception {
             when(voucherService.redeemVoucher("alice", 99L))
-                    .thenThrow(new Exception("Voucher not found"));
+                    .thenThrow(new NotFoundException("Voucher not found"));
 
-            ResponseEntity<?> response = voucherController.redeemVoucher(99L, auth());
-
-            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            Authentication auth = auth();
+            assertThrows(NotFoundException.class, () -> voucherController.redeemVoucher(99L, auth));
         }
 
         @Test
-        @DisplayName("returns 400 for other failures (expired, no codes, insufficient points)")
-        void returns400ForOtherFailures() throws Exception {
+        @DisplayName("propagates BusinessRuleException for business-rule failures (expired, no codes, insufficient points)")
+        void propagatesBusinessRuleForOtherFailures() throws Exception {
             when(voucherService.redeemVoucher("alice", 1L))
-                    .thenThrow(new Exception("Insufficient points"));
+                    .thenThrow(new BusinessRuleException("Insufficient points"));
 
-            ResponseEntity<?> response = voucherController.redeemVoucher(1L, auth());
-
-            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-            assertEquals("Insufficient points", response.getBody());
+            Authentication auth = auth();
+            assertThrows(BusinessRuleException.class, () -> voucherController.redeemVoucher(1L, auth));
         }
     }
 }
-
