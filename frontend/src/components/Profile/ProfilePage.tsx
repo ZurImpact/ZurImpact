@@ -13,7 +13,7 @@ import {Input} from '../ui/input';
 import {Button} from '../ui/button';
 import {ROUTES} from '../../routes';
 import {deleteCurrentUser, updateCurrentUserEmail, updateCurrentUserName} from '../../api/userApi';
-import {logout, updateCurrentUser} from '../../store/slices/UserSlice';
+import {fetchCurrentUser, logout} from '../../store/slices/UserSlice';
 import {ChangePasswordForm} from './ChangePasswordForm';
 
 const updateProfileNameSchema = z.object({
@@ -80,8 +80,8 @@ export function ProfilePage() {
     setNameUpdateMessage(null);
 
     try {
-      const updatedUser = await updateCurrentUserName({newUsername: values.username});
-      dispatch(updateCurrentUser(updatedUser));
+      await updateCurrentUserName({newUsername: values.username});
+      await dispatch(fetchCurrentUser());
       setNameUpdateMessage(t('profile.updateName.success'));
     } catch {
       setNameUpdateError(t('profile.updateName.errorGeneric'));
