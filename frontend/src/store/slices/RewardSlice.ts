@@ -1,5 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import apiClient from '../../api/apiClient';
+import {getErrorMessage} from '../../api/problemDetail';
 
 export interface RewardDto {
   id: string;
@@ -41,10 +42,7 @@ export const fetchRewards = createAsyncThunk('reward/fetchRewards', async (_, {r
     const response = await apiClient.get('/vouchers');
     return response.data;
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      return rejectWithValue(error.message);
-    }
-    return rejectWithValue('Failed to fetch rewards');
+    return rejectWithValue(getErrorMessage(error, 'Failed to fetch rewards'));
   }
 });
 
@@ -55,16 +53,7 @@ export const redeemVoucher = createAsyncThunk(
       const response = await apiClient.post(`/vouchers/${voucherId}/redeem`);
       return response.data as RedemptionResult;
     } catch (error: unknown) {
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as {response?: {data?: unknown}};
-        const data = axiosError.response?.data;
-        const message = typeof data === 'string' ? data : 'Failed to redeem voucher';
-        return rejectWithValue(message);
-      }
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue('Failed to redeem voucher');
+      return rejectWithValue(getErrorMessage(error, 'Failed to redeem voucher'));
     }
   },
 );

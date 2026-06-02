@@ -7,6 +7,7 @@ import {MapContainer, Marker, TileLayer, useMap, useMapEvents} from 'react-leafl
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import apiClient from '../../api/apiClient';
+import {getErrorMessage} from '../../api/problemDetail';
 import {ROUTES} from '../../routes';
 import {useAppSelector} from '../../store/store';
 import {Button} from '../ui/button';
@@ -283,8 +284,9 @@ export function ActionCreatePage() {
       navigate(ROUTES.actionDetails(response.data.id));
     } catch (error) {
       console.error('Failed to create action:', error);
-      setFormError(t('actionCreatePage.error'));
-      toast.error(t('actionCreatePage.error'));
+      const message = getErrorMessage(error, t('actionCreatePage.error'));
+      setFormError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

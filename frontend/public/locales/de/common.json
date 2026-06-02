@@ -169,6 +169,8 @@
       "submitPending": "Konto wird erstellt\u2026",
       "signInLink": "Anmelden",
       "alreadyHaveAccount": "Haben Sie bereits ein Konto?",
+      "errorUsernameTaken": "Dieser Benutzername ist bereits vergeben.",
+      "errorEmailTaken": "Mit dieser E-Mail-Adresse besteht bereits ein Konto.",
       "errorGeneric": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
     },
     "verifyEmail": {
