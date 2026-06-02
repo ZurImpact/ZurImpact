@@ -97,10 +97,18 @@ describe('AuthSlice', () => {
       expect(loginState.error).toBe('invalid_credentials');
     });
 
-    it('sets error "email_not_verified" on 403 with message email_not_verified', async () => {
+    it('sets error "email_not_verified" on 403 with detail email_not_verified', async () => {
       const store = createTestStore();
       vi.mocked(authApi.login).mockRejectedValueOnce({
-        response: {status: 403, data: {message: 'email_not_verified'}},
+        response: {
+          status: 403,
+          data: {
+            type: 'https://zurimpact.ch/problems/forbidden',
+            title: 'Forbidden',
+            status: 403,
+            detail: 'email_not_verified',
+          },
+        },
       });
       await store.dispatch(loginUser({username: 'alice', password: 'secret'}));
 
@@ -261,10 +269,18 @@ describe('AuthSlice', () => {
       expect(store.getState().auth.changePassword.error).toBe('change_password_failed');
     });
 
-    it('sets error "wrong_current_password" on 400 with that message', async () => {
+    it('sets error "wrong_current_password" on 400 with that detail', async () => {
       const store = createTestStore();
       vi.mocked(userApi.changePassword).mockRejectedValueOnce({
-        response: {status: 400, data: {message: 'wrong_current_password'}},
+        response: {
+          status: 400,
+          data: {
+            type: 'https://zurimpact.ch/problems/bad-request',
+            title: 'Bad Request',
+            status: 400,
+            detail: 'wrong_current_password',
+          },
+        },
       });
       await store.dispatch(changePassword({currentPassword: 'wrong', newPassword: 'NewPass1!'}));
 

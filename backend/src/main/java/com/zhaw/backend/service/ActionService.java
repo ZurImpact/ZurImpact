@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface ActionService {
 
-    List<ActionDto> getActions(String text, Integer points, String tags, LocalDateTime validUntil) throws Exception;
+    List<ActionDto> getActions(String text, Integer points, String tags, LocalDateTime validUntil);
 
-    ActionDto getActionById(Long actionId) throws Exception;
+    ActionDto getActionById(Long actionId);
 
     boolean startActionForUser(Long userId, Long actionId, Boolean isSubtask, String subActionId);
 
-    boolean completeActionForUser(Long userId, Long actionId) throws Exception;
+    boolean completeActionForUser(Long userId, Long actionId);
 
     boolean deleteActionForUser(Long userId, Long actionId);
 

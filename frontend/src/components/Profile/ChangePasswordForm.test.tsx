@@ -239,7 +239,15 @@ describe('ChangePasswordForm', () => {
     it('shows inline alert about incorrect current password on wrong_current_password error', async () => {
       const user = userEvent.setup();
       vi.mocked(userApi.changePassword).mockRejectedValueOnce({
-        response: {status: 400, data: {message: 'wrong_current_password'}},
+        response: {
+          status: 400,
+          data: {
+            type: 'https://zurimpact.ch/problems/bad-request',
+            title: 'Bad Request',
+            status: 400,
+            detail: 'wrong_current_password',
+          },
+        },
       });
 
       renderChangePasswordForm();

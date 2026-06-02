@@ -11,7 +11,7 @@ import java.util.Map;
 
 public interface SubTaskService {
 
-    List<SubTaskDto> getSubTasks(Long actionId, ActionType actionType) throws Exception;
+    List<SubTaskDto> getSubTasks(Long actionId, ActionType actionType);
 
     void createSubTask(Long actionId, GpsActionTaskDto dto);
 
@@ -21,5 +21,5 @@ public interface SubTaskService {
 
     Map<Long, CompletionState> getSubTasksCompletionStatesForUser(Long userId, Long actionId);
 
-    boolean completeSubTaskForUser(SubTaskCompletionRequestDto requestDto) throws Exception;
+    boolean completeSubTaskForUser(SubTaskCompletionRequestDto requestDto);
 }

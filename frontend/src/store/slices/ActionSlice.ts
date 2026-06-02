@@ -1,5 +1,6 @@
 import {createSlice, createAsyncThunk, type PayloadAction} from '@reduxjs/toolkit';
 import apiClient from '../../api/apiClient';
+import {getErrorMessage} from '../../api/problemDetail';
 import type {DistanceThresholdLevel} from '../../utils/distanceThreshold';
 import {fetchCurrentUser} from './UserSlice';
 export type {DistanceThresholdLevel};
@@ -94,22 +95,6 @@ const initialState: ActionState = {
   error: null,
 };
 
-function getErrorMessage(error: unknown, fallback: string): string {
-  if (error && typeof error === 'object' && 'response' in error) {
-    const axiosError = error as {
-      message?: string;
-      response?: {data?: {error?: string}};
-    };
-    return axiosError.response?.data?.error ?? axiosError.message ?? fallback;
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return fallback;
-}
-
 function mergeUserActions(...actionGroups: UserActionHistoryDto[][]): UserActionHistoryDto[] {
   const seen = new Set<string>();
   const mergedActions: UserActionHistoryDto[] = [];
@@ -179,10 +164,7 @@ export const fetchActions = createAsyncThunk(
       const response = await apiClient.get(`/actions`);
       return response.data;
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue('Failed to fetch actions');
+      return rejectWithValue(getErrorMessage(error, 'Failed to fetch actions'));
     }
   },
 );

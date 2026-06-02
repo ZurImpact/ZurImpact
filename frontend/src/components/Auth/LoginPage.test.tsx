@@ -190,10 +190,33 @@ describe('LoginPage', () => {
       });
     });
 
+    it('shows a generic error alert when the backend is unreachable (e.g. 404 / network)', async () => {
+      const user = userEvent.setup();
+      vi.mocked(authApi.login).mockRejectedValueOnce({response: {status: 404}});
+
+      renderLoginPage();
+
+      await user.type(screen.getByLabelText(/username/i), 'alice');
+      await user.type(screen.getByLabelText(/password/i), 'secret');
+      await user.click(screen.getByRole('button', {name: /sign in/i}));
+
+      await waitFor(() => {
+        expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
+      });
+    });
+
     it('navigates to /verify-email?pending=1 on 403 email_not_verified', async () => {
       const user = userEvent.setup();
       vi.mocked(authApi.login).mockRejectedValueOnce({
-        response: {status: 403, data: {message: 'email_not_verified'}},
+        response: {
+          status: 403,
+          data: {
+            type: 'https://zurimpact.ch/problems/forbidden',
+            title: 'Forbidden',
+            status: 403,
+            detail: 'email_not_verified',
+          },
+        },
       });
 
       renderLoginPage();

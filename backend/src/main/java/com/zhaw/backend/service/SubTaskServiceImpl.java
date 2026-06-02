@@ -2,6 +2,8 @@ package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.ActionType;
 import com.zhaw.backend.enums.CompletionState;
+import com.zhaw.backend.exception.BadRequestException;
+import com.zhaw.backend.exception.NotFoundException;
 import com.zhaw.backend.mappers.SubTaskMapper;
 import com.zhaw.backend.model.dao.SubTaskDao;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
@@ -34,9 +36,9 @@ public class SubTaskServiceImpl implements SubTaskService {
     }
 
     @Override
-    public List<SubTaskDto> getSubTasks(Long actionId, ActionType actionType) throws Exception {
+    public List<SubTaskDto> getSubTasks(Long actionId, ActionType actionType) {
         if (actionId == null || actionType == null) {
-            throw new Exception("Action ID and Action Type must not be null");
+            throw new BadRequestException("Action ID and Action Type must not be null");
         }
         return handlersForEntities.getOrDefault(actionType, id -> List.of()).apply(actionId);
     }
@@ -52,27 +54,27 @@ public class SubTaskServiceImpl implements SubTaskService {
     }
 
     @Override
-    public boolean completeSubTaskForUser(SubTaskCompletionRequestDto requestDto) throws Exception {
+    public boolean completeSubTaskForUser(SubTaskCompletionRequestDto requestDto) {
         return switch (requestDto.getActionType()) {
             case GPS -> completeGpsSubTaskForUser(requestDto.getUserId(), requestDto.getActionId(), requestDto.getSubTaskId(),
                     (Double) requestDto.getAdditionalData().get("latitude"), (Double) requestDto.getAdditionalData().get("longitude"));
-            default -> throw new Exception("Unsupported SubTask Type: " + requestDto.getActionType());
+            default -> throw new BadRequestException("Unsupported SubTask Type: " + requestDto.getActionType());
         };
     }
 
-    private boolean completeGpsSubTaskForUser(Long userId, Long actionId, Long subtaskId, Double latitude, Double longitude) throws Exception {
+    private boolean completeGpsSubTaskForUser(Long userId, Long actionId, Long subtaskId, Double latitude, Double longitude) {
         if (latitude == null || longitude == null) {
-            throw new Exception("GPS coordinates must not be null");
+            throw new BadRequestException("GPS coordinates must not be null");
         }
         GpsActionTask gpsActionTaskEntity;
         try {
             gpsActionTaskEntity = subTaskDao.findGpsSubTaskById(subtaskId);
         } catch (Exception e) {
-            throw new Exception("Error retrieving GPS SubTask for ID: " + subtaskId, e);
+            throw new RuntimeException("Error retrieving GPS SubTask for ID: " + subtaskId, e);
         }
         GpsActionTaskDto gpsActionTask = gpsActionTaskEntity != null ? (GpsActionTaskDto) SubTaskMapper.GpsActionTaskToDto(gpsActionTaskEntity) : null;
         if (gpsActionTask == null) {
-            throw new Exception("GPS SubTask not found for ID: " + subtaskId);
+            throw new NotFoundException("GPS SubTask not found for ID: " + subtaskId);
         }
         if(SubTaskValidator.validateGpsSubTask(latitude, longitude, gpsActionTask.getLatitude(), gpsActionTask.getLongitude(), gpsActionTask.getDistanceThresholdLevel().getOffsett())){
             return subTaskDao.completeSubTaskForUser(userId, actionId, true, subtaskId.toString());

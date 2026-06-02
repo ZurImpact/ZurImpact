@@ -1,5 +1,9 @@
 package com.zhaw.backend.controller;
 
+import com.zhaw.backend.exception.BadRequestException;
+import com.zhaw.backend.exception.ConflictException;
+import com.zhaw.backend.exception.NotFoundException;
+import com.zhaw.backend.exception.UnauthorizedException;
 import com.zhaw.backend.mappers.UserMapper;
 import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.UserResponseDto;
@@ -52,7 +56,7 @@ public class UserController {
                     return UserMapper.toResponseDto(user, hasPending);
                 })
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
     }
 
     @GetMapping("/{id}/actions")
@@ -72,7 +76,7 @@ public class UserController {
             Authentication authentication) {
         Long userId = currentUserResolver.userIdOf(authentication);
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            throw new UnauthorizedException("Not authenticated");
         }
         return getActionsForUser(userId, active);
     }
@@ -80,18 +84,18 @@ public class UserController {
     @PostMapping("/me/password-change")
     @Operation(summary = "Change password", description = "Changes the authenticated user's password and revokes all sessions including the current one — client must log in again afterwards.")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> changePassword(@Valid @RequestBody PasswordChangeRequest request,
-                                            Authentication authentication) {
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody PasswordChangeRequest request,
+                                               Authentication authentication) {
         Long userId = currentUserResolver.userIdOf(authentication);
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Not authenticated"));
+            throw new UnauthorizedException("Not authenticated");
         }
         AuthService.ChangePasswordResult result = authService.changePassword(
                 userId, request.currentPassword(), request.newPassword());
         return switch (result) {
             case SUCCESS -> ResponseEntity.noContent().build();
-            case WRONG_CURRENT -> ResponseEntity.badRequest().body(Map.of("message", "wrong_current_password"));
-            case USER_NOT_FOUND -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Not authenticated"));
+            case WRONG_CURRENT -> throw new BadRequestException("wrong_current_password");
+            case USER_NOT_FOUND -> throw new UnauthorizedException("Not authenticated");
         };
     }
 
@@ -99,20 +103,16 @@ public class UserController {
     @PostMapping("/me/name-change")
     @Operation(summary = "Change user name", description = "Changes the authenticated user's display name.")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> changeName(@RequestParam ChangeUsernameRequest request, Authentication authentication) {
+    public ResponseEntity<Void> changeName(@Valid @RequestBody ChangeUsernameRequest request, Authentication authentication) {
         Long userId = currentUserResolver.userIdOf(authentication);
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Not authenticated"));
+            throw new UnauthorizedException("Not authenticated");
         }
         String newName = request.newUsername().trim();
-        try {
-            if(!userService.changeUsername(userId, newName)) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Invalid username"));
-            }
-            return ResponseEntity.noContent().build();
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An error occurred while changing the name"));
+        if (!userService.changeUsername(userId, newName)) {
+            throw new BadRequestException("Invalid username");
         }
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/me/email-change")
@@ -122,19 +122,16 @@ public class UserController {
                                      Authentication authentication) {
         Long userId = currentUserResolver.userIdOf(authentication);
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("message", "Not authenticated"));
+            throw new UnauthorizedException("Not authenticated");
         }
 
         try {
             authService.requestEmailChange(userId, request.newEmail());
             return ResponseEntity.accepted().body(Map.of("message", "verification_sent"));
         } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", "email_in_use"));
+            throw new ConflictException("email_in_use");
         } catch (IllegalStateException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "User not found"));
+            throw new NotFoundException("User not found");
         }
     }
 
@@ -143,19 +140,15 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteAccount(Authentication authentication) {
         Long userID = currentUserResolver.userIdOf(authentication);
-        if(userID == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Not authenticated"));
+        if (userID == null) {
+            throw new UnauthorizedException("Not authenticated");
         }
         userService.deleteUserById(userID);
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Account deleted successfully"));
     }
 
     private ResponseEntity<List<UserActionHistoryDto>> getActionsForUser(Long userId, Boolean active) {
-        try {
-            return ResponseEntity.ok(userActionHistoryService.getUserActions(userId, active));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return ResponseEntity.ok(userActionHistoryService.getUserActions(userId, active));
     }
 
 }
