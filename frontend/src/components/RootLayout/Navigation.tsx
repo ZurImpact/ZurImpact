@@ -143,7 +143,7 @@ export const Navigation = () => {
             {/* Subtle separator before auth section */}
             <div className="h-5 w-px bg-border" aria-hidden="true" />
             {renderAuthLinks()}
-            {isAuthenticated && <span className="text-sm font-medium whitespace-nowrap">{currentUser?.username}</span>}
+            {isAuthenticated && <span className="text-lg font-medium whitespace-nowrap">{currentUser?.username}</span>}
             {renderPointsDisplay()}
             {renderThemeButton()}
           </div>
@@ -165,7 +165,7 @@ export const Navigation = () => {
                   {renderNavLinks(true)}
                   {/* Separator between nav and auth */}
                   <div className="h-px w-3/4 bg-border my-2" aria-hidden="true" />
-                  {isAuthenticated && <span className="text-sm font-medium">{currentUser?.username}</span>}
+                  {isAuthenticated && <span className="text-lg font-medium">{currentUser?.username}</span>}
                   {renderAuthLinks(true)}
                   {renderPointsDisplay(true)}
                 </div>
