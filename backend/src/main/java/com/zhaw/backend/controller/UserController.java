@@ -103,7 +103,7 @@ public class UserController {
     @PostMapping("/me/name-change")
     @Operation(summary = "Change user name", description = "Changes the authenticated user's display name.")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Void> changeName(@RequestParam ChangeUsernameRequest request, Authentication authentication) {
+    public ResponseEntity<Void> changeName(@Valid @RequestBody ChangeUsernameRequest request, Authentication authentication) {
         Long userId = currentUserResolver.userIdOf(authentication);
         if (userId == null) {
             throw new UnauthorizedException("Not authenticated");

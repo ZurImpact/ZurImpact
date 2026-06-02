@@ -17,9 +17,8 @@ export async function getUserById(id: number): Promise<UserDto> {
   return response.data;
 }
 
-export async function updateCurrentUserName(req: {newUsername: string}): Promise<UserDto> {
-  const response = await apiClient.post<UserDto>('/users/me/name-change', req);
-  return response.data;
+export async function updateCurrentUserName(req: {newUsername: string}): Promise<void> {
+  await apiClient.post('/users/me/name-change', req);
 }
 
 export async function updateCurrentUserEmail(req: {newEmail: string}): Promise<UserDto> {
