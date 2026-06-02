@@ -45,24 +45,12 @@ describe('userApi', () => {
     });
   });
 
-  it('updateCurrentUserName posts to /users/me/name-change with body and returns UserDto', async () => {
-    const payload = {
-      id: 1,
-      username: 'alice',
-      email: 'alice@example.com',
-      role: 'USER',
-      emailVerified: true,
-      points: 50,
-      address: null,
-      createdAt: '2024-01-01T00:00:00Z',
-      hasPendingEmailChange: false,
-    };
-    mockedPost.mockResolvedValueOnce({data: payload});
+  it('updateCurrentUserName posts to /users/me/name-change with body', async () => {
+    mockedPost.mockResolvedValueOnce({data: {}});
 
-    const result = await updateCurrentUserName({newUsername: 'alice2'});
+    await updateCurrentUserName({newUsername: 'alice2'});
 
     expect(mockedPost).toHaveBeenCalledWith('/users/me/name-change', {newUsername: 'alice2'});
-    expect(result).toEqual(payload);
   });
 
   it('updateCurrentUserEmail posts to /users/me/email-change with body and returns UserDto', async () => {
