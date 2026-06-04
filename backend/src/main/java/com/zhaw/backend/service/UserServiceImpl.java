@@ -1,5 +1,8 @@
 package com.zhaw.backend.service;
 
+import com.zhaw.backend.exception.BadRequestException;
+import com.zhaw.backend.exception.ConflictException;
+import com.zhaw.backend.exception.NotFoundException;
 import com.zhaw.backend.mappers.UserMapper;
 import com.zhaw.backend.model.dao.UserDao;
 import com.zhaw.backend.model.dto.UserDto;
@@ -95,15 +98,15 @@ public class UserServiceImpl implements UserService {
         }
         String normalized = newUsername.trim();
         if(normalized.length() < 3 || normalized.length() > 50) {
-            throw new IllegalArgumentException("Username must be between 3 and 50 characters");
+            throw new BadRequestException("Username must be between 3 and 50 characters");
         }
         Optional<User> userOptional = userDao.findById(userId);
         if(userOptional.isEmpty()){
-            throw new IllegalArgumentException("User with id " + userId + " not found");
+            throw new NotFoundException("User with id " + userId + " not found");
         }
         userOptional = userDao.findByUsername(normalized);
         if(userOptional.isPresent() && !userOptional.get().getId().equals(userId)){
-            throw new IllegalArgumentException("Username " + normalized + " is already taken");
+            throw new ConflictException("Username " + normalized + " is already taken");
         }
 
         try {

@@ -1,6 +1,7 @@
 package com.zhaw.backend.controller;
 
 import com.zhaw.backend.enums.Role;
+import com.zhaw.backend.exception.NotFoundException;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.dto.auth.DevLoginRequest;
 import com.zhaw.backend.security.AuthCookieFilter;
@@ -11,7 +12,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +39,7 @@ public class DevAuthController {
     public ResponseEntity<?> devLogin(@Valid @RequestBody DevLoginRequest request, HttpServletRequest httpRequest) {
         UserDto user = userService.findUserByUsername(request.username());
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found"));
+            throw new NotFoundException("User not found");
         }
         Role role = user.getRole() == null ? Role.ROLE_USER : user.getRole();
         String token = sessionService.createSession(user.getId());

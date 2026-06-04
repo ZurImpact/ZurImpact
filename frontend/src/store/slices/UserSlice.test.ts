@@ -118,10 +118,18 @@ describe('UserSlice', () => {
       expect(state.currentUser).toBeNull();
     });
 
-    it('uses server-provided error message on non-401 axios error', async () => {
+    it('uses the problem detail on a non-401 axios error', async () => {
       const store = createTestStore();
       mockedGet.mockRejectedValueOnce({
-        response: {status: 500, data: {error: 'Server exploded'}},
+        response: {
+          status: 500,
+          data: {
+            type: 'https://zurimpact.ch/problems/internal-error',
+            title: 'Internal Server Error',
+            status: 500,
+            detail: 'Server exploded',
+          },
+        },
       });
 
       await store.dispatch(fetchCurrentUser());
@@ -130,7 +138,7 @@ describe('UserSlice', () => {
       expect(store.getState().user.isAuthenticated).toBe(false);
     });
 
-    it('falls back to "Failed to fetch user" when axios error has no data.error', async () => {
+    it('falls back to "Failed to fetch user" when there is no problem detail', async () => {
       const store = createTestStore();
       mockedGet.mockRejectedValueOnce({response: {status: 500}});
 

@@ -1,6 +1,7 @@
 import {createSlice, createAsyncThunk, type PayloadAction} from '@reduxjs/toolkit';
 import * as authApi from '../../api/authApi';
 import * as userApi from '../../api/userApi';
+import {getProblemDetail, getHttpStatus} from '../../api/problemDetail';
 
 type OpStatus = 'idle' | 'pending' | 'fulfilled' | 'rejected';
 
@@ -35,37 +36,34 @@ const initialState: AuthState = {
   verifyEmailChange: makeIdleOp(),
 };
 
-interface AxiosErrorContext {
-  status?: number;
-  message?: string;
-}
-
-function extractAxiosErrorContext(error: unknown): AxiosErrorContext | null {
-  if (error && typeof error === 'object' && 'response' in error) {
-    const axiosError = error as {response?: {status?: number; data?: {message?: string}}};
-    return {
-      status: axiosError.response?.status,
-      message: axiosError.response?.data?.message,
-    };
-  }
-  return null;
-}
-
+// Auth flows keep an app-specific error *code* (mapped to a localized message in the
+// components) because the code drives UI branching (e.g. email_not_verified → verify page)
+// and the messages are already translated en+de. The semantic code now lives in the
+// Problem Detail `detail` field (was `message` before the RFC 9457 migration).
 function mapLoginError(error: unknown, fallback: string): string {
-  const ctx = extractAxiosErrorContext(error);
-  if (ctx) {
-    if (ctx.status === 403 && ctx.message === 'email_not_verified') return 'email_not_verified';
-    if (ctx.status === 401) return 'invalid_credentials';
-  }
+  const status = getHttpStatus(error);
+  const detail = getProblemDetail(error)?.detail;
+  if (status === 403 && detail === 'email_not_verified') return 'email_not_verified';
+  if (status === 401) return 'invalid_credentials';
   return fallback;
 }
 
 function mapChangePasswordError(error: unknown, fallback: string): string {
-  const ctx = extractAxiosErrorContext(error);
-  if (ctx && ctx.status === 400 && ctx.message === 'wrong_current_password') {
+  if (getHttpStatus(error) === 400 && getProblemDetail(error)?.detail === 'wrong_current_password') {
     return 'wrong_current_password';
   }
   return fallback;
+}
+
+// Register conflicts (409) carry which field collided in `detail`; the page maps
+// these codes onto the username/email fields. Anything else leads to generic banner.
+function mapRegisterError(error: unknown): string {
+  if (getHttpStatus(error) === 409) {
+    const detail = getProblemDetail(error)?.detail;
+    if (detail === 'username_taken') return 'username_taken';
+    if (detail === 'email_taken') return 'email_taken';
+  }
+  return 'register_failed';
 }
 
 export const loginUser = createAsyncThunk('auth/login', async (req: authApi.LoginRequest, {rejectWithValue}) => {
@@ -81,8 +79,8 @@ export const registerUser = createAsyncThunk(
   async (req: authApi.RegisterRequest, {rejectWithValue}) => {
     try {
       return await authApi.register(req);
-    } catch {
-      return rejectWithValue('register_failed');
+    } catch (error: unknown) {
+      return rejectWithValue(mapRegisterError(error));
     }
   },
 );

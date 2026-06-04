@@ -1,5 +1,7 @@
 package com.zhaw.backend.service;
 
+import com.zhaw.backend.exception.BusinessRuleException;
+import com.zhaw.backend.exception.NotFoundException;
 import com.zhaw.backend.mappers.VoucherMapper;
 import com.zhaw.backend.model.dao.VoucherCodeDao;
 import com.zhaw.backend.model.dao.VoucherDao;
@@ -51,23 +53,23 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UserVoucherDto redeemVoucher(String username, Long voucherId) throws Exception {
+    public UserVoucherDto redeemVoucher(String username, Long voucherId) {
         Voucher voucher = voucherDao.findById(voucherId)
-                .orElseThrow(() -> new Exception("Voucher not found"));
+                .orElseThrow(() -> new NotFoundException("Voucher not found"));
 
         if (!voucher.getValidUntil().isAfter(LocalDateTime.now())) {
-            throw new Exception("Voucher has expired");
+            throw new BusinessRuleException("Voucher has expired");
         }
 
         Long userId = userService.findUserByUsername(username).getId();
 
         LocalDateTime assignedAt = LocalDateTime.now();
         VoucherCode voucherCode = voucherCodeDao.findAndAssign(voucherId, userId, assignedAt)
-                .orElseThrow(() -> new Exception("No codes available"));
+                .orElseThrow(() -> new BusinessRuleException("No codes available"));
 
         boolean deducted = userService.deductPointsFromUser(userId, voucher.getPoints());
         if (!deducted) {
-            throw new Exception("Insufficient points");
+            throw new BusinessRuleException("Insufficient points");
         }
 
         return UserVoucherDto.builder()

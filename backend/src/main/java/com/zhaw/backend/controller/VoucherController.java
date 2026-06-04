@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Voucher catalogue and redemption. The service throws typed exceptions
+ * ({@code NotFoundException}, {@code BusinessRuleException}) that the
+ * {@code GlobalExceptionHandler} renders as RFC 9457 problems.
+ */
 @RestController
 @RequestMapping("/api/vouchers")
 @RequiredArgsConstructor
@@ -19,25 +24,11 @@ public class VoucherController {
 
     @GetMapping
     public ResponseEntity<List<VoucherDto>> getAllVouchers() {
-        try {
-            List<VoucherDto> vouchers = voucherService.getAllVouchers();
-            return ResponseEntity.ok(vouchers);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
-        }
+        return ResponseEntity.ok(voucherService.getAllVouchers());
     }
 
     @PostMapping("/{voucherId}/redeem")
-    public ResponseEntity<?> redeemVoucher(@PathVariable Long voucherId, Authentication authentication) {
-        try {
-            UserVoucherDto result = voucherService.redeemVoucher(authentication.getName(), voucherId);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            String message = e.getMessage();
-            if ("Voucher not found".equals(message)) {
-                return ResponseEntity.status(404).body(message);
-            }
-            return ResponseEntity.badRequest().body(message);
-        }
+    public ResponseEntity<UserVoucherDto> redeemVoucher(@PathVariable Long voucherId, Authentication authentication) {
+        return ResponseEntity.ok(voucherService.redeemVoucher(authentication.getName(), voucherId));
     }
 }

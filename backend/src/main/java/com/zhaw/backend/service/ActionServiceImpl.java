@@ -7,10 +7,8 @@ import com.zhaw.backend.model.dao.ActionDao;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubTaskDto;
-import com.zhaw.backend.model.dto.UserActionHistoryDto;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
 import com.zhaw.backend.model.entities.Action;
-import com.zhaw.backend.model.entities.SubTask;
 import com.zhaw.backend.validator.ActionValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,7 +39,7 @@ public class ActionServiceImpl implements ActionService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<ActionDto> getActions(String text, Integer points, String tags, LocalDateTime validUntil) throws Exception {
+    public List<ActionDto> getActions(String text, Integer points, String tags, LocalDateTime validUntil) {
         ActionFilterDto filter = ActionFilterMapper.fromRequest(text, points, tags, validUntil);
         List<Action> actionsList = actionDao.findAllFiltered(filter);
         List<ActionDto> actionDtoList = ActionMapper.toDtoList(actionsList);
@@ -56,7 +54,7 @@ public class ActionServiceImpl implements ActionService {
     }
 
     @Override
-    public ActionDto getActionById(Long actionId) throws Exception{
+    public ActionDto getActionById(Long actionId) {
         Action action = actionDao.findById(actionId);
         if (action != null) {
             ActionDto actionDto = ActionMapper.toDto(action);
@@ -71,7 +69,7 @@ public class ActionServiceImpl implements ActionService {
         }
     }
 
-    private List<SubTaskDto> getSubTasks(Long actionId, ActionType actionType) throws Exception {
+    private List<SubTaskDto> getSubTasks(Long actionId, ActionType actionType) {
         return subTaskService.getSubTasks(actionId, actionType);
     }
 
@@ -96,7 +94,7 @@ public class ActionServiceImpl implements ActionService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean completeActionForUser(Long userId, Long actionId) throws Exception {
+    public boolean completeActionForUser(Long userId, Long actionId) {
         if(ActionValidator.validateActionCompletion(subTaskService.getSubTasksCompletionStatesForUser(userId,actionId)) ){
             boolean successCompletion = actionDao.completeAction(userId, actionId, false, null);
             if(successCompletion){
@@ -104,10 +102,10 @@ public class ActionServiceImpl implements ActionService {
                 if (success){
                     return true;
                 } else {
-                    throw new Exception("Failed to add points to user after completing action");
+                    throw new RuntimeException("Failed to add points to user after completing action");
                 }
             } else {
-                throw new Exception("Failed to complete action for user");
+                throw new RuntimeException("Failed to complete action for user");
             }
         }
         return false;

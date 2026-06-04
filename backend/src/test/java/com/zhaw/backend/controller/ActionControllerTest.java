@@ -1,5 +1,6 @@
 package com.zhaw.backend.controller;
 
+import com.zhaw.backend.exception.NotFoundException;
 import com.zhaw.backend.model.dto.ActionDto;
 import com.zhaw.backend.service.ActionService;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +42,7 @@ class ActionControllerTest {
 
         @Test
         @DisplayName("returns 200 with actions when service succeeds")
-        void returns200WhenServiceSucceeds() throws Exception {
+        void returns200WhenServiceSucceeds() {
             LocalDateTime validUntil = LocalDateTime.of(2026, 12, 1, 10, 0);
             when(actionService.getActions("bike", 10, "FOOD", validUntil)).thenReturn(List.of(actionDto(1L)));
 
@@ -53,13 +55,11 @@ class ActionControllerTest {
         }
 
         @Test
-        @DisplayName("returns 500 when service throws exception")
-        void returns500WhenServiceThrows() throws Exception {
+        @DisplayName("propagates service exception to the global handler")
+        void propagatesWhenServiceThrows() {
             when(actionService.getActions(null, null, null, null)).thenThrow(new RuntimeException("db error"));
 
-            ResponseEntity<List<ActionDto>> response = actionController.getActions(null, null, null, null);
-
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertThrows(RuntimeException.class, () -> actionController.getActions(null, null, null, null));
         }
     }
 
@@ -69,7 +69,7 @@ class ActionControllerTest {
 
         @Test
         @DisplayName("returns 200 when action exists")
-        void returns200WhenActionExists() throws Exception {
+        void returns200WhenActionExists() {
             when(actionService.getActionById(1L)).thenReturn(actionDto(1L));
 
             ResponseEntity<ActionDto> response = actionController.getAction(1L);
@@ -80,23 +80,19 @@ class ActionControllerTest {
         }
 
         @Test
-        @DisplayName("returns 404 when action does not exist")
-        void returns404WhenActionDoesNotExist() throws Exception {
+        @DisplayName("throws NotFoundException when action does not exist")
+        void throwsNotFoundWhenActionDoesNotExist() {
             when(actionService.getActionById(99L)).thenReturn(null);
 
-            ResponseEntity<ActionDto> response = actionController.getAction(99L);
-
-            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertThrows(NotFoundException.class, () -> actionController.getAction(99L));
         }
 
         @Test
-        @DisplayName("returns 500 when service throws exception")
-        void returns500WhenServiceThrows() throws Exception {
+        @DisplayName("propagates service exception to the global handler")
+        void propagatesWhenServiceThrows() {
             when(actionService.getActionById(1L)).thenThrow(new RuntimeException("db error"));
 
-            ResponseEntity<ActionDto> response = actionController.getAction(1L);
-
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertThrows(RuntimeException.class, () -> actionController.getAction(1L));
         }
     }
 
@@ -119,14 +115,12 @@ class ActionControllerTest {
         }
 
         @Test
-        @DisplayName("returns 500 when create throws exception")
-        void returns500WhenCreateThrows() {
+        @DisplayName("propagates service exception to the global handler")
+        void propagatesWhenCreateThrows() {
             ActionDto input = actionDto(null);
             when(actionService.createAction(input)).thenThrow(new RuntimeException("db error"));
 
-            ResponseEntity<ActionDto> response = actionController.createAction(input);
-
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertThrows(RuntimeException.class, () -> actionController.createAction(input));
         }
     }
 
@@ -146,25 +140,21 @@ class ActionControllerTest {
         }
 
         @Test
-        @DisplayName("returns 404 when action was not found")
-        void returns404WhenNotFound() {
+        @DisplayName("throws NotFoundException when action was not found")
+        void throwsNotFoundWhenNotFound() {
             ActionDto dto = actionDto(99L);
             when(actionService.updateAction(99L, dto)).thenReturn(false);
 
-            ResponseEntity<Void> response = actionController.updateAction(99L, dto);
-
-            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertThrows(NotFoundException.class, () -> actionController.updateAction(99L, dto));
         }
 
         @Test
-        @DisplayName("returns 500 when update throws exception")
-        void returns500WhenUpdateThrows() {
+        @DisplayName("propagates service exception to the global handler")
+        void propagatesWhenUpdateThrows() {
             ActionDto dto = actionDto(1L);
             when(actionService.updateAction(1L, dto)).thenThrow(new RuntimeException("db error"));
 
-            ResponseEntity<Void> response = actionController.updateAction(1L, dto);
-
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertThrows(RuntimeException.class, () -> actionController.updateAction(1L, dto));
         }
     }
 
@@ -183,23 +173,19 @@ class ActionControllerTest {
         }
 
         @Test
-        @DisplayName("returns 404 when action was not found")
-        void returns404WhenNotFound() {
+        @DisplayName("throws NotFoundException when action was not found")
+        void throwsNotFoundWhenNotFound() {
             when(actionService.deleteAction(99L)).thenReturn(false);
 
-            ResponseEntity<Void> response = actionController.deleteAction(99L);
-
-            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertThrows(NotFoundException.class, () -> actionController.deleteAction(99L));
         }
 
         @Test
-        @DisplayName("returns 500 when delete throws exception")
-        void returns500WhenDeleteThrows() {
+        @DisplayName("propagates service exception to the global handler")
+        void propagatesWhenDeleteThrows() {
             when(actionService.deleteAction(1L)).thenThrow(new RuntimeException("db error"));
 
-            ResponseEntity<Void> response = actionController.deleteAction(1L);
-
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertThrows(RuntimeException.class, () -> actionController.deleteAction(1L));
         }
     }
 
@@ -217,18 +203,16 @@ class ActionControllerTest {
         }
 
         @Test
-        @DisplayName("startAction returns 500 on exception")
-        void startActionReturns500OnException() {
+        @DisplayName("startAction propagates service exception")
+        void startActionPropagatesException() {
             when(actionService.startActionForUser(1L, 2L, true, "5")).thenThrow(new RuntimeException("db error"));
 
-            ResponseEntity<Void> response = actionController.startAction(1L, 2L, true, "5");
-
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertThrows(RuntimeException.class, () -> actionController.startAction(1L, 2L, true, "5"));
         }
 
         @Test
         @DisplayName("completeAction returns 200 on success")
-        void completeActionReturns200OnSuccess() throws Exception {
+        void completeActionReturns200OnSuccess() {
             ResponseEntity<Void> response = actionController.completeAction(1L, 2L);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -236,13 +220,11 @@ class ActionControllerTest {
         }
 
         @Test
-        @DisplayName("completeAction returns 500 on exception")
-        void completeActionReturns500OnException() throws Exception {
-            when(actionService.completeActionForUser(1L, 2L)).thenThrow(new Exception("failed"));
+        @DisplayName("completeAction propagates service exception")
+        void completeActionPropagatesException() {
+            when(actionService.completeActionForUser(1L, 2L)).thenThrow(new RuntimeException("failed"));
 
-            ResponseEntity<Void> response = actionController.completeAction(1L, 2L);
-
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertThrows(RuntimeException.class, () -> actionController.completeAction(1L, 2L));
         }
 
         @Test
@@ -255,14 +237,11 @@ class ActionControllerTest {
         }
 
         @Test
-        @DisplayName("cancelAction returns 500 on exception")
-        void cancelActionReturns500OnException() {
+        @DisplayName("cancelAction propagates service exception")
+        void cancelActionPropagatesException() {
             when(actionService.deleteActionForUser(1L, 2L)).thenThrow(new RuntimeException("db error"));
 
-            ResponseEntity<Void> response = actionController.cancelAction(1L, 2L);
-
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertThrows(RuntimeException.class, () -> actionController.cancelAction(1L, 2L));
         }
     }
 }
-
