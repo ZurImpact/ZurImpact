@@ -508,7 +508,13 @@ app.post(BASE_URL + '/auth/login', (req, res) => {
     return res.status(401).json({message: 'invalid_credentials'});
   }
   if (!user.emailVerified) {
-    return res.status(403).json({message: 'email_not_verified'});
+    // RFC 9457 problem-detail shape — the FE branches on `detail`, not `message`.
+    return res.status(403).json({
+      type: 'about:blank',
+      title: 'Forbidden',
+      status: 403,
+      detail: 'email_not_verified',
+    });
   }
   const sid = newSessionId();
   sessions.set(sid, {userId: user.id});
