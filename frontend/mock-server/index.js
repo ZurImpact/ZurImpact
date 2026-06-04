@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import {randomBytes} from 'node:crypto';
-import {loadJSON} from './fileManager.ts';
+import {loadJSON} from './fileManager.js';
 
 // =============================================================================
 // DEV-ONLY MOCK SERVER — NOT FOR PRODUCTION USE.
