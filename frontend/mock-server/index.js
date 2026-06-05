@@ -261,7 +261,6 @@ app.get(BASE_URL + '/vouchers', (req, res) => {
 
 app.post(BASE_URL + '/vouchers/:voucherId/redeem', (req, res) => {
   const ctx = currentUserFromReq(req);
-  const ctx = currentUserFromReq(req);
   if (!ctx)
     return res.status(401).json({type: 'about:blank', title: 'Unauthorized', status: 401, detail: 'not_authenticated'});
 
