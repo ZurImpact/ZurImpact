@@ -18,8 +18,8 @@ export default defineConfig({
   // Tests share a single mock server, and /_test/reset wipes all sessions.
   // Parallel workers would race on reset and evict each other's auth cookies,
   // so the suite must run serially until the mock learns to scope state per
-  // worker. fullyParallel stays true so tests within a file can interleave
-  // within the single worker.
+  // worker. fullyParallel is left enabled so we can increase `workers` later without changing
+  // per-file parallelization semantics; with `workers: 1` the suite still runs serially.
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
