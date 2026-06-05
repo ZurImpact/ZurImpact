@@ -24,12 +24,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link UserServiceImpl}.
@@ -61,7 +56,7 @@ class UserServiceImplTest {
         sampleUser.setCreatedAt(LocalDateTime.of(2025, 1, 1, 12, 0));
     }
 
-    private User user(String username, String rawPassword, Role role, boolean verified){
+    private User user(String username, String rawPassword, Role role, boolean verified) {
         return User.builder().id(11L)
                 .username(username)
                 .email(username + "@example.com")
@@ -344,7 +339,7 @@ class UserServiceImplTest {
         when(userDao.findByUsername("existing")).thenReturn(Optional.of(other));
 
         assertThrows(ConflictException.class,
-            () -> userService.changeUsername(11L, "existing"));
+                () -> userService.changeUsername(11L, "existing"));
 
         verify(userDao, never()).updateUsername(anyLong(), anyString());
     }

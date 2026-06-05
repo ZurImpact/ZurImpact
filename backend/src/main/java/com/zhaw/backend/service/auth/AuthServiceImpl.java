@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
             throw new DisabledException("email_not_verified");
         }
 
-        if(user.getRole() == null){
+        if (user.getRole() == null) {
             throw new DisabledException("No user role assigned");
         }
 
@@ -86,7 +86,9 @@ public class AuthServiceImpl implements AuthService {
         mailService.sendVerificationEmail(email, username, token);
     }
 
-    /** Re-sends a verification email for an existing unverified account. Always silent. */
+    /**
+     * Re-sends a verification email for an existing unverified account. Always silent.
+     */
     @Override
     @Transactional
     public void resendVerification(String email) {
@@ -103,7 +105,9 @@ public class AuthServiceImpl implements AuthService {
         mailService.sendVerificationEmail(user.getEmail(), user.getUsername(), token);
     }
 
-    /** Consumes a single-use verification token. Returns true on success. */
+    /**
+     * Consumes a single-use verification token. Returns true on success.
+     */
     @Override
     @Transactional
     public boolean verifyEmail(String rawToken) {
@@ -114,7 +118,9 @@ public class AuthServiceImpl implements AuthService {
         }).orElse(Boolean.FALSE);
     }
 
-    /** Sends a password-reset email if the address belongs to a verified account. Always silent. */
+    /**
+     * Sends a password-reset email if the address belongs to a verified account. Always silent.
+     */
     @Override
     @Transactional
     public void requestPasswordReset(String email) {

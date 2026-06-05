@@ -7,15 +7,11 @@ import com.zhaw.backend.exception.ForbiddenException;
 import com.zhaw.backend.exception.UnauthorizedException;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.dto.UserResponseDto;
-import com.zhaw.backend.model.dto.auth.EmailRequest;
-import com.zhaw.backend.model.dto.auth.LoginRequest;
-import com.zhaw.backend.model.dto.auth.PasswordResetConfirmRequest;
-import com.zhaw.backend.model.dto.auth.RegisterRequest;
-import com.zhaw.backend.model.dto.auth.VerifyEmailRequest;
+import com.zhaw.backend.model.dto.auth.*;
 import com.zhaw.backend.security.AuthenticatedUser;
+import com.zhaw.backend.service.UserService;
 import com.zhaw.backend.service.auth.AuthService;
 import com.zhaw.backend.service.session.SessionService;
-import com.zhaw.backend.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,10 +42,14 @@ import static org.mockito.Mockito.*;
 @DisplayName("AuthController - Unit Tests")
 class AuthControllerTest {
 
-    @Mock private AuthService authService;
-    @Mock private SessionService sessionService;
-    @Mock private UserService userService;
-    @Mock private HttpServletRequest request;
+    @Mock
+    private AuthService authService;
+    @Mock
+    private SessionService sessionService;
+    @Mock
+    private UserService userService;
+    @Mock
+    private HttpServletRequest request;
 
     @InjectMocks
     private AuthController controller;

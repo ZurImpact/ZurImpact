@@ -92,7 +92,7 @@ public class UserDao {
                 newEmail, userId);
     }
 
-    public void updateUsername(Long userId, String newUsername){
+    public void updateUsername(Long userId, String newUsername) {
         jdbc.update(
                 "UPDATE users SET username = ? WHERE id = ?",
                 newUsername, userId);

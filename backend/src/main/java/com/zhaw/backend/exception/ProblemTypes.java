@@ -10,7 +10,9 @@ package com.zhaw.backend.exception;
  */
 public final class ProblemTypes {
 
-    /** Base URI for all problem types. Slugs are appended, e.g. {@code BASE + "not-found"}. */
+    /**
+     * Base URI for all problem types. Slugs are appended, e.g. {@code BASE + "not-found"}.
+     */
     public static final String BASE = "https://zurimpact.ch/problems/";
 
     public static final String VALIDATION_ERROR = "validation-error";

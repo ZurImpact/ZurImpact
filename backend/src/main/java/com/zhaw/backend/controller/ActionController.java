@@ -36,9 +36,9 @@ public class ActionController {
     /**
      * Returns all actions, optionally filtered by text, points, tags, and expiry date.
      *
-     * @param text      case-insensitive search across description and displayName
-     * @param points    exact points value to filter by
-     * @param tags      comma-separated tag names to filter by
+     * @param text       case-insensitive search across description and displayName
+     * @param points     exact points value to filter by
+     * @param tags       comma-separated tag names to filter by
      * @param validUntil only return actions valid up to this timestamp
      * @return list of matching actions including their subtasks
      */
@@ -121,9 +121,9 @@ public class ActionController {
     /**
      * Starts an action for a user by creating an IN_PROGRESS mapping in the database.
      *
-     * @param userId      the user ID
-     * @param actionId    the action ID to start
-     * @param isSubtask   whether this is a subtask interaction
+     * @param userId    the user ID
+     * @param actionId  the action ID to start
+     * @param isSubtask whether this is a subtask interaction
      * @param subtaskId the subtask ID, if applicable
      * @return 200 on success
      */
@@ -141,8 +141,8 @@ public class ActionController {
     /**
      * Marks an action as completed for a user by adding a COMPLETED mapping in the database.
      *
-     * @param userId      the user ID
-     * @param actionId    the action ID to complete
+     * @param userId   the user ID
+     * @param actionId the action ID to complete
      * @return 200 on success
      */
     @PostMapping("/completeAction")

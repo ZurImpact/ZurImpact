@@ -1,7 +1,10 @@
 package com.zhaw.backend.model.dto;
 
 import com.zhaw.backend.enums.DistanceThresholdLevel;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Getter

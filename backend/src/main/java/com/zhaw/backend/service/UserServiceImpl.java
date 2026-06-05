@@ -97,15 +97,15 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         String normalized = newUsername.trim();
-        if(normalized.length() < 3 || normalized.length() > 50) {
+        if (normalized.length() < 3 || normalized.length() > 50) {
             throw new BadRequestException("Username must be between 3 and 50 characters");
         }
         Optional<User> userOptional = userDao.findById(userId);
-        if(userOptional.isEmpty()){
+        if (userOptional.isEmpty()) {
             throw new NotFoundException("User with id " + userId + " not found");
         }
         userOptional = userDao.findByUsername(normalized);
-        if(userOptional.isPresent() && !userOptional.get().getId().equals(userId)){
+        if (userOptional.isPresent() && !userOptional.get().getId().equals(userId)) {
             throw new ConflictException("Username " + normalized + " is already taken");
         }
 

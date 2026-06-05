@@ -17,10 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
@@ -28,9 +25,12 @@ import static org.mockito.Mockito.when;
 @DisplayName("DevAuthController - Unit Tests")
 class DevAuthControllerTest {
 
-    @Mock private UserService userService;
-    @Mock private SessionService sessionService;
-    @Mock private HttpServletRequest request;
+    @Mock
+    private UserService userService;
+    @Mock
+    private SessionService sessionService;
+    @Mock
+    private HttpServletRequest request;
 
     @InjectMocks
     private DevAuthController controller;

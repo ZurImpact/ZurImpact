@@ -19,10 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class AuthServiceTest {
@@ -262,7 +259,7 @@ class AuthServiceTest {
         when(userDao.findById(11L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalStateException.class,
-            () -> authService.requestEmailChange(11L, "newemail@example.com"));
+                () -> authService.requestEmailChange(11L, "newemail@example.com"));
     }
 
     @Test
@@ -274,7 +271,7 @@ class AuthServiceTest {
         when(userDao.findByEmail("existing@example.com")).thenReturn(Optional.of(other));
 
         assertThrows(IllegalArgumentException.class,
-            () -> authService.requestEmailChange(11L, "existing@example.com"));
+                () -> authService.requestEmailChange(11L, "existing@example.com"));
     }
 
     @Test

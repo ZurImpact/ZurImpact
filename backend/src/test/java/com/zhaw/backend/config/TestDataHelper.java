@@ -17,9 +17,12 @@ import java.util.UUID;
  */
 public final class TestDataHelper {
 
-    private TestDataHelper() {}
+    private TestDataHelper() {
+    }
 
-    /** Inserts a minimal address row and returns its generated ID. */
+    /**
+     * Inserts a minimal address row and returns its generated ID.
+     */
     public static Long insertAddress(JdbcTemplate jdbc) {
         KeyHolder kh = new GeneratedKeyHolder();
         jdbc.update(connection -> {

@@ -7,7 +7,8 @@ import org.springframework.security.core.Authentication;
 
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DisplayName("CurrentUserResolver - Unit Tests")
 class CurrentUserResolverTest {

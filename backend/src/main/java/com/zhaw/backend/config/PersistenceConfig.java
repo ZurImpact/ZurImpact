@@ -25,12 +25,12 @@ import java.util.Properties;
 
 /**
  * Persistence configuration: DataSource → Flyway → JPA/Hibernate.
- *
+ * <p>
  * Credentials are read from environment variables (DB_URL, DB_USER,
  * DB_PASSWORD).
  * Copy .env.example to .env and set real values for local development.
  * In Kubernetes, inject these as Secret-backed env vars in the pod spec.
- *
+ * <p>
  * Flyway runs migrations BEFORE the EntityManagerFactory is created,
  * so Hibernate's "validate" mode will always see the correct schema.
  */

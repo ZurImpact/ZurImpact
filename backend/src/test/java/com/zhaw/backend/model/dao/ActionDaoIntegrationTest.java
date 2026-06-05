@@ -1,8 +1,8 @@
 package com.zhaw.backend.model.dao;
 
 import com.zhaw.backend.config.DockerAvailableCondition;
-import com.zhaw.backend.config.TestDatabaseConfig;
 import com.zhaw.backend.config.TestDataHelper;
+import com.zhaw.backend.config.TestDatabaseConfig;
 import com.zhaw.backend.enums.CompletionState;
 import com.zhaw.backend.mappers.ActionFilterMapper;
 import com.zhaw.backend.model.dto.filters.ActionFilterDto;
@@ -92,9 +92,9 @@ class ActionDaoIntegrationTest {
 
             // The result should NOT contain the expired action
             assertTrue(result.stream().anyMatch(a -> a.getId().equals(validId)),
-                "Valid action should be present");
+                    "Valid action should be present");
             assertFalse(result.stream().anyMatch(a -> a.getId().equals(expiredId)),
-                "Expired action should be filtered out");
+                    "Expired action should be filtered out");
         }
 
         @Test

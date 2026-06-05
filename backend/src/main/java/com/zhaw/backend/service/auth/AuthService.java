@@ -1,6 +1,7 @@
 package com.zhaw.backend.service.auth;
 
 import com.zhaw.backend.enums.Role;
+
 public interface AuthService {
     AuthResult authenticate(String username, String rawPassword);
 
@@ -16,7 +17,8 @@ public interface AuthService {
 
     ChangePasswordResult changePassword(Long userId, String currentPassword, String newPassword);
 
-    record AuthResult(Long userId, String username, Role role) {}
+    record AuthResult(Long userId, String username, Role role) {
+    }
 
     enum ChangePasswordResult {
         SUCCESS, WRONG_CURRENT, USER_NOT_FOUND

@@ -10,11 +10,11 @@ import com.zhaw.backend.model.dto.auth.ChangeUsernameRequest;
 import com.zhaw.backend.model.dto.auth.PasswordChangeRequest;
 import com.zhaw.backend.model.entities.User;
 import com.zhaw.backend.security.AuthenticatedUser;
-import com.zhaw.backend.service.auth.AuthService;
-import com.zhaw.backend.service.auth.EmailChangeTokenService;
 import com.zhaw.backend.security.CurrentUserResolver;
 import com.zhaw.backend.service.UserActionHistoryService;
 import com.zhaw.backend.service.UserService;
+import com.zhaw.backend.service.auth.AuthService;
+import com.zhaw.backend.service.auth.EmailChangeTokenService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,23 +33,23 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UserController - Unit Tests")
 class UserControllerTest {
 
-    @Mock private UserService userService;
-    @Mock private UserActionHistoryService userActionHistoryService;
-    @Mock private AuthService authService;
-    @Mock private EmailChangeTokenService emailChangeTokenService;
-    @Mock private CurrentUserResolver currentUserResolver;
+    @Mock
+    private UserService userService;
+    @Mock
+    private UserActionHistoryService userActionHistoryService;
+    @Mock
+    private AuthService authService;
+    @Mock
+    private EmailChangeTokenService emailChangeTokenService;
+    @Mock
+    private CurrentUserResolver currentUserResolver;
 
     @InjectMocks
     private UserController controller;

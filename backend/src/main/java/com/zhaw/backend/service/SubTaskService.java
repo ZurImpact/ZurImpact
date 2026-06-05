@@ -1,8 +1,8 @@
 package com.zhaw.backend.service;
 
 import com.zhaw.backend.enums.ActionType;
-import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.enums.CompletionState;
+import com.zhaw.backend.model.dto.GpsActionTaskDto;
 import com.zhaw.backend.model.dto.SubTaskCompletionRequestDto;
 import com.zhaw.backend.model.dto.SubTaskDto;
 

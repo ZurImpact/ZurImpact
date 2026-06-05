@@ -21,7 +21,9 @@ public class EmailVerificationTokenService {
 
     private final EmailVerificationTokenDao dao;
 
-    /** Creates a token for the user and returns the raw token (to embed in the email). */
+    /**
+     * Creates a token for the user and returns the raw token (to embed in the email).
+     */
     @Transactional
     public String issue(Long userId) {
         String raw = TokenHashing.randomHexToken();

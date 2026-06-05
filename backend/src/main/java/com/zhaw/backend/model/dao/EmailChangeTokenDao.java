@@ -59,8 +59,8 @@ public class EmailChangeTokenDao {
 
     public boolean hasValidPendingToken(Long userId) {
         Integer count = jdbc.queryForObject(
-            "SELECT COUNT(*) FROM email_change_token WHERE user_id = ? AND consumed_at IS NULL AND expires_at > CURRENT_TIMESTAMP",
-            Integer.class, userId
+                "SELECT COUNT(*) FROM email_change_token WHERE user_id = ? AND consumed_at IS NULL AND expires_at > CURRENT_TIMESTAMP",
+                Integer.class, userId
         );
         return count != null && count > 0;
     }

@@ -1,8 +1,8 @@
 package com.zhaw.backend.model.dao;
 
 import com.zhaw.backend.config.DockerAvailableCondition;
-import com.zhaw.backend.config.TestDatabaseConfig;
 import com.zhaw.backend.config.TestDataHelper;
+import com.zhaw.backend.config.TestDatabaseConfig;
 import com.zhaw.backend.enums.CompletionState;
 import com.zhaw.backend.model.entities.UserActionHistory;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +19,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(DockerAvailableCondition.class)
 @SpringJUnitConfig(TestDatabaseConfig.class)

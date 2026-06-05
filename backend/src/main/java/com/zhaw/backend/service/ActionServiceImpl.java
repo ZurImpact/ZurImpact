@@ -31,9 +31,10 @@ public class ActionServiceImpl implements ActionService {
 
     /**
      * Gets all Actions in DB available with filtering options for text, points, tags and validUntil
-     * @param text gets all Actions with text in description or displayName, case-insensitive
-     * @param points points limit
-     * @param tags filters on specific tasks
+     *
+     * @param text       gets all Actions with text in description or displayName, case-insensitive
+     * @param points     points limit
+     * @param tags       filters on specific tasks
      * @param validUntil filters on validUntil, gets all Actions with validUntil before the given date
      * @return List of all Actions available in DB with filtering options for text, points, tags and validUntil
      */
@@ -44,8 +45,8 @@ public class ActionServiceImpl implements ActionService {
         List<Action> actionsList = actionDao.findAllFiltered(filter);
         List<ActionDto> actionDtoList = ActionMapper.toDtoList(actionsList);
 
-        for(ActionDto actionDto : actionDtoList){
-            if(actionDto.getHasSubtasks()) {
+        for (ActionDto actionDto : actionDtoList) {
+            if (actionDto.getHasSubtasks()) {
                 actionDto.setSubTasks(getSubTasks(actionDto.getId(), actionDto.getType()));
             }
         }
@@ -59,7 +60,7 @@ public class ActionServiceImpl implements ActionService {
         if (action != null) {
             ActionDto actionDto = ActionMapper.toDto(action);
 
-            if(actionDto.getHasSubtasks()){
+            if (actionDto.getHasSubtasks()) {
                 actionDto.setSubTasks(getSubTasks(actionDto.getId(), actionDto.getType()));
             }
 
@@ -74,10 +75,10 @@ public class ActionServiceImpl implements ActionService {
     }
 
 
-
     /**
      * Starts an action for a user, creates a mapping in DB with state "IN_PROGRESS"
-     * @param userId id of the user for which the action should be started
+     *
+     * @param userId   id of the user for which the action should be started
      * @param actionId id of the action which should be started
      * @return true if the action was successfully started, false if not (e.g. if the mapping already exists)
      */
@@ -88,18 +89,19 @@ public class ActionServiceImpl implements ActionService {
 
     /**
      * Completes an action for a user, updates the mapping in DB to state "COMPLETED"
-     * @param userId id of the user for which the action should be completed
+     *
+     * @param userId   id of the user for which the action should be completed
      * @param actionId id of the action which should be completed
      * @return true if the action was successfully completed, false if not (e.g. if the mapping does not exist or is already completed)
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean completeActionForUser(Long userId, Long actionId) {
-        if(ActionValidator.validateActionCompletion(subTaskService.getSubTasksCompletionStatesForUser(userId,actionId)) ){
+        if (ActionValidator.validateActionCompletion(subTaskService.getSubTasksCompletionStatesForUser(userId, actionId))) {
             boolean successCompletion = actionDao.completeAction(userId, actionId, false, null);
-            if(successCompletion){
+            if (successCompletion) {
                 boolean success = userService.addPointsToUser(userId, actionDao.getPointsForAction(actionId));
-                if (success){
+                if (success) {
                     return true;
                 } else {
                     throw new RuntimeException("Failed to add points to user after completing action");
@@ -112,7 +114,7 @@ public class ActionServiceImpl implements ActionService {
     }
 
     @Override
-    public boolean deleteActionForUser(Long userId, Long actionId){
+    public boolean deleteActionForUser(Long userId, Long actionId) {
         return actionDao.deleteAction(userId, actionId);
     }
 
