@@ -1,7 +1,7 @@
 import {test, expect} from '../fixtures/test';
 
 test.describe('i18n / language switch', () => {
-  test('renders the login page in German when the i18nextLng cookie is set to de', async ({page, context}) => {
+  test('renders the login page in German when the i18nextLng localStorage key is set to de', async ({page, context}) => {
     // i18next-browser-languagedetector reads `i18nextLng` from localStorage first
     // (see frontend/src/utility/i18n.ts). Seed it before the app boots.
     await context.addInitScript(() => {
