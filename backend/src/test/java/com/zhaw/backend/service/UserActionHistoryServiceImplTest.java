@@ -24,7 +24,7 @@ public class UserActionHistoryServiceImplTest {
 
     @Mock
     private UserActionHistoryDao userActionHistoryDao;
-    
+
     private UserActionHistoryServiceImpl userActionHistoryService;
 
     @BeforeEach

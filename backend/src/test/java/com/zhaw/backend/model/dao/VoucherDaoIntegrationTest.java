@@ -1,8 +1,8 @@
 package com.zhaw.backend.model.dao;
 
 import com.zhaw.backend.config.DockerAvailableCondition;
-import com.zhaw.backend.config.TestDatabaseConfig;
 import com.zhaw.backend.config.TestDataHelper;
+import com.zhaw.backend.config.TestDatabaseConfig;
 import com.zhaw.backend.model.entities.Voucher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

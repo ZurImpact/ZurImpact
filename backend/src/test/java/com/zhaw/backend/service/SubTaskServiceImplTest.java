@@ -21,7 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubTaskServiceImpl - Unit Tests")
@@ -70,7 +71,7 @@ class SubTaskServiceImplTest {
         void shouldThrowExceptionWhenActionIdIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subTaskService.getSubTasks(null, ActionType.GPS));
+                    subTaskService.getSubTasks(null, ActionType.GPS));
             assertEquals("Action ID and Action Type must not be null", exception.getMessage());
         }
 
@@ -79,7 +80,7 @@ class SubTaskServiceImplTest {
         void shouldThrowExceptionWhenActionTypeIsNull() {
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subTaskService.getSubTasks(1L, null));
+                    subTaskService.getSubTasks(1L, null));
             assertEquals("Action ID and Action Type must not be null", exception.getMessage());
         }
     }
@@ -126,6 +127,7 @@ class SubTaskServiceImplTest {
             // Then
             assertTrue(result);
         }
+
         @Test
         @DisplayName("Should complete GPS subtask successfully when coordinates are inside medium threshold")
         void shouldCompleteMediumGpsSubTaskSuccessfully() throws Exception {
@@ -260,7 +262,7 @@ class SubTaskServiceImplTest {
 
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subTaskService.completeSubTaskForUser(requestDto));
+                    subTaskService.completeSubTaskForUser(requestDto));
             assertEquals("GPS coordinates must not be null", exception.getMessage());
         }
 
@@ -285,7 +287,7 @@ class SubTaskServiceImplTest {
 
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subTaskService.completeSubTaskForUser(requestDto));
+                    subTaskService.completeSubTaskForUser(requestDto));
             assertTrue(exception.getMessage().contains("GPS SubTask not found"));
         }
 
@@ -304,7 +306,7 @@ class SubTaskServiceImplTest {
 
             // When & Then
             Exception exception = assertThrows(Exception.class, () ->
-                subTaskService.completeSubTaskForUser(requestDto));
+                    subTaskService.completeSubTaskForUser(requestDto));
             assertTrue(exception.getMessage().contains("Unsupported SubTask Type"));
         }
 

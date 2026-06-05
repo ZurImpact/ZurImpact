@@ -21,7 +21,7 @@ public class DockerAvailableCondition implements ExecutionCondition {
         } catch (Exception e) {
             return ConditionEvaluationResult.disabled(
                     "Docker is not available — skipping integration test. " +
-                    "Start Docker Desktop and re-run to execute this test.");
+                            "Start Docker Desktop and re-run to execute this test.");
         }
     }
 }
