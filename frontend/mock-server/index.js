@@ -272,7 +272,9 @@ app.post(BASE_URL + '/vouchers/:voucherId/redeem', (req, res) => {
   if (reward.available <= 0)
     return res.status(400).json({type: 'about:blank', title: 'Bad Request', status: 400, detail: 'No codes available'});
   if (mockUserPoints.points < reward.points)
-    return res.status(400).json({type: 'about:blank', title: 'Bad Request', status: 400, detail: 'Insufficient points'});
+    return res
+      .status(400)
+      .json({type: 'about:blank', title: 'Bad Request', status: 400, detail: 'Insufficient points'});
 
   mockUserPoints.points -= reward.points;
   mockRewards[rewardIndex].available -= 1;
