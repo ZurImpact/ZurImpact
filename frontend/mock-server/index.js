@@ -261,14 +261,19 @@ app.get(BASE_URL + '/vouchers', (req, res) => {
 
 app.post(BASE_URL + '/vouchers/:voucherId/redeem', (req, res) => {
   const ctx = currentUserFromReq(req);
-  if (!ctx) return res.status(401).json({message: 'Not authenticated'});
+  const ctx = currentUserFromReq(req);
+  if (!ctx)
+    return res.status(401).json({type: 'about:blank', title: 'Unauthorized', status: 401, detail: 'not_authenticated'});
 
   const voucherId = req.params.voucherId;
   const rewardIndex = mockRewards.findIndex((r) => String(r.id) === String(voucherId));
-  if (rewardIndex === -1) return res.status(404).json('Voucher not found');
+  if (rewardIndex === -1)
+    return res.status(404).json({type: 'about:blank', title: 'Not Found', status: 404, detail: 'Voucher not found'});
   const reward = mockRewards[rewardIndex];
-  if (reward.available <= 0) return res.status(400).json('No more vouchers available');
-  if (mockUserPoints.points < reward.points) return res.status(400).json('Not enough points');
+  if (reward.available <= 0)
+    return res.status(400).json({type: 'about:blank', title: 'Bad Request', status: 400, detail: 'No codes available'});
+  if (mockUserPoints.points < reward.points)
+    return res.status(400).json({type: 'about:blank', title: 'Bad Request', status: 400, detail: 'Insufficient points'});
 
   mockUserPoints.points -= reward.points;
   mockRewards[rewardIndex].available -= 1;
