@@ -1,9 +1,9 @@
 import type {APIRequestContext} from '@playwright/test';
 
 // Hit the mock server directly rather than via the Vite proxy.
-// The proxy strips `/backend_war_exploded`, but the mock server registers all
-// routes under that prefix, so proxied requests would 404. Test-only endpoints
-// only exist on the mock anyway — there's no real-backend equivalent.
+// In real-backend mode, Vite strips `/backend_war_exploded` so both Tomcat layouts work.
+// In mock mode (`VITE_USE_MOCK=1`), the proxy keeps the prefix because the mock registers
+// routes under `/backend_war_exploded/api`. Test-only endpoints also only exist on the mock.
 const MOCK_BASE = 'http://localhost:4000/backend_war_exploded/api';
 const RESET_URL = `${MOCK_BASE}/_test/reset`;
 const DEV_TOKENS_URL = `${MOCK_BASE}/auth/dev-tokens`;
