@@ -83,8 +83,9 @@ export function ProfilePage() {
       await updateCurrentUserName({newUsername: values.username});
       await dispatch(fetchCurrentUser());
       setNameUpdateMessage(t('profile.updateName.success'));
-    } catch {
-      setNameUpdateError(t('profile.updateName.errorGeneric'));
+    } catch (error) {
+      const detail = (error as {response?: {data?: {detail?: string}}})?.response?.data?.detail;
+      setNameUpdateError(detail ?? t('profile.updateName.errorGeneric'));
     }
   };
 
