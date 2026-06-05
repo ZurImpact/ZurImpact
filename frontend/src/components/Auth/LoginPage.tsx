@@ -9,7 +9,7 @@ import {Input} from '../ui/input';
 import {Button} from '../ui/button';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {loginUser, resetAuthOp} from '../../store/slices/AuthSlice';
-import {fetchCurrentUser} from '../../store/slices/UserSlice';
+import {fetchCurrentUser, logout} from '../../store/slices/UserSlice';
 import {loginSchema, type LoginInput} from '../../lib/validation/authSchemas';
 import {ROUTES} from '../../routes';
 
@@ -31,10 +31,19 @@ export function LoginPage() {
   });
 
   useEffect(() => {
+    // If the user arrived here via a forced logout (e.g. password change),
+    // clear local auth state on mount. Doing this in ChangePasswordForm
+    // before navigate races with ProtectedRoute: the still-mounted /profile
+    // re-renders unauthenticated and Navigates to /login with
+    // {from: '/profile'}, overwriting our {reason} state and stranding the
+    // user on /profile after re-login.
+    if (locationState?.reason === 'password_changed') {
+      dispatch(logout());
+    }
     return () => {
       dispatch(resetAuthOp('login'));
     };
-  }, [dispatch]);
+  }, [dispatch, locationState?.reason]);
 
   const onSubmit = async (values: LoginInput) => {
     const result = await dispatch(loginUser(values));

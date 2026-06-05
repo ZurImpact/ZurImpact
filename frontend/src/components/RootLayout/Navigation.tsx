@@ -118,6 +118,7 @@ export const Navigation = () => {
     if (!isAuthenticated) return null;
     return (
       <div
+        data-testid="user-points"
         className={`flex items-center gap-2 px-3 py-1 bg-brand-container border border-brand rounded-full shrink-0 whitespace-nowrap ${
           mobile ? 'self-start' : ''
         }`}
@@ -129,7 +130,7 @@ export const Navigation = () => {
   };
 
   return (
-    <nav className="bg-background border-b sticky top-0 z-50 shadow-sm">
+    <nav data-testid="app-nav" className="bg-background border-b sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 shrink-0">

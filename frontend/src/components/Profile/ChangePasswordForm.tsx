@@ -9,7 +9,6 @@ import {Input} from '../ui/input';
 import {Button} from '../ui/button';
 import {useAppDispatch, useAppSelector} from '../../store/store';
 import {changePassword, resetAuthOp} from '../../store/slices/AuthSlice';
-import {logout} from '../../store/slices/UserSlice';
 import {changePasswordSchema, type ChangePasswordInput} from '../../lib/validation/authSchemas';
 import {ROUTES} from '../../routes';
 
@@ -40,8 +39,11 @@ export function ChangePasswordForm() {
     );
 
     if (changePassword.fulfilled.match(result)) {
-      // Synchronously clear local auth state before navigating
-      dispatch(logout());
+      // Only navigate here — LoginPage clears the auth state on mount when it
+      // sees reason='password_changed'. Doing logout() here would race with
+      // navigate(): ProtectedRoute on the still-mounted /profile could fire a
+      // redirect to /login with state {from: '/profile'} before our navigate
+      // commits, stranding the user on /profile after they sign back in.
       navigate(ROUTES.login, {replace: true, state: {reason: 'password_changed'}});
     }
   };

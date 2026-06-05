@@ -8,7 +8,10 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    lng: 'en',
+    // No hard-coded `lng` — let LanguageDetector pick from localStorage /
+    // navigator / htmlTag (configured below). Pinning `lng: 'en'` here would
+    // override the detector entirely, which defeats the persisted-language
+    // cache and the supportedLngs config.
     fallbackLng: 'en',
     supportedLngs: ['en', 'de'], //Extend for each supportedLngs
     debug: true,

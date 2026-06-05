@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import {randomBytes} from 'node:crypto';
-import {loadJSON} from './fileManager.ts';
+import {loadJSON} from './fileManager.js';
 
 // =============================================================================
 // DEV-ONLY MOCK SERVER — NOT FOR PRODUCTION USE.
@@ -29,7 +29,10 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json());
+// body-parser v2 is strict by default and rejects the literal "null". Axios
+// sends `null` as the body for parameterless POSTs (e.g. /actions/startAction)
+// alongside Content-Type: application/json, which would otherwise 400 here.
+app.use(express.json({strict: false}));
 app.use(cookieParser());
 
 const BASE_URL = '/backend_war_exploded/api';
@@ -67,6 +70,29 @@ users.set(mockCurrentUser.username, {
   ...mockCurrentUser,
   password: 'Password1!',
 });
+
+// Initial snapshot used by /api/_test/reset to restore state between e2e tests.
+const initialUserPoints = mockUserPoints.points;
+const initialRewardAvailability = mockRewards.map((r) => r.available);
+const seedUserSnapshot = JSON.parse(JSON.stringify(mockCurrentUser));
+
+// Seed an admin user so e2e admin-only flows are testable.
+// Only enabled when MOCK_TEST_MODE=1 so the dev experience for non-test users is unchanged.
+const TEST_MODE = process.env.MOCK_TEST_MODE === '1';
+if (TEST_MODE) {
+  const adminUser = {
+    id: 9999,
+    username: 'admin',
+    email: 'admin@example.com',
+    password: 'Password1!',
+    role: 'ROLE_ADMIN',
+    emailVerified: true,
+    points: 9999,
+    address: null,
+    createdAt: '2024-01-01T00:00:00Z',
+  };
+  users.set(adminUser.username, adminUser);
+}
 
 // Use crypto.randomBytes for unpredictable IDs/tokens (CodeQL js/insecure-randomness).
 // Even though this is a dev-only server, predictable IDs would make e2e flakes
@@ -168,7 +194,8 @@ app.put(BASE_URL + '/actions/:id', (req, res) => {
   const idx = mockActions.findIndex((a) => a.id === parseInt(req.params.id));
   if (idx !== -1) {
     mockActions[idx] = {...mockActions[idx], ...req.body};
-    res.json(mockActions[idx]);
+    // Backend returns 204 No Content on successful update.
+    res.status(204).end();
   } else {
     res.status(404).json({error: 'Action not found'});
   }
@@ -177,8 +204,9 @@ app.put(BASE_URL + '/actions/:id', (req, res) => {
 app.delete(BASE_URL + '/actions/:id', (req, res) => {
   const idx = mockActions.findIndex((a) => a.id === parseInt(req.params.id));
   if (idx !== -1) {
-    const deleted = mockActions.splice(idx, 1);
-    res.json(deleted[0]);
+    mockActions.splice(idx, 1);
+    // Backend returns 204 No Content on successful delete.
+    res.status(204).end();
   } else {
     res.status(404).json({error: 'Action not found'});
   }
@@ -221,11 +249,45 @@ app.post(BASE_URL + '/subTasks/completeSubTask', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Rewards
+// Vouchers (rewards)
+//
+// Path matches the real backend's VoucherController (@RequestMapping("/api/vouchers")).
+// Frontend RewardSlice calls GET /vouchers and POST /vouchers/{id}/redeem.
 // ---------------------------------------------------------------------------
 
-app.get(BASE_URL + '/rewards', (req, res) => {
+app.get(BASE_URL + '/vouchers', (req, res) => {
   res.json(mockRewards);
+});
+
+app.post(BASE_URL + '/vouchers/:voucherId/redeem', (req, res) => {
+  const ctx = currentUserFromReq(req);
+  if (!ctx)
+    return res.status(401).json({type: 'about:blank', title: 'Unauthorized', status: 401, detail: 'not_authenticated'});
+
+  const voucherId = req.params.voucherId;
+  const rewardIndex = mockRewards.findIndex((r) => String(r.id) === String(voucherId));
+  if (rewardIndex === -1)
+    return res.status(404).json({type: 'about:blank', title: 'Not Found', status: 404, detail: 'Voucher not found'});
+  const reward = mockRewards[rewardIndex];
+  if (reward.available <= 0)
+    return res.status(400).json({type: 'about:blank', title: 'Bad Request', status: 400, detail: 'No codes available'});
+  if (mockUserPoints.points < reward.points)
+    return res
+      .status(400)
+      .json({type: 'about:blank', title: 'Bad Request', status: 400, detail: 'Insufficient points'});
+
+  mockUserPoints.points -= reward.points;
+  mockRewards[rewardIndex].available -= 1;
+
+  // Shape matches RedemptionResult in frontend/src/store/slices/RewardSlice.ts
+  // (which mirrors backend UserVoucherDto: code, voucherId, displayName, pointsDeducted, assignedAt).
+  res.json({
+    code: `VCHR-${randomBytes(4).toString('hex').toUpperCase()}`,
+    voucherId: Number(voucherId),
+    displayName: reward.title,
+    pointsDeducted: reward.points,
+    assignedAt: new Date().toISOString(),
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -263,56 +325,58 @@ app.get(BASE_URL + '/users/:id', (req, res) => {
   res.status(404).json({error: 'User not found'});
 });
 
-// POST /users/me/username-change — updates the current user's username
-app.post(BASE_URL + '/users/me/username-change', (req, res) => {
+// POST /users/me/name-change — updates the current user's username.
+// Matches backend UserController.changeName which accepts ChangeUsernameRequest{newUsername}.
+app.post(BASE_URL + '/users/me/name-change', (req, res) => {
   const ctx = currentUserFromReq(req);
   if (!ctx) return res.status(401).json({message: 'Not authenticated'});
 
-  const {username} = req.body ?? {};
-  if (!username) {
+  const {newUsername} = req.body ?? {};
+  if (!newUsername || typeof newUsername !== 'string') {
     return res.status(400).json({message: 'invalid_request'});
   }
 
-  if (ctx.user.username === username) {
+  if (ctx.user.username === newUsername) {
     const {password: _pw, ...rest} = ctx.user;
     return res.json({...rest, points: mockUserPoints.points});
   }
 
-  if (users.has(username)) {
+  if (users.has(newUsername)) {
     return res.status(409).json({message: 'username_taken'});
   }
 
   const oldUsername = ctx.user.username;
-  ctx.user.username = username;
+  ctx.user.username = newUsername;
   users.delete(oldUsername);
-  users.set(username, ctx.user);
+  users.set(newUsername, ctx.user);
 
   const {password: _pw, ...rest} = ctx.user;
   res.json({...rest, points: mockUserPoints.points});
 });
 
-// POST /users/me/email-change — updates the current user's email
+// POST /users/me/email-change — updates the current user's email.
+// Matches backend UserController.changeEmail which accepts ChangeEmailRequest{newEmail}.
 app.post(BASE_URL + '/users/me/email-change', (req, res) => {
   const ctx = currentUserFromReq(req);
   if (!ctx) return res.status(401).json({message: 'Not authenticated'});
 
-  const {email} = req.body ?? {};
-  if (!email) {
+  const {newEmail} = req.body ?? {};
+  if (!newEmail || typeof newEmail !== 'string') {
     return res.status(400).json({message: 'invalid_request'});
   }
 
-  if (ctx.user.email === email) {
+  if (ctx.user.email === newEmail) {
     const {password: _pw, ...rest} = ctx.user;
     return res.json({...rest, points: mockUserPoints.points});
   }
 
   for (const u of users.values()) {
-    if (u.email === email && u.id !== ctx.user.id) {
-      return res.status(409).json({message: 'email_taken'});
+    if (u.email === newEmail && u.id !== ctx.user.id) {
+      return res.status(409).json({message: 'email_in_use'});
     }
   }
 
-  ctx.user.email = email;
+  ctx.user.email = newEmail;
   ctx.user.emailVerified = false;
 
   const {password: _pw, ...rest} = ctx.user;
@@ -342,8 +406,9 @@ app.post(BASE_URL + '/users/me/password-change', (req, res) => {
   res.status(204).end();
 });
 
-// DELETE /users/me — deletes the current user's profile and revokes all sessions
-app.delete(BASE_URL + '/users/me', (req, res) => {
+// POST /users/me/delete-account — deletes the current user's profile and revokes all sessions.
+// Matches backend UserController.deleteAccount.
+app.post(BASE_URL + '/users/me/delete-account', (req, res) => {
   const ctx = currentUserFromReq(req);
   if (!ctx) return res.status(401).json({message: 'Not authenticated'});
 
@@ -353,30 +418,7 @@ app.delete(BASE_URL + '/users/me', (req, res) => {
 
   users.delete(ctx.user.username);
   clearSessionCookie(res);
-  res.status(204).end();
-});
-
-app.post(BASE_URL + '/users/redemptions', (req, res) => {
-  const {userId, voucherId} = req.query;
-  if (!userId || !voucherId) {
-    return res.status(400).json({error: 'userId and voucherId are required'});
-  }
-  const rewardIndex = mockRewards.findIndex((r) => r.id === voucherId);
-  if (rewardIndex === -1) return res.status(404).json({error: 'Reward not found'});
-  const reward = mockRewards[rewardIndex];
-  if (reward.available <= 0) return res.status(400).json({error: 'No more rewards available'});
-  if (mockUserPoints.points < reward.points) return res.status(400).json({error: 'Not enough points'});
-
-  mockUserPoints.points -= reward.points;
-  mockRewards[rewardIndex].available -= 1;
-  const voucherCode = `VCHR-${Date.now().toString(36).toUpperCase()}`;
-
-  res.json({
-    success: true,
-    message: 'Voucher redeemed successfully',
-    remainingPoints: mockUserPoints.points,
-    voucherCode,
-  });
+  res.status(200).json({message: 'Account deleted successfully'});
 });
 
 // ---------------------------------------------------------------------------
@@ -436,6 +478,18 @@ app.post(BASE_URL + '/auth/verify-email', (req, res) => {
   res.status(400).json({message: 'invalid_token'});
 });
 
+// POST /auth/verify-email-change — finalises an email-change request.
+//
+// The current mock email-change flow updates the email immediately and does
+// NOT mint a verify token, so this endpoint exists only to back the FE's
+// rejection UI: any token submitted here is invalid. When the real backend's
+// tokenised flow is wired up, replace this with proper token tracking.
+app.post(BASE_URL + '/auth/verify-email-change', (req, res) => {
+  const {token} = req.body ?? {};
+  if (!token) return res.status(400).json({message: 'invalid_token'});
+  res.status(400).json({message: 'invalid_token'});
+});
+
 // POST /auth/resend-verification — anti-enumeration: always 204
 app.post(BASE_URL + '/auth/resend-verification', (req, res) => {
   const {email} = req.body ?? {};
@@ -460,7 +514,13 @@ app.post(BASE_URL + '/auth/login', (req, res) => {
     return res.status(401).json({message: 'invalid_credentials'});
   }
   if (!user.emailVerified) {
-    return res.status(403).json({message: 'email_not_verified'});
+    // RFC 9457 problem-detail shape — the FE branches on `detail`, not `message`.
+    return res.status(403).json({
+      type: 'about:blank',
+      title: 'Forbidden',
+      status: 403,
+      detail: 'email_not_verified',
+    });
   }
   const sid = newSessionId();
   sessions.set(sid, {userId: user.id});
@@ -550,6 +610,48 @@ app.post(BASE_URL + '/auth/password-reset/confirm', (req, res) => {
   }
   res.status(400).json({message: 'invalid_token'});
 });
+
+// ---------------------------------------------------------------------------
+// Test-only endpoints — gated behind MOCK_TEST_MODE=1.
+//
+// Used by the Playwright suite to restore deterministic state between specs:
+//   - Restores the seeded user's points and the rewards' availability counters
+//   - Wipes any registered/throwaway users and active sessions
+// ---------------------------------------------------------------------------
+if (TEST_MODE) {
+  app.post(BASE_URL + '/_test/reset', (req, res) => {
+    sessions.clear();
+    verifyTokens.clear();
+    resetTokens.clear();
+
+    users.clear();
+    users.set(seedUserSnapshot.username, {
+      ...seedUserSnapshot,
+      password: 'Password1!',
+    });
+
+    const adminUser = {
+      id: 9999,
+      username: 'admin',
+      email: 'admin@example.com',
+      password: 'Password1!',
+      role: 'ROLE_ADMIN',
+      emailVerified: true,
+      points: 9999,
+      address: null,
+      createdAt: '2024-01-01T00:00:00Z',
+    };
+    users.set(adminUser.username, adminUser);
+
+    mockUserPoints.points = initialUserPoints;
+    mockRewards.forEach((r, i) => {
+      r.available = initialRewardAvailability[i];
+    });
+
+    clearSessionCookie(res);
+    res.status(204).end();
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Mock server running on http://localhost:${PORT}`);

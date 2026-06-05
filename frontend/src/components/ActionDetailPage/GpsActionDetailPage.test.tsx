@@ -75,7 +75,7 @@ vi.mock('react-router', async () => {
 });
 
 vi.mock('react-leaflet', () => ({
-  MapContainer: ({children}: {children: React.ReactNode}) => <div data-testid="map-container">{children}</div>,
+  MapContainer: ({children}: {children: React.ReactNode}) => <div data-testid="leaflet-map">{children}</div>,
   TileLayer: () => <div data-testid="tile-layer" />,
   Marker: ({children}: {children?: React.ReactNode}) => <div data-testid="marker">{children}</div>,
   Polyline: () => <div data-testid="polyline" />,

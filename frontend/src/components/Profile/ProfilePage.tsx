@@ -211,6 +211,7 @@ export function ProfilePage() {
                     <FormLabel>{t('profile.updateName.nameLabel')}</FormLabel>
                     <FormControl>
                       <Input
+                        data-testid="profile-username-input"
                         type="text"
                         autoComplete="username"
                         placeholder={t('profile.updateName.namePlaceholder')}
@@ -223,6 +224,7 @@ export function ProfilePage() {
               />
 
               <Button
+                data-testid="profile-username-submit"
                 type="submit"
                 className="w-full bg-brand hover:bg-brand/90 text-brand-foreground"
                 disabled={nameForm.formState.isSubmitting}
@@ -280,6 +282,7 @@ export function ProfilePage() {
                     <FormLabel>{t('profile.updateEmail.emailLabel')}</FormLabel>
                     <FormControl>
                       <Input
+                        data-testid="profile-email-input"
                         type="email"
                         autoComplete="email"
                         placeholder={t('profile.updateEmail.emailPlaceholder')}
@@ -292,6 +295,7 @@ export function ProfilePage() {
               />
 
               <Button
+                data-testid="profile-email-submit"
                 type="submit"
                 className="w-full bg-brand hover:bg-brand/90 text-brand-foreground"
                 disabled={emailForm.formState.isSubmitting}
@@ -322,6 +326,7 @@ export function ProfilePage() {
           )}
 
           <Button
+            data-testid="profile-delete-btn"
             variant="destructive"
             className="w-full sm:w-auto"
             onClick={handleDeleteProfile}

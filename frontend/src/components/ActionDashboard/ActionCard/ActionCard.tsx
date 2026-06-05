@@ -29,6 +29,8 @@ export const ActionCard = ({action, onClick}: {action: ActionDto; onClick?: () =
 
   return (
     <Card
+      data-testid="action-card"
+      data-action-id={action.id}
       className="p-6 relative overflow-hidden hover:shadow-lg transition-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       onClick={handleClick}
       onKeyDown={handleKeyDown}

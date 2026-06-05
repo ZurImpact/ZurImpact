@@ -466,6 +466,7 @@ export function GpsActionDetailPage() {
               </Badge>
 
               <Button
+                data-testid="start-action-btn"
                 className="h-12 bg-brand px-5 text-base text-brand-foreground hover:bg-brand/90"
                 onClick={() => setShowStartDialog(true)}
                 disabled={isStartActionDisabled}
@@ -509,6 +510,7 @@ export function GpsActionDetailPage() {
                 {t('gpsActionDetail.cancel')}
               </Button>
               <Button
+                data-testid="confirm-start-action-btn"
                 className="bg-brand text-brand-foreground hover:bg-brand/90"
                 onClick={handleStartAction}
                 disabled={gpsActionDetail.startLoading}
@@ -535,7 +537,7 @@ export function GpsActionDetailPage() {
               </div>
             </div>
 
-            <div className="h-[620px] bg-surface-container/20">
+            <div data-testid="map-container" className="h-[620px] bg-surface-container/20">
               <MapContainer center={mapCenter} zoom={14} style={{height: '100%', width: '100%'}}>
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -662,6 +664,7 @@ export function GpsActionDetailPage() {
 
                   {isDevMode && !checkpoint.isCheckedIn && (
                     <Button
+                      data-testid={`checkpoint-teleport-${checkpoint.id}`}
                       variant="outline"
                       onClick={() => {
                         applyLocalLocation(checkpoint.position[0], checkpoint.position[1]);

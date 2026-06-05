@@ -210,28 +210,26 @@ describe('ChangePasswordForm', () => {
       resolveChangePassword(undefined);
     });
 
-    it('force-logout: clears auth state and navigates to /login with reason=password_changed on success', async () => {
+    it('navigates to /login with reason=password_changed on success (LoginPage clears auth state)', async () => {
       const user = userEvent.setup();
       vi.mocked(userApi.changePassword).mockResolvedValueOnce(undefined);
 
-      const {store} = renderChangePasswordForm();
+      renderChangePasswordForm();
 
       await user.type(screen.getByLabelText(/current password/i), 'OldPassword1!');
       await user.type(screen.getByLabelText(/^new password$/i), 'NewPassword1!');
       await user.type(screen.getByLabelText(/confirm.*password/i), 'NewPassword1!');
       await user.click(screen.getByRole('button', {name: /change password/i}));
 
+      // ChangePasswordForm intentionally does NOT dispatch logout — that would
+      // race with ProtectedRoute and inject from=/profile into the login state.
+      // LoginPage clears auth on mount when it sees reason=password_changed.
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/login', {
           replace: true,
           state: {reason: 'password_changed'},
         });
       });
-
-      // User state must be cleared (isAuthenticated = false, currentUser = null)
-      const userState = store.getState().user;
-      expect(userState.isAuthenticated).toBe(false);
-      expect(userState.currentUser).toBeNull();
     });
   });
 

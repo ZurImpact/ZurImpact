@@ -20,4 +20,13 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // Playwright fixtures expose a `use` callback per fixture. The
+    // react-hooks/rules-of-hooks rule mistakes it for a React Hook call —
+    // disable the rule for e2e files where no React renders.
+    files: ['e2e/**/*.ts'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+    },
+  },
 ]);
