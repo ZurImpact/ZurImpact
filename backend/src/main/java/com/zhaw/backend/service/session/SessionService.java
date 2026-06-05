@@ -37,5 +37,6 @@ public interface SessionService {
      */
     int invalidateAllForUser(Long userId);
 
-    record SessionRecord(Long userId, String username, Role role, Instant expiresAt) {}
+    record SessionRecord(Long userId, String username, Role role, Instant expiresAt) {
+    }
 }

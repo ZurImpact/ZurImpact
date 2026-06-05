@@ -44,7 +44,7 @@ public class SubTaskServiceImpl implements SubTaskService {
     }
 
     @Override
-    public Map<Long, CompletionState> getSubTasksCompletionStatesForUser(Long userId, Long actionId){
+    public Map<Long, CompletionState> getSubTasksCompletionStatesForUser(Long userId, Long actionId) {
         return subTaskDao.findSubTaskCompletionStates(userId, actionId);
     }
 
@@ -56,8 +56,9 @@ public class SubTaskServiceImpl implements SubTaskService {
     @Override
     public boolean completeSubTaskForUser(SubTaskCompletionRequestDto requestDto) {
         return switch (requestDto.getActionType()) {
-            case GPS -> completeGpsSubTaskForUser(requestDto.getUserId(), requestDto.getActionId(), requestDto.getSubTaskId(),
-                    (Double) requestDto.getAdditionalData().get("latitude"), (Double) requestDto.getAdditionalData().get("longitude"));
+            case GPS ->
+                    completeGpsSubTaskForUser(requestDto.getUserId(), requestDto.getActionId(), requestDto.getSubTaskId(),
+                            (Double) requestDto.getAdditionalData().get("latitude"), (Double) requestDto.getAdditionalData().get("longitude"));
             default -> throw new BadRequestException("Unsupported SubTask Type: " + requestDto.getActionType());
         };
     }
@@ -76,7 +77,7 @@ public class SubTaskServiceImpl implements SubTaskService {
         if (gpsActionTask == null) {
             throw new NotFoundException("GPS SubTask not found for ID: " + subtaskId);
         }
-        if(SubTaskValidator.validateGpsSubTask(latitude, longitude, gpsActionTask.getLatitude(), gpsActionTask.getLongitude(), gpsActionTask.getDistanceThresholdLevel().getOffsett())){
+        if (SubTaskValidator.validateGpsSubTask(latitude, longitude, gpsActionTask.getLatitude(), gpsActionTask.getLongitude(), gpsActionTask.getDistanceThresholdLevel().getOffsett())) {
             return subTaskDao.completeSubTaskForUser(userId, actionId, true, subtaskId.toString());
         }
         return false;

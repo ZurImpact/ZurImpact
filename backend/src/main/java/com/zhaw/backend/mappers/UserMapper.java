@@ -7,44 +7,44 @@ import com.zhaw.backend.model.entities.User;
 
 public final class UserMapper {
 
-	private UserMapper() {
-		// utility class
-	}
+    private UserMapper() {
+        // utility class
+    }
 
-	public static UserDto toDto(User entity, boolean hasPendingEmailChange) {
-		if (entity == null) {
-			return null;
-		}
+    public static UserDto toDto(User entity, boolean hasPendingEmailChange) {
+        if (entity == null) {
+            return null;
+        }
 
-		return UserDto.builder()
-				.id(entity.getId())
-				.username(entity.getUsername())
-				.email(entity.getEmail())
-				.passwordHash(entity.getPasswordHash())
-				.address(entity.getAddress())
-				.createdAt(entity.getCreatedAt() == null ? null : entity.getCreatedAt().toString())
-				.points(entity.getPoints())
-				.role(entity.getRole() == null ? null : Role.valueOf(entity.getRole()))
-				.emailVerified(entity.getEmailVerified())
-				.hasPendingEmailChange(hasPendingEmailChange)
-				.build();
-	}
+        return UserDto.builder()
+                .id(entity.getId())
+                .username(entity.getUsername())
+                .email(entity.getEmail())
+                .passwordHash(entity.getPasswordHash())
+                .address(entity.getAddress())
+                .createdAt(entity.getCreatedAt() == null ? null : entity.getCreatedAt().toString())
+                .points(entity.getPoints())
+                .role(entity.getRole() == null ? null : Role.valueOf(entity.getRole()))
+                .emailVerified(entity.getEmailVerified())
+                .hasPendingEmailChange(hasPendingEmailChange)
+                .build();
+    }
 
-	public static UserResponseDto toResponseDto(User entity, boolean hasPendingEmailChange) {
-		if (entity == null) {
-			return null;
-		}
+    public static UserResponseDto toResponseDto(User entity, boolean hasPendingEmailChange) {
+        if (entity == null) {
+            return null;
+        }
 
-		return UserResponseDto.builder()
-				.id(entity.getId())
-				.username(entity.getUsername())
-				.email(entity.getEmail())
-				.address(entity.getAddress())
-				.createdAt(entity.getCreatedAt() == null ? null : entity.getCreatedAt().toString())
-				.points(entity.getPoints())
-				.role(entity.getRole() == null ? null : Role.valueOf(entity.getRole()))
-				.emailVerified(entity.getEmailVerified())
-				.hasPendingEmailChange(hasPendingEmailChange)
-				.build();
-	}
+        return UserResponseDto.builder()
+                .id(entity.getId())
+                .username(entity.getUsername())
+                .email(entity.getEmail())
+                .address(entity.getAddress())
+                .createdAt(entity.getCreatedAt() == null ? null : entity.getCreatedAt().toString())
+                .points(entity.getPoints())
+                .role(entity.getRole() == null ? null : Role.valueOf(entity.getRole()))
+                .emailVerified(entity.getEmailVerified())
+                .hasPendingEmailChange(hasPendingEmailChange)
+                .build();
+    }
 }

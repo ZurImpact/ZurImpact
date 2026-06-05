@@ -64,6 +64,7 @@ public class UserActionHistoryDao {
 
     /**
      * Finds all Actions a user did
+     *
      * @param userId User to search for
      * @return Actions which the user did
      */

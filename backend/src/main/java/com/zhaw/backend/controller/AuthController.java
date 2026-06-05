@@ -1,20 +1,12 @@
 package com.zhaw.backend.controller;
 
-import com.zhaw.backend.exception.BadRequestException;
-import com.zhaw.backend.exception.ConflictException;
-import com.zhaw.backend.exception.ForbiddenException;
-import com.zhaw.backend.exception.NotFoundException;
-import com.zhaw.backend.exception.UnauthorizedException;
+import com.zhaw.backend.exception.*;
 import com.zhaw.backend.model.dto.UserResponseDto;
-import com.zhaw.backend.model.dto.auth.EmailRequest;
-import com.zhaw.backend.model.dto.auth.LoginRequest;
-import com.zhaw.backend.model.dto.auth.PasswordResetConfirmRequest;
-import com.zhaw.backend.model.dto.auth.RegisterRequest;
-import com.zhaw.backend.model.dto.auth.VerifyEmailRequest;
+import com.zhaw.backend.model.dto.auth.*;
 import com.zhaw.backend.security.AuthCookieFilter;
+import com.zhaw.backend.service.UserService;
 import com.zhaw.backend.service.auth.AuthService;
 import com.zhaw.backend.service.session.SessionService;
-import com.zhaw.backend.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,11 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.util.Map;
@@ -173,7 +161,8 @@ public class AuthController {
         return null;
     }
 
-    public record LoginResponse(String username, String role) {}
+    public record LoginResponse(String username, String role) {
+    }
 
     @PostMapping("/verify-email-change")
     public ResponseEntity<Void> verifyEmailChange(@Valid @RequestBody VerifyEmailRequest request) {

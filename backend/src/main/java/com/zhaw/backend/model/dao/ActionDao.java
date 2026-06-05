@@ -49,6 +49,7 @@ public class ActionDao {
 
     /**
      * Finds all actions in regard to filter
+     *
      * @param filter ActionFilterDto with all filter options, if null, no filter is applied and all actions are returned
      * @return List of result
      */
@@ -68,7 +69,7 @@ public class ActionDao {
         return jdbc.query(sql.toString(), ROW_MAPPER, params.toArray());
     }
 
-    public Action findById(Long id){
+    public Action findById(Long id) {
         List<Action> actions = jdbc.query(
                 "SELECT id, description, display_name, points, tags, type, has_subtasks, valid_until, created_on FROM action WHERE id = ?",
                 ROW_MAPPER,
@@ -77,15 +78,15 @@ public class ActionDao {
     }
 
     /**
-     * @param userId id of the user for which the action should be started
-     * @param actionId id of the action which should be started
+     * @param userId    id of the user for which the action should be started
+     * @param actionId  id of the action which should be started
      * @param isSubtask if the action is a subtask
      * @param subtaskId id of the subtask
      * @return true if the action was successfully started, false otherwise
      */
     public boolean startAction(Long userId, Long actionId, Boolean isSubtask, String subtaskId) {
         int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subtask_id) " +
-                                "VALUES (?, ?, ?, ?, ?, ?)",
+                        "VALUES (?, ?, ?, ?, ?, ?)",
                 userId, actionId, CompletionState.IN_PROGRESS.name(), Timestamp.valueOf(java.time.LocalDateTime.now()),
                 isSubtask != null && isSubtask, subtaskId);
         return rows > 0;
@@ -93,16 +94,17 @@ public class ActionDao {
 
     /**
      * Completes an action for a user by updating the corresponding record in the user_action_mapping table to COMPLETED state
-     * @param userId id of the user for which the action should be completed
-     * @param actionId id of the action which should be completed
+     *
+     * @param userId    id of the user for which the action should be completed
+     * @param actionId  id of the action which should be completed
      * @param isSubtask if it is a subtask
      * @param subtaskId subtask id
      * @return true if the action was successfully completed, false otherwise
      */
     public boolean completeAction(Long userId, Long actionId, Boolean isSubtask, String subtaskId) {
         int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subtask_id) " +
-                                "VALUES(?,?,?,?,?,?)",
-                userId,actionId,CompletionState.COMPLETED.name(),Timestamp.valueOf(java.time.LocalDateTime.now()),
+                        "VALUES(?,?,?,?,?,?)",
+                userId, actionId, CompletionState.COMPLETED.name(), Timestamp.valueOf(java.time.LocalDateTime.now()),
                 isSubtask != null && isSubtask, subtaskId);
         return rows > 0;
     }
@@ -147,7 +149,8 @@ public class ActionDao {
 
     /**
      * Deletes the action mapping for a user, effectively deleting the action for that user
-     * @param userId id of the user for which the action should be deleted
+     *
+     * @param userId   id of the user for which the action should be deleted
      * @param actionId id of the action which should be deleted
      * @return true if the action was successfully deleted, false otherwise
      */
@@ -168,19 +171,18 @@ public class ActionDao {
      * @return true if the action is completed, false otherwise
      */
     public boolean isActionCompleted(Long userId, Long actionId) {
-        StringBuilder sql = new StringBuilder(
-                "SELECT COUNT(*) FROM user_action_mapping " +
-                "WHERE user_id = ? AND action_id = ? AND completion_state = ?");
+        String sql = "SELECT COUNT(*) FROM user_action_mapping " +
+                "WHERE user_id = ? AND action_id = ? AND completion_state = ?";
         List<Object> params = new ArrayList<>();
         params.add(userId);
         params.add(actionId);
         params.add(CompletionState.COMPLETED.name());
 
-        Integer count = jdbc.queryForObject(sql.toString(), Integer.class, params.toArray());
+        Integer count = jdbc.queryForObject(sql, Integer.class, params.toArray());
         return count != null && count > 0;
     }
 
-    public int getPointsForAction(Long id){
+    public int getPointsForAction(Long id) {
         Integer points = jdbc.queryForObject("SELECT points FROM action WHERE id = ?", Integer.class, id);
         return points != null ? points : 0;
     }
@@ -188,10 +190,11 @@ public class ActionDao {
 
     /**
      * Adds a text filter to the query, which searches for the text in description and display_name, case-insensitive
-     * @param sql query builder to append the filter to
-     * @param params list of parameters to add the filter values to
+     *
+     * @param sql      query builder to append the filter to
+     * @param params   list of parameters to add the filter values to
      * @param hasWhere indicates if the query already has a WHERE clause, to decide if AND or WHERE should be used
-     * @param text filter text
+     * @param text     filter text
      * @return is where has been used
      */
     private boolean appendTextFilter(StringBuilder sql, List<Object> params, boolean hasWhere, String text) {
@@ -209,11 +212,12 @@ public class ActionDao {
 
     /**
      * Adds equals condition
-     * @param sql query
-     * @param params list of filter to add
+     *
+     * @param sql      query
+     * @param params   list of filter to add
      * @param hasWhere indicates if the query already has a WHERE clause, to decide if AND or WHERE should be used
-     * @param column column that needs to be equaled
-     * @param value value to compare
+     * @param column   column that needs to be equaled
+     * @param value    value to compare
      * @return if where has been used
      */
     private boolean appendEquals(StringBuilder sql, List<Object> params, boolean hasWhere, String column, Object value) {
@@ -236,10 +240,11 @@ public class ActionDao {
 
     /**
      * Filter for tags
-     * @param sql query
-     * @param params tags to be added in the condition
+     *
+     * @param sql      query
+     * @param params   tags to be added in the condition
      * @param hasWhere indicates if the query already has a WHERE clause, to decide if AND or WHERE should be used
-     * @param tags tages to be filtered by
+     * @param tags     tages to be filtered by
      * @return if where has been used
      */
     private boolean appendTagFilter(StringBuilder sql, List<Object> params, boolean hasWhere, List<String> tags) {

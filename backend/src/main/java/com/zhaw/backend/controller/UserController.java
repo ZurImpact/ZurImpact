@@ -10,11 +10,11 @@ import com.zhaw.backend.model.dto.UserResponseDto;
 import com.zhaw.backend.model.dto.auth.ChangeEmailRequest;
 import com.zhaw.backend.model.dto.auth.ChangeUsernameRequest;
 import com.zhaw.backend.model.dto.auth.PasswordChangeRequest;
-import com.zhaw.backend.service.auth.AuthService;
-import com.zhaw.backend.service.auth.EmailChangeTokenService;
 import com.zhaw.backend.security.CurrentUserResolver;
 import com.zhaw.backend.service.UserActionHistoryService;
 import com.zhaw.backend.service.UserService;
+import com.zhaw.backend.service.auth.AuthService;
+import com.zhaw.backend.service.auth.EmailChangeTokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,13 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -119,7 +113,7 @@ public class UserController {
     @Operation(summary = "Change user email", description = "Starts an email change flow; the email only changes after verification.")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> changeEmail(@Valid @RequestBody ChangeEmailRequest request,
-                                     Authentication authentication) {
+                                         Authentication authentication) {
         Long userId = currentUserResolver.userIdOf(authentication);
         if (userId == null) {
             throw new UnauthorizedException("Not authenticated");

@@ -23,6 +23,6 @@ public class SubTask {
     private String displayName;
 
     @Column(name = "action_id", nullable = false)
-    private Long   actionId;
+    private Long actionId;
 
 }

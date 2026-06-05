@@ -7,7 +7,7 @@ import lombok.experimental.SuperBuilder;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = GpsActionTaskDto.class, name = "GPS")
+        @JsonSubTypes.Type(value = GpsActionTaskDto.class, name = "GPS")
 })
 @Getter
 @Setter
@@ -19,5 +19,5 @@ public class SubTaskDto {
     private Long id;
     private String description;
     private String displayName;
-    private Long   actionId;
+    private Long actionId;
 }

@@ -6,11 +6,7 @@ import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ProblemDetail;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -45,19 +41,24 @@ import java.util.UUID;
  * handler here covers {@code @PreAuthorize} denials that surface through the
  * DispatcherServlet instead.
  */
-@Hidden // exclude from springdoc: it cannot introspect ResponseEntityExceptionHandler's inherited handlers and fails /v3/api-docs generation
+@Hidden
+// exclude from springdoc: it cannot introspect ResponseEntityExceptionHandler's inherited handlers and fails /v3/api-docs generation
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    /** Application errors with an explicit status/type/title. */
+    /**
+     * Application errors with an explicit status/type/title.
+     */
     @ExceptionHandler(ApiException.class)
     public ProblemDetail handleApiException(ApiException ex) {
         return problem(ex.getStatus(), ex.getTypeSlug(), ex.getTitle(), ex.getMessage());
     }
 
-    /** {@code @PreAuthorize} / method-security denials reaching the dispatcher. */
+    /**
+     * {@code @PreAuthorize} / method-security denials reaching the dispatcher.
+     */
     @ExceptionHandler(AccessDeniedException.class)
     public ProblemDetail handleAccessDenied(AccessDeniedException ex) {
         log.error("Access denied: ", ex);
@@ -65,7 +66,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 "You do not have permission to perform this action.");
     }
 
-    /** Anything unexpected. Logs the full stack server-side; leaks nothing to the client. */
+    /**
+     * Anything unexpected. Logs the full stack server-side; leaks nothing to the client.
+     */
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUnexpected(Exception ex, HttpServletRequest request) {
         String incidentId = UUID.randomUUID().toString();
@@ -77,7 +80,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return pd;
     }
 
-    /** Bean-validation failures on {@code @Valid @RequestBody} DTOs — adds a field-level {@code errors} array. */
+    /**
+     * Bean-validation failures on {@code @Valid @RequestBody} DTOs — adds a field-level {@code errors} array.
+     */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers,

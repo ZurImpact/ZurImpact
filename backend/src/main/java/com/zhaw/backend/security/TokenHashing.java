@@ -14,16 +14,21 @@ public final class TokenHashing {
 
     private static final SecureRandom RNG = new SecureRandom();
 
-    private TokenHashing() {}
+    private TokenHashing() {
+    }
 
-    /** Returns 32 random bytes hex-encoded (64 chars). */
+    /**
+     * Returns 32 random bytes hex-encoded (64 chars).
+     */
     public static String randomHexToken() {
         byte[] bytes = new byte[32];
         RNG.nextBytes(bytes);
         return HexFormat.of().formatHex(bytes);
     }
 
-    /** SHA-256 of the input, hex-encoded (64 chars). */
+    /**
+     * SHA-256 of the input, hex-encoded (64 chars).
+     */
     public static String sha256Hex(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");

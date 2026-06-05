@@ -9,6 +9,7 @@ public enum DistanceThresholdLevel {
     HARD(5);
 
     private final double offsett;
+
     DistanceThresholdLevel(double offsett) {
         this.offsett = offsett;
     }

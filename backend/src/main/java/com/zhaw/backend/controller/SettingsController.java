@@ -31,5 +31,6 @@ public class SettingsController {
         );
     }
 
-    public record ChangeUsernameRequest(@NotBlank String newUsername) {}
+    public record ChangeUsernameRequest(@NotBlank String newUsername) {
+    }
 }

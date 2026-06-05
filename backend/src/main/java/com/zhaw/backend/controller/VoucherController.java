@@ -1,7 +1,7 @@
 package com.zhaw.backend.controller;
 
-import com.zhaw.backend.model.dto.VoucherDto;
 import com.zhaw.backend.model.dto.UserVoucherDto;
+import com.zhaw.backend.model.dto.VoucherDto;
 import com.zhaw.backend.service.VoucherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

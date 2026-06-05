@@ -42,8 +42,8 @@ public class VoucherCodeDao {
     public Optional<VoucherCode> findAndAssign(Long voucherId, Long userId, LocalDateTime assignedAt) {
         List<VoucherCode> results = jdbc.query(
                 "UPDATE voucher_code SET user_id = ?, assigned_at = ? " +
-                "WHERE id = (SELECT id FROM voucher_code WHERE voucher_id = ? AND user_id IS NULL LIMIT 1 FOR UPDATE SKIP LOCKED) " +
-                "RETURNING id, voucher_id, code, user_id, assigned_at",
+                        "WHERE id = (SELECT id FROM voucher_code WHERE voucher_id = ? AND user_id IS NULL LIMIT 1 FOR UPDATE SKIP LOCKED) " +
+                        "RETURNING id, voucher_id, code, user_id, assigned_at",
                 ROW_MAPPER,
                 userId, Timestamp.valueOf(assignedAt), voucherId);
         return results.stream().findFirst();

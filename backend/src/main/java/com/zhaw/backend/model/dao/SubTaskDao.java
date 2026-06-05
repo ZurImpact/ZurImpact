@@ -49,8 +49,9 @@ public class SubTaskDao {
 
     /**
      * Completes an action for a user by updating the corresponding record in the user_action_mapping table to COMPLETED state
-     * @param userId id of the user for which the action should be completed
-     * @param actionId id of the action which should be completed
+     *
+     * @param userId    id of the user for which the action should be completed
+     * @param actionId  id of the action which should be completed
      * @param isSubtask if it is a subtask
      * @param subTaskId subtask id
      * @return true if the action was successfully completed, false otherwise
@@ -58,14 +59,15 @@ public class SubTaskDao {
     public boolean completeSubTaskForUser(Long userId, Long actionId, Boolean isSubtask, String subTaskId) {
         int rows = jdbc.update("INSERT INTO user_action_mapping (user_id, action_id, completion_state, created_on, is_subtask, subtask_id) " +
                         "VALUES(?,?,?,?,?,?)",
-                userId,actionId, CompletionState.COMPLETED.name(), Timestamp.valueOf(java.time.LocalDateTime.now()),
+                userId, actionId, CompletionState.COMPLETED.name(), Timestamp.valueOf(java.time.LocalDateTime.now()),
                 isSubtask != null && isSubtask, subTaskId);
         return rows > 0;
     }
 
     /**
      * Returns a list of Subtasks and their coresponding CompletionState
-     * @param userId id of the user
+     *
+     * @param userId   id of the user
      * @param actionId id of the parent action
      * @return Map with subtask_id and completion_state for the given user and action
      */
