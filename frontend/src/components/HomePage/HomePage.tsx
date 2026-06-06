@@ -174,7 +174,7 @@ export function HomePage() {
           <h2 className="text-3xl md:text-4xl mb-6 text-brand-foreground">{t('homePage.ctaTitle')}</h2>
           <p className="text-lg text-brand-foreground/80 mb-8">{t('homePage.ctaSubtitle')}</p>
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/dashboard')}
             className="inline-flex items-center gap-2 bg-background text-brand hover:bg-background/80 px-8 py-3 rounded-lg transition-colors"
           >
             {t('homePage.ctaButton')}
