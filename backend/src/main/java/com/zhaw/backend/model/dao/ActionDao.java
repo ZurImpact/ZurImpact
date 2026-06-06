@@ -163,6 +163,10 @@ public class ActionDao {
         return rows > 0;
     }
 
+    public void deleteAllByUserId(Long userId) {
+        jdbc.update("DELETE FROM user_action_mapping WHERE user_id = ?", userId);
+    }
+
     /**
      * Checks if an action has been completed by a user
      *

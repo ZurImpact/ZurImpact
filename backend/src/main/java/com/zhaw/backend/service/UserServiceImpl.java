@@ -4,7 +4,9 @@ import com.zhaw.backend.exception.BadRequestException;
 import com.zhaw.backend.exception.ConflictException;
 import com.zhaw.backend.exception.NotFoundException;
 import com.zhaw.backend.mappers.UserMapper;
+import com.zhaw.backend.model.dao.ActionDao;
 import com.zhaw.backend.model.dao.UserDao;
+import com.zhaw.backend.model.dao.VoucherDao;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
 import com.zhaw.backend.service.auth.EmailChangeTokenService;
@@ -22,10 +24,15 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
+    private final ActionDao actionDao;
+    private final VoucherDao voucherDao;
     private final EmailChangeTokenService emailChangeTokenService;
 
-    public UserServiceImpl(UserDao userDao, EmailChangeTokenService emailChangeTokenService) {
+    public UserServiceImpl(UserDao userDao, ActionDao actionDao, VoucherDao voucherDao,
+                           EmailChangeTokenService emailChangeTokenService) {
         this.userDao = userDao;
+        this.actionDao = actionDao;
+        this.voucherDao = voucherDao;
         this.emailChangeTokenService = emailChangeTokenService;
     }
 
@@ -58,6 +65,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUserById(Long id) {
+        actionDao.deleteAllByUserId(id);
+        voucherDao.unassignVoucherCodesFromUser(id);
         userDao.deleteById(id);
     }
 
