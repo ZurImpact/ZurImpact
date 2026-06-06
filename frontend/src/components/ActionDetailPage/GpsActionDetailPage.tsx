@@ -653,7 +653,8 @@ export function GpsActionDetailPage() {
                     <p className="font-medium">
                       {t('gpsActionDetail.checkpoint')} {checkpoint.index}
                     </p>
-                    <p className="text-sm text-muted-foreground">{checkpoint.displayName}</p>
+                    <p className=" text-sm text-foreground">{checkpoint.displayName}</p>
+                    <p className="text-sm text-muted-foreground">{checkpoint.description}</p>
                   </div>
 
                   <div className="text-right">
