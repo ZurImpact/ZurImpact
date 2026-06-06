@@ -64,7 +64,7 @@ export function HomePage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-150 flex items-center justify-center overflow-hidden">
         <ImageWithFallback
           src="https://images.unsplash.com/photo-1620563092215-0fbc6b55cfc5?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="Zurich cityscape"
@@ -174,7 +174,7 @@ export function HomePage() {
           <h2 className="text-3xl md:text-4xl mb-6 text-brand-foreground">{t('homePage.ctaTitle')}</h2>
           <p className="text-lg text-brand-foreground/80 mb-8">{t('homePage.ctaSubtitle')}</p>
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/dashboard')}
             className="inline-flex items-center gap-2 bg-background text-brand hover:bg-background/80 px-8 py-3 rounded-lg transition-colors"
           >
             {t('homePage.ctaButton')}

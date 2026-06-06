@@ -4,7 +4,9 @@ import com.zhaw.backend.enums.Role;
 import com.zhaw.backend.exception.BadRequestException;
 import com.zhaw.backend.exception.ConflictException;
 import com.zhaw.backend.exception.NotFoundException;
+import com.zhaw.backend.model.dao.ActionDao;
 import com.zhaw.backend.model.dao.UserDao;
+import com.zhaw.backend.model.dao.VoucherDao;
 import com.zhaw.backend.model.dto.UserDto;
 import com.zhaw.backend.model.entities.User;
 import com.zhaw.backend.service.auth.EmailChangeTokenService;
@@ -39,6 +41,12 @@ class UserServiceImplTest {
     private UserDao userDao;
 
     @Mock
+    private ActionDao actionDao;
+
+    @Mock
+    private VoucherDao voucherDao;
+
+    @Mock
     private EmailChangeTokenService emailChangeTokenService;
 
     private UserServiceImpl userService;
@@ -47,7 +55,7 @@ class UserServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userDao, emailChangeTokenService);
+        userService = new UserServiceImpl(userDao, actionDao, voucherDao, emailChangeTokenService);
         sampleUser = new User();
         sampleUser.setId(1L);
         sampleUser.setUsername("testuser");
@@ -211,14 +219,17 @@ class UserServiceImplTest {
     class DeleteUserById {
 
         @Test
-        @DisplayName("delegates to DAO")
+        @DisplayName("deletes action mappings and unassigns vouchers before deleting user")
         void delegatesToDao() {
+            doNothing().when(actionDao).deleteAllByUserId(1L);
+            doNothing().when(voucherDao).unassignVoucherCodesFromUser(1L);
             doNothing().when(userDao).deleteById(1L);
 
             userService.deleteUserById(1L);
 
+            verify(actionDao, times(1)).deleteAllByUserId(1L);
+            verify(voucherDao, times(1)).unassignVoucherCodesFromUser(1L);
             verify(userDao, times(1)).deleteById(1L);
-            verifyNoMoreInteractions(userDao);
         }
     }
 

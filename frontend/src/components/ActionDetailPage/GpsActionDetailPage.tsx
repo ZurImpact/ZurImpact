@@ -428,7 +428,7 @@ export function GpsActionDetailPage() {
           {t('gpsActionDetail.back')}
         </Button>
 
-        <div className="overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-surface-container to-background shadow-xl">
+        <div className="overflow-hidden rounded-3xl border border-border bg-linear-to-br from-surface-container to-background shadow-xl">
           <div className="grid gap-6 p-6 sm:p-8 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-2">
@@ -537,7 +537,7 @@ export function GpsActionDetailPage() {
               </div>
             </div>
 
-            <div data-testid="map-container" className="h-[620px] bg-surface-container/20">
+            <div data-testid="map-container" className="h-155 bg-surface-container/20">
               <MapContainer center={mapCenter} zoom={14} style={{height: '100%', width: '100%'}}>
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -653,7 +653,8 @@ export function GpsActionDetailPage() {
                     <p className="font-medium">
                       {t('gpsActionDetail.checkpoint')} {checkpoint.index}
                     </p>
-                    <p className="text-sm text-muted-foreground">{checkpoint.displayName}</p>
+                    <p className=" text-sm text-foreground">{checkpoint.displayName}</p>
+                    <p className="text-sm text-muted-foreground">{checkpoint.description}</p>
                   </div>
 
                   <div className="text-right">
@@ -684,7 +685,7 @@ export function GpsActionDetailPage() {
 
           <Card className="rounded-3xl border p-6 shadow-lg bg-card">
             <div className="flex items-start gap-3">
-              <Navigation className="mt-0.5 h-5 w-5 flex-shrink-0 text-brand" aria-hidden="true" />
+              <Navigation className="mt-0.5 h-5 w-5 shrink-0 text-brand" aria-hidden="true" />
               <div className="text-sm">
                 <p className="mb-1 font-semibold text-foreground">{t('gpsActionDetail.trackingActive')}</p>
                 <p className="text-muted-foreground">

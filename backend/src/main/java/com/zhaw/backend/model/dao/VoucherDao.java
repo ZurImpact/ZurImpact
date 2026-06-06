@@ -70,6 +70,10 @@ public class VoucherDao {
         jdbc.update("DELETE FROM voucher WHERE id = ?", id);
     }
 
+    public void unassignVoucherCodesFromUser(Long userId) {
+        jdbc.update("UPDATE voucher_code SET user_id = NULL WHERE user_id = ?", userId);
+    }
+
     // ── Private helpers ────────────────────────────────────────────────────────
 
     private Voucher insert(Voucher voucher) {
